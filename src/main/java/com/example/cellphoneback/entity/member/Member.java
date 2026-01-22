@@ -1,6 +1,7 @@
 package com.example.cellphoneback.entity.member;
 
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,9 +11,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberEntity {
+@Entity
+public class Member {
 
+    @Id
     private String id;
+
     private String name;
     private String email;
     private int phoneNumber;
@@ -21,8 +25,4 @@ public class MemberEntity {
     private Role role;
     private LocalDateTime createdAt;
 
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
 }
