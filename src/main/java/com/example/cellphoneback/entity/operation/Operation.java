@@ -15,6 +15,7 @@ public class Operation {
     @Id
     private String id;
 
+    private String koreanName;
     private String productId;
     private String description;
     private double duration;
