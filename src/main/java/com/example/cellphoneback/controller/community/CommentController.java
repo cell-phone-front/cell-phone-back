@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/api/community")
-public class CommunityController {
+public class CommentController {
 
-//    community	POST	/api/community	게시글 작성	planner, worker
-//    community	PUT	/api/community	게시글 수정	planner, worker
-//    community	DELETE	/api/community	게시글 삭제	planner, worker
-//    community	GET	/api/community	게시글 조회	all
+//    community	POST	/api/community/{communityId}	댓글 작성	planner, worker
+//    community	PUT	/api/community/{communityId}	댓글 수정	planner, worker
+//    community	DELETE	/api/community/{communityId}	댓글 삭제	planner, worker
+//    community	GET	/api/community/{communityId}	댓글 조회	all
 }
