@@ -1,10 +1,11 @@
 package com.example.cellphoneback.entity.member;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,11 +19,18 @@ public class Member {
     private String id;
 
     private String name;
+    @Email
     private String email;
-    private int phoneNumber;
+    private String phoneNumber;
     private String dept;
     private String workTeam;
+    @Enumerated(EnumType.STRING)
     private Role role;
-    private LocalDateTime createdAt;
+    private String hireDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 6);
+    }
 
 }
