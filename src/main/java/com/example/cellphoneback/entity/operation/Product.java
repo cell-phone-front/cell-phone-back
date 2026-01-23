@@ -15,7 +15,7 @@ public class Product {
     @Id
     private String id;
 
-    private String brand;
-    private String description;
+    private String variety;
+
 
 }

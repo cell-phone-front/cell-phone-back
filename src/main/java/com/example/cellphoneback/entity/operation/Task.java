@@ -15,6 +15,7 @@ public class Task {
     @Id
     private String id;
 
+    private String koreanName;
     private String operationId;
     private String machineId;
     private String description;
