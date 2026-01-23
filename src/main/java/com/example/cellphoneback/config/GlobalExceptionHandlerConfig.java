@@ -46,6 +46,7 @@ public class GlobalExceptionHandlerConfig {
     // 500 - 그 외 예외 처리는 서버문제
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
+        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
     }
 

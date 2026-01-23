@@ -11,11 +11,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+
+@Component
 @RequiredArgsConstructor
 public class JWTVerifyFilter extends OncePerRequestFilter {
 
@@ -27,7 +31,7 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        return  (uri.startsWith("/api/member/"))
+        return  (uri.equals("/api/member/login"))
                 || method.equals("OPTIONS"); // 메소드 요청이 OPTIONS 라고 오면 필터를 거치지 않겠다.
     }
 
@@ -61,8 +65,12 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
         }
 
         // 인증시에 사용했던 계정의 ID를 설정해서 보냄
-        int subject = Integer.parseInt(jwt.getSubject());
-        request.setAttribute("memberId", subject);
+        String subject = jwt.getSubject();
+
+        Member member = memberRepository.findById(subject).orElseThrow(() -> new NoSuchElementException("직원 정보가 없습니다."));
+
+        //request.setAttribute("memberId", subject);
+        request.setAttribute("member", member);
 
 
         filterChain.doFilter(request,response);
