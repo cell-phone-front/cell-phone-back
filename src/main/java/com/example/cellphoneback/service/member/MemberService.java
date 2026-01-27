@@ -103,7 +103,7 @@ public class MemberService {
                         .filter(e -> !itemIds.contains(e.getId())).toList();
         memberRepository.deleteAll(notContainsMember);
 
-        List<Member> UpsertMembers = items.stream().map(e -> Member.builder()
+        List<Member> upsertMembers = items.stream().map(e -> Member.builder()
                 .id(e.toEntity().getId())
                 .name(e.toEntity().getName())
                 .email(e.toEntity().getEmail())
@@ -112,11 +112,11 @@ public class MemberService {
                 .workTeam(e.toEntity().getWorkTeam())
                 .role(e.toEntity().getRole())
                 .hireDate(e.toEntity().getHireDate()).build()).toList();
-        memberRepository.saveAll(UpsertMembers);
+        memberRepository.saveAll(upsertMembers);
 
         int deleted = notContainsMember.size();
         int updated = saveMember.size() - deleted;
-        int created = UpsertMembers.size() - updated;
+        int created = upsertMembers.size() - updated;
 
         return MemberBulkUpsertResponse.builder()
                 .createMember(created)

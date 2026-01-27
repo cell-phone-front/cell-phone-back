@@ -39,14 +39,13 @@ public class MemberController {
 
     // POST	/api/member/upsert	계정 생성, 수정, 삭제 admin
     @PostMapping("/upsert")
-    public ResponseEntity<MemberBulkUpsertResponse> memberCreate(@RequestBody MemberBulkUpsertRequest request,
+    public ResponseEntity<MemberBulkUpsertResponse> memberUpsert(@RequestBody MemberBulkUpsertRequest request,
                                                                  @RequestAttribute Member member){
 
         MemberBulkUpsertResponse response = memberService.memberBulkUpsertService(member, request);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
 
     // GET /api/member	전체 멤버 조회	admin
     @GetMapping
@@ -56,9 +55,6 @@ public class MemberController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
-
-
 
     // GET /api/member/{memberId}	계정 조회	본인
     @GetMapping("/{memberId}")
