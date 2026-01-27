@@ -21,8 +21,8 @@ public class TaskBulkUpsertRequest {
     static public class Item {
         private String id;
         private String koreanName;
-        private Operation operation;
-        private Machine machine;
+        private String operationId;
+        private String machineId;
         private String description;
 
 
@@ -30,8 +30,6 @@ public class TaskBulkUpsertRequest {
             return Task.builder()
                     .id(this.id)
                     .koreanName(this.koreanName)
-                    .operation(this.operation)
-                    .machine(this.machine)
                     .description(this.description)
                     .build();
         }

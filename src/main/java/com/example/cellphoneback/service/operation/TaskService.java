@@ -8,6 +8,8 @@ import com.example.cellphoneback.dto.response.operation.TaskParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Task;
+import com.example.cellphoneback.repository.operation.MachineRepository;
+import com.example.cellphoneback.repository.operation.OperationRepository;
 import com.example.cellphoneback.repository.operation.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -26,6 +28,8 @@ import java.util.NoSuchElementException;
 @Service
 public class TaskService {
     final TaskRepository taskRepository;
+    private final MachineRepository machineRepository;
+    private final OperationRepository operationRepository;
 
     // POST	/api/operation/task/xls	기계 엑셀 파싱	admin,planner
     public TaskParseResponse taskParseService(Member member, MultipartFile taskFile){
@@ -78,13 +82,14 @@ public class TaskService {
                         .filter(e -> !taskIds.contains(e.getId())).toList();
         taskRepository.deleteAll(notContainsTask);
 
-        List<Task> upsertTask = items.stream().map(e -> Task.builder()
-                .id(e.toEntity().getId())
-                .koreanName(e.toEntity().getKoreanName())
-                .operation(e.toEntity().getOperation())
-                .machine(e.toEntity().getMachine())
-                .description(e.toEntity().getDescription())
-                .build()).toList();
+        List<Task> upsertTask = items.stream().map(e -> {
+            Task task = e.toEntity();
+            task.setOperation(operationRepository.findById(e.getOperationId())
+                    .orElseThrow(() -> new NoSuchElementException("operation Not Found.")));
+            task.setMachine(machineRepository.findById(e.getMachineId())
+                    .orElseThrow(() -> new NoSuchElementException("machine Not Found.")));
+            return task;
+        }).toList();
         taskRepository.saveAll(upsertTask);
 
         int deleted = notContainsTask.size();
