@@ -80,7 +80,7 @@ public ProductBulkUpsertResponse productBulkUpsertService(Member member, Product
     List<Product> UpsertProductList = items.stream()
             .map(e -> Product.builder()
             .id(e.toEntity().getId())
-            .variety(e.getVariety())
+            .variety(e.toEntity().getVariety())
             .build()).toList();
     productRepository.saveAll(UpsertProductList);
 
