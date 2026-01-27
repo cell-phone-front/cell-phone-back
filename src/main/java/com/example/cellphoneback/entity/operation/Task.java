@@ -2,6 +2,8 @@ package com.example.cellphoneback.entity.operation;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 @Getter
@@ -16,8 +18,14 @@ public class Task {
     private String id;
 
     private String koreanName;
-    private String operationId;
-    private String machineId;
+
+    @ManyToOne
+    @JoinColumn (name = "operation_id")
+    private Operation operation;
+
+    @ManyToOne
+    @JoinColumn (name = "machine_id")
+    private Machine machine;
     private String description;
 
 }
