@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 @ControllerAdvice // 모든 컨트롤러에 적용되는 전역 설정 클래스
 public class GlobalExceptionHandlerConfig {
 
-    // 404 - 리소스 없을 때 ( 멤버 없음, 페이지 없음)
+    // 404 - 리소스 없을 때 ( 멤버 없음, 페이지 없음, 파일 내용이 없을 때)
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<?> handleNoSuchElementException(NoSuchElementException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));

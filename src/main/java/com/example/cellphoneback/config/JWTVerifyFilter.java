@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+
 
 
 @Component
@@ -67,7 +67,9 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
         // 인증시에 사용했던 계정의 ID를 설정해서 보냄
         String subject = jwt.getSubject();
 
-        Member member = memberRepository.findById(subject).orElseThrow(() -> new NoSuchElementException("직원 정보가 없습니다."));
+        // 해당 직원이 리스트에 있는지 확인
+        Member member = memberRepository.findById(subject).orElseThrow(() ->
+                new NoSuchElementException("직원 정보가 없습니다."));
 
         //request.setAttribute("memberId", subject);
         request.setAttribute("member", member);
