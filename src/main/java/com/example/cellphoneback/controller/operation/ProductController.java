@@ -1,10 +1,6 @@
 package com.example.cellphoneback.controller.operation;
 
-import com.example.cellphoneback.dto.request.member.MemberBulkUpsertRequest;
 import com.example.cellphoneback.dto.request.operation.ProductBulkUpsertRequest;
-import com.example.cellphoneback.dto.response.member.MemberBulkUpsertResponse;
-import com.example.cellphoneback.dto.response.member.MemberListResponse;
-import com.example.cellphoneback.dto.response.member.MemberParseResponse;
 import com.example.cellphoneback.dto.response.operation.product.ProductBulkUpsertResponse;
 import com.example.cellphoneback.dto.response.operation.product.ProductListResponse;
 import com.example.cellphoneback.dto.response.operation.product.ProductParseResponse;
