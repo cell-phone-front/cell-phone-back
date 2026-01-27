@@ -1,4 +1,4 @@
-package com.example.cellphoneback.controller.simulation;
+package com.example.cellphoneback.controller.operation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("/api/simulation")
-public class SimulationController {
+@RequestMapping("/api/operation")
+public class ProductController {
 }
