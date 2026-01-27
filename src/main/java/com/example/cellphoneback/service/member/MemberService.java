@@ -82,7 +82,7 @@ public class MemberService {
                                 .build();
                 memberXls.add(one);
             }
-            return MemberParseResponse.builder().members(memberXls).build();
+            return MemberParseResponse.builder().memberList(memberXls).build();
 
         } catch (IOException e) {
             throw new RuntimeException("파일 처리 중 오류가 발생했습니다.");

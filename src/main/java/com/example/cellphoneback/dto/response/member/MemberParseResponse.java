@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 public class MemberParseResponse {
-    List<xls> members;
+    List<xls> memberList;
 
     @Getter
     @Builder
