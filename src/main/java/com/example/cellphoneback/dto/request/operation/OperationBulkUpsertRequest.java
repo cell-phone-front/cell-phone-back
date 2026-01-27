@@ -2,6 +2,7 @@ package com.example.cellphoneback.dto.request.operation;
 
 
 import com.example.cellphoneback.entity.operation.Operation;
+import com.example.cellphoneback.entity.operation.Product;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +20,7 @@ public class OperationBulkUpsertRequest {
     static public class Item {
         private String id;
         private String koreanName;
-        private String productId;
+        private Product product;
         private String description;
         private double duration;
 
@@ -28,7 +29,7 @@ public class OperationBulkUpsertRequest {
             return Operation.builder()
                     .id(this.id)
                     .koreanName(this.koreanName)
-                    .productId(this.productId)
+                    .product(this.product)
                     .description(this.description)
                     .duration(this.duration)
                     .build();

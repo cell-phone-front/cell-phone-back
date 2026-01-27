@@ -2,6 +2,8 @@ package com.example.cellphoneback.entity.operation;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 @Getter
@@ -16,7 +18,13 @@ public class Operation {
     private String id;
 
     private String koreanName;
-    private String productId;
+
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+
     private String description;
     private double duration;
 }
