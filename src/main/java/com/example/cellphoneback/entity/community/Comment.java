@@ -1,9 +1,7 @@
 package com.example.cellphoneback.entity.community;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.cellphoneback.entity.member.Member;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -18,7 +16,14 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int communityId;
-    private String memberId;
+    @ManyToOne
+    @JoinColumn(name = "community_id")
+    private Community community;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     private String content;
+
 }
