@@ -39,7 +39,7 @@ public class CommentService {
     }
 
     //    community	PUT	/api/comment/{communityId}/	댓글 수정	planner, worker	pathvariable={communityId}
-    public Comment editComment(Member member, Integer commentId, EditCommentRequest request) {
+    public Comment editComment(Integer communityId, Integer commentId, Member member, EditCommentRequest request) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
@@ -54,7 +54,7 @@ public class CommentService {
     }
 
     //    community	DELETE	/api/comment/{communityId}/	댓글 삭제	planner, worker	pathvariable={communityId}
-    public void deleteComment(Member member, Integer commentId) {
+    public void deleteComment(Integer communityId, Integer commentId, Member member) {
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));

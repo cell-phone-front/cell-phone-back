@@ -39,22 +39,24 @@ public class CommentController {
                 .body(CreateCommentResponse.fromEntity(response));
     }
 
-    // PUT	/api/comment/{communityId}/	댓글 수정	planner, worker	pathvariable={communityId}
-    @PutMapping("/{commentId}")
-    public ResponseEntity<EditCommentResponse> updateComment(@PathVariable Integer commentId,
+    // PUT	/api/comment/{commentId}/	댓글 수정	planner, worker	pathvariable={communityId}
+    @PutMapping("/{communityId}/{commentId}")
+    public ResponseEntity<EditCommentResponse> updateComment(@PathVariable Integer communityId,
+                                                             @PathVariable Integer commentId,
                                                              @RequestAttribute Member member,
                                                              @RequestBody EditCommentRequest request) {
-        Comment response = commentService.editComment(member, commentId, request);
+        Comment response = commentService.editComment(communityId, commentId, member, request);
         return ResponseEntity
                 .status(HttpStatus.OK) //200
                 .body(EditCommentResponse.fromEntity(response));
     }
 
-    //DELETE	/api/comment/{communityId}/	댓글 삭제	planner, worker	pathvariable={communityId}
-    @DeleteMapping("/{commentId}")
-    public ResponseEntity<DeleteCommentResponse> deleteComment(@PathVariable Integer commentId,
+    //DELETE	/api/comment/{commentId}/	댓글 삭제	planner, worker	pathvariable={communityId}
+    @DeleteMapping("/{communityId}/{commentId}")
+    public ResponseEntity<DeleteCommentResponse> deleteComment(@PathVariable Integer communityId,
+                                                               @PathVariable Integer commentId,
                                                                @RequestAttribute Member member) {
-        commentService.deleteComment(member, commentId);
+        commentService.deleteComment(communityId, commentId, member);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200

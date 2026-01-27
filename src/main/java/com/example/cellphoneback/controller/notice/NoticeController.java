@@ -49,7 +49,7 @@ public class NoticeController {
     //3	notice	DELETE	/api/notice	공지사항 삭제	admin, planner
     @DeleteMapping("/{noticeId}")
     public ResponseEntity<DeleteNoticeResponse> deleteNotice(@RequestAttribute Member member,
-                                                             @RequestBody Integer noticeId) {
+                                                             @PathVariable Integer noticeId) {
         noticeService.deleteNotice(member, noticeId);
 
         return ResponseEntity
