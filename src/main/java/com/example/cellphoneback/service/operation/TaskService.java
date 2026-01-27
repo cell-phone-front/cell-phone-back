@@ -81,6 +81,8 @@ public class TaskService {
         List<Task> upsertTask = items.stream().map(e -> Task.builder()
                 .id(e.toEntity().getId())
                 .koreanName(e.toEntity().getKoreanName())
+                .operation(e.toEntity().getOperation())
+                .machine(e.toEntity().getMachine())
                 .description(e.toEntity().getDescription())
                 .build()).toList();
         taskRepository.saveAll(upsertTask);
