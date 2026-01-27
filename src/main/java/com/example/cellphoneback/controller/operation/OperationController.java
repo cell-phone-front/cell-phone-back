@@ -1,13 +1,9 @@
 package com.example.cellphoneback.controller.operation;
 
-import com.example.cellphoneback.dto.request.member.MemberBulkUpsertRequest;
 import com.example.cellphoneback.dto.request.operation.OperationBulkUpsertRequest;
-import com.example.cellphoneback.dto.response.member.MemberBulkUpsertResponse;
-import com.example.cellphoneback.dto.response.member.MemberListResponse;
-import com.example.cellphoneback.dto.response.member.MemberParseResponse;
-import com.example.cellphoneback.dto.response.operation.OperationBulkUpsertResponse;
-import com.example.cellphoneback.dto.response.operation.OperationListResponse;
-import com.example.cellphoneback.dto.response.operation.OperationParseResponse;
+import com.example.cellphoneback.dto.response.operation.Operation.OperationBulkUpsertResponse;
+import com.example.cellphoneback.dto.response.operation.Operation.OperationListResponse;
+import com.example.cellphoneback.dto.response.operation.Operation.OperationParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.operation.OperationService;
 import lombok.RequiredArgsConstructor;

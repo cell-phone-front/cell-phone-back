@@ -1,5 +1,5 @@
 
-package com.example.cellphoneback.dto.response.operation;
+package com.example.cellphoneback.dto.response.operation.Task;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;

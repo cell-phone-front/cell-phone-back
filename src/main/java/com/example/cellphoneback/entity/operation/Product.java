@@ -1,6 +1,8 @@
 package com.example.cellphoneback.entity.operation;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -13,8 +15,10 @@ import lombok.*;
 public class Product {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
+    private String brand;
     private String variety;
 
 

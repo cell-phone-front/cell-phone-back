@@ -2,9 +2,9 @@
 package com.example.cellphoneback.service.operation;
 
 import com.example.cellphoneback.dto.request.operation.TaskBulkUpsertRequest;
-import com.example.cellphoneback.dto.response.operation.TaskBulkUpsertResponse;
-import com.example.cellphoneback.dto.response.operation.TaskListResponse;
-import com.example.cellphoneback.dto.response.operation.TaskParseResponse;
+import com.example.cellphoneback.dto.response.operation.Task.TaskBulkUpsertResponse;
+import com.example.cellphoneback.dto.response.operation.Task.TaskListResponse;
+import com.example.cellphoneback.dto.response.operation.Task.TaskParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Task;
@@ -14,8 +14,6 @@ import com.example.cellphoneback.repository.operation.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -83,11 +81,17 @@ public class TaskService {
         taskRepository.deleteAll(notContainsTask);
 
         List<Task> upsertTask = items.stream().map(e -> {
+            // toEntity() - DTO를 DB에 저장 가능한 Entity로 변환
+            // DTO(e)를 Entity로 변환
+            // task 자체 필드(id, koreanName, description)만 들어가 있음
             Task task = e.toEntity();
+            // DTO가 들고 있는 외래키 값으로 각각 조회하고,
+            // 없으면 에러 내보내고 있으면 task에 세팅을 한다.
             task.setOperation(operationRepository.findById(e.getOperationId())
-                    .orElseThrow(() -> new NoSuchElementException("operation Not Found.")));
+                    .orElseThrow(() -> new NoSuchElementException("operationId 가 없습니다.")));
             task.setMachine(machineRepository.findById(e.getMachineId())
-                    .orElseThrow(() -> new NoSuchElementException("machine Not Found.")));
+                    .orElseThrow(() -> new NoSuchElementException("machineId 가 없습니다.")));
+            // 다 세팅 되었다면 리턴
             return task;
         }).toList();
         taskRepository.saveAll(upsertTask);
