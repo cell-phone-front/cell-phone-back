@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SearchAllCommentResponse {
+    Integer id;
     Integer communityId;
     String memberId;
     String content;
@@ -15,6 +16,7 @@ public class SearchAllCommentResponse {
 
     public static SearchAllCommentResponse fromEntity(Comment comment){
         return SearchAllCommentResponse.builder()
+                .id(comment.getId())
                 .communityId(comment.getCommunity().getId())
                 .memberId(comment.getMember().getId())
                 .content(comment.getContent())
