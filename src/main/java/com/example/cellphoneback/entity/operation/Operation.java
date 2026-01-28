@@ -20,9 +20,7 @@ public class Operation {
     private String koreanName;
 
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private String productId;
 
 
     private String description;
