@@ -1,5 +1,6 @@
 package com.example.cellphoneback.controller.simulation;
 
+import com.example.cellphoneback.service.simulation.SimulationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,28 +12,30 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/simulation")
 public class SimulationController {
+    private final SimulationService simulationService;
 
 //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
     @PostMapping
     public ResponseEntity<?> createSimulation() {
+        simulationService.createSimulation();
         return ResponseEntity.ok().build();
     }
 
 //    simulation	POST	/api/simulation/{simulationId}	시뮬레이션 실행 요청	admin, planner
     @PostMapping("/{simulationId}")
-    public ResponseEntity<?> editSimulationRun() {
+    public ResponseEntity<?> runSimulation(@PathVariable String simulationId) {
         return ResponseEntity.ok().build();
     }
 
 //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
     @DeleteMapping
-    public ResponseEntity<?> deleteSimulationRun() {
+    public ResponseEntity<?> deleteSimulation(@PathVariable String simulationId) {
         return ResponseEntity.ok().build();
     }
 
 //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 단건 조회	admin, planner
     @GetMapping("/{simulationId}/json")
-    public ResponseEntity<?> getSimulation() {
+    public ResponseEntity<?> getSimulation(@PathVariable String simulationId) {
         return ResponseEntity.ok().build();
     }
 
@@ -43,7 +46,7 @@ public class SimulationController {
     }
 //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
     @GetMapping({"/{simulationId}"})
-    public ResponseEntity<?> getSimulationSchedule() {
+    public ResponseEntity<?> getSimulationSchedule(@PathVariable String simulationId) {
         return ResponseEntity.ok().build();
     }
 }
