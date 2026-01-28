@@ -73,7 +73,7 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
     }
 
     List<OperationBulkUpsertRequest.Item> items = request.getOperationList();
-    List<String> itemIds = items.stream().map(e -> e.toEntity().getId()).toList();
+    List<String> itemIds = items.stream().map(e -> e.getId()).toList();
 
     List<Operation> saveOperation = operationRepository.findAll();
     List<Operation> notContainsOperation =
@@ -82,11 +82,11 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
     operationRepository.deleteAll(notContainsOperation);
 
     List<Operation> UpsertOperations = items.stream().map(e -> Operation.builder()
-            .id(e.toEntity().getId())
-            .koreanName(e.toEntity().getKoreanName())
-            .product(e.toEntity().getProduct())
-            .description(e.toEntity().getDescription())
-            .duration(e.toEntity().getDuration())
+            .id(e.getId())
+            .koreanName(e.getKoreanName())
+            .product(e.getProduct())
+            .description(e.getDescription())
+            .duration(e.getDuration())
             .build()).toList();
     operationRepository.saveAll(UpsertOperations);
 

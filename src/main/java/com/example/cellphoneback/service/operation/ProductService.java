@@ -70,7 +70,7 @@ public class ProductService {
         }
         List<ProductBulkUpsertRequest.Item> items = request.getProductList();
         // 아디가 String이 아닌 int 이므로 Integer로 받는다.
-        List<Integer> itemIds = items.stream().map(e -> e.toEntity().getId()).toList();
+        List<Integer> itemIds = items.stream().map(e -> e.getId()).toList();
 
         List<Product> saveProduct = productRepository.findAll();
         List<Product> notContainsProduct =
@@ -82,9 +82,9 @@ public class ProductService {
                 .map(e -> Product.builder()
                         // 파싱하면서 나온 id 값을 넣어서 저장을하면
                         // 아이디가 자동으로 int auto_increment으로 생성 됨
-                        .id(e.toEntity().getId())
-                        .brand(e.toEntity().getBrand())
-                        .variety(e.toEntity().getVariety())
+                        .id(e.getId())
+                        .brand(e.getBrand())
+                        .variety(e.getVariety())
                         .build()).toList();
         productRepository.saveAll(UpsertProductList);
 

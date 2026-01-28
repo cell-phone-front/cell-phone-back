@@ -21,13 +21,5 @@ public class ProductBulkUpsertRequest {
         private String brand;
         private String variety;
 
-
-        public Product toEntity() {
-            return Product.builder()
-                    .id(this.id)
-                    .brand(this.brand)
-                    .variety(this.variety)
-                    .build();
-        }
     }
 }

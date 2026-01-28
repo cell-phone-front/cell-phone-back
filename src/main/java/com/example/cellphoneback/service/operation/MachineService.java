@@ -68,7 +68,7 @@ public class MachineService {
         }
 
         List<MachineBulkUpsertRequest.Item> items = request.getMachineList();
-        List<String> machineIds = items.stream().map(e -> e.toEntity().getId()).toList();
+        List<String> machineIds = items.stream().map(e -> e.getId()).toList();
 
         List<Machine> saveMachine = machineRepository.findAll();
         List<Machine> notContainsMachine =
@@ -77,9 +77,9 @@ public class MachineService {
         machineRepository.deleteAll(notContainsMachine);
 
         List<Machine> upsertMachine = items.stream().map(e -> Machine.builder()
-                .id(e.toEntity().getId())
-                .koreanName(e.toEntity().getKoreanName())
-                .description(e.toEntity().getDescription())
+                .id(e.getId())
+                .koreanName(e.getKoreanName())
+                .description(e.getDescription())
                 .build()).toList();
         machineRepository.saveAll(upsertMachine);
 
