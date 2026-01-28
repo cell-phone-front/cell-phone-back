@@ -12,6 +12,7 @@ public class SearchAllCommunityResponse {
     String title;
     String description;
     java.time.LocalDateTime createdAt;
+    int commentCount;
 
     public static SearchAllCommunityResponse fromEntity(Community community){
         return SearchAllCommunityResponse.builder()
@@ -20,6 +21,7 @@ public class SearchAllCommunityResponse {
                 .title(community.getTitle())
                 .description(community.getDescription())
                 .createdAt(community.getCreatedAt())
+                .commentCount(community.getCommentCount())
                 .build();
     }
 }

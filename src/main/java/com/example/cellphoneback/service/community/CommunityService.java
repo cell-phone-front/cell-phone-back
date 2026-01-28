@@ -6,6 +6,7 @@ import com.example.cellphoneback.dto.request.community.EditCommunityRequest;
 import com.example.cellphoneback.entity.community.Community;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
+import com.example.cellphoneback.repository.community.CommentRepository;
 import com.example.cellphoneback.repository.community.CommunityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 @Service
 public class CommunityService {
     final CommunityRepository communityRepository;
+    final CommentRepository commentRepository;
 
     //    community	POST	/api/community	게시글 작성	planner, worker
     public Community createCommunity(Member member, CreateCommunityRequest request) {
@@ -80,7 +82,15 @@ public class CommunityService {
                     String kw = keyword.trim();
                     return (c.getTitle() != null && c.getTitle().contains(kw)) ||
                             (c.getDescription() != null && c.getDescription().contains(kw));
-                }).toList();
+                })
+                .toList();
+
+
+        // 각 글마다 댓글 수 설정
+        for (Community community : communityList) {
+            long commentCount = commentRepository.countByCommunityId(community.getId());
+            community.setCommentCount((int) commentCount);
+        }
 
         return communityList;
     }
