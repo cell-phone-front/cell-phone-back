@@ -9,6 +9,7 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.repository.operation.OperationRepository;
+import com.example.cellphoneback.repository.operation.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.*;
 @Service
 public class OperationService {
     private final OperationRepository operationRepository;
+    private final ProductRepository productRepository;
 
 //    operation	POST	/api/operation/xls	공정 단계 엑셀 파싱	admin, planner
 public OperationParseResponse operationParseService(Member member, MultipartFile operationFile){
@@ -84,7 +86,7 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
     List<Operation> UpsertOperations = items.stream().map(e -> Operation.builder()
             .id(e.getId())
             .koreanName(e.getKoreanName())
-            .product(e.getProduct())
+            .productId(e.getProductId())
             .description(e.getDescription())
             .duration(e.getDuration())
             .build()).toList();
