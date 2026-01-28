@@ -18,11 +18,7 @@ public class Operation {
     private String id;
 
     private String koreanName;
-
-
-    private String productId;
-
-
+    private int productId;
     private String description;
     private double duration;
 }

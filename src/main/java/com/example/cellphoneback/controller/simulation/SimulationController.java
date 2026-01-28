@@ -19,7 +19,7 @@ public class SimulationController {
     }
 
 //    simulation	POST	/api/simulation/{simulationId}	시뮬레이션 실행 요청	admin, planner
-    @PostMapping
+    @PostMapping("/{simulationId}")
     public ResponseEntity<?> editSimulationRun() {
         return ResponseEntity.ok().build();
     }

@@ -86,7 +86,7 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
     List<Operation> UpsertOperations = items.stream().map(e -> Operation.builder()
             .id(e.getId())
             .koreanName(e.getKoreanName())
-            .productId(e.getProductId())
+            .productId(Integer.parseInt(e.getProductId()))
             .description(e.getDescription())
             .duration(e.getDuration())
             .build()).toList();
