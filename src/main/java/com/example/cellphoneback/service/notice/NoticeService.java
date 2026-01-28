@@ -63,7 +63,7 @@ public class NoticeService {
     }
 
     //4	notice	GET	/api/notice	전체 공지사항 조회	all
-    public List<Notice> searchAllNotice(String keyword) {
+    public List<Notice> searchAllNotice(Member member, String keyword) {
 
         List<Notice> notices = noticeRepository.findAll();
 

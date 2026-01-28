@@ -59,11 +59,12 @@ public class NoticeController {
 
     //4	notice	GET	/api/notice	공지사항 조회	all
     @GetMapping
-    public ResponseEntity<List<SearchAllNoticeResponse>> getNotice(@RequestParam(required = false) String keyword) {
-        List<Notice> response = noticeService.searchAllNotice(keyword);
+    public ResponseEntity<List<SearchAllNoticeResponse>> getNotice(@RequestAttribute Member member,
+                                                                   @RequestParam(required = false) String keyword) {
+        List<Notice> response = noticeService.searchAllNotice(member, keyword);
 
         List<SearchAllNoticeResponse> responseList = response.stream()
-                .map(SearchAllNoticeResponse::fromEntity)
+                .map(n -> SearchAllNoticeResponse.fromEntity(member, n))
                 .collect(Collectors.toList());
 
         return ResponseEntity
