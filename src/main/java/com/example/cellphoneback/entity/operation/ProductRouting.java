@@ -14,8 +14,8 @@ public class ProductRouting {
     @Id
     public String id;
     public String name;
-    public String product_id;
-    public String operation_id;
-    public int operation_seq;
+    public String productId;
+    public String operationId;
+    public int operationSeq;
     public String description;
 }
