@@ -62,17 +62,13 @@ public class CommunityController {
 
     //    community	GET	/api/community	게시글 조회	all
     @GetMapping
-    public ResponseEntity<List<SearchAllCommunityResponse>> searchAllCommunity(@RequestParam(required = false) String keyword) {
+    public ResponseEntity<SearchAllCommunityResponse> searchAllCommunity(@RequestParam(required = false) String keyword) {
 
-        List<Community> response = communityService.searchAllCommunity(keyword);
-
-        List<SearchAllCommunityResponse> responseList = response.stream()
-                .map(SearchAllCommunityResponse::fromEntity)
-                .collect(Collectors.toList());
+        SearchAllCommunityResponse response = communityService.searchAllCommunity(keyword);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200
-                .body(responseList);
+                .body(response);
     }
 
     // community	GET	/api/community/{communityId}	해당 게시글 조회	all
@@ -84,16 +80,5 @@ public class CommunityController {
         return ResponseEntity
                 .status(HttpStatus.OK) //201
                 .body(SearchCommunityByIdResponse.fromEntity(response));
-    }
-
-    // community	GET	/api/community/{communityId}/comment-count	댓글 수 조회	all	pathvariable={commentId}
-    @GetMapping("/{communityId}/comment-count")
-    public ResponseEntity<CommentCountResponse> commentCount(@PathVariable Integer communityId) {
-
-        Community response = communityService.commentCount(communityId);
-
-        return ResponseEntity
-                .status(HttpStatus.OK) //201
-                .body(CommentCountResponse.fromEntity(response));
     }
 }
