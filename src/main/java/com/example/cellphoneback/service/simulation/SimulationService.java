@@ -8,6 +8,7 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.simulation.Simulation;
 import com.example.cellphoneback.entity.simulation.SimulationProduct;
+import com.example.cellphoneback.entity.simulation.SimulationSchedule;
 import com.example.cellphoneback.repository.operation.MachineRepository;
 import com.example.cellphoneback.repository.operation.OperationRepository;
 import com.example.cellphoneback.repository.operation.ProductRepository;
@@ -28,9 +29,9 @@ public class SimulationService {
     private final OperationRepository operationRepository;
     private final ProductRepository productRepository;
     private final SimulationScheduleRepository simulationScheduleRepository;
-    private final SimulationProductRepository  simulationProductRepository;
+    private final SimulationProductRepository simulationProductRepository;
 
-//    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
+    //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
     public CreateSimulationResponse createSimulation(Member member, CreateSimulationRequest request) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 생성 권한이 없습니다.");
@@ -57,22 +58,38 @@ public class SimulationService {
     }
 
 
-
-
-
     //    simulation	POST	/api/{simulationId}/simulation	시뮬레이션 실행 요청	admin, planner
     public void runSimulation(Member member, String simulationId) {
+
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 실행 요청 권한이 없습니다.");
         }
-//        Simulation simulation = simulationRepository.findById(simulationId)
-//                .orElseThrow(()-> new IllegalArgumentException("해당 시뮬레이션이 존재하지 않습니다."));
-//
-//        RestClient restClient = RestClient.create();
-//
-//        SolveApiResult result =
-//                restClient.post().uri("http://localhost:5000/api/solve").body(simulation).retrieve().body(SolveApiResult.class)
+        Simulation simulation = simulationRepository.findById(simulationId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 시뮬레이션이 존재하지 않습니다."));
 
+        RestClient restClient = RestClient.create();
+
+//        SolveApiResult result = restClient.post()
+//                .uri("http://localhost:5000/api/solve")
+//                .body(simulation).
+//                retrieve()
+//                .body(SolveApiResult.class);
+//
+//        simulation.setStatus(result.getStatus());
+//        simulation.setWorkTime(result.getMakespan());
+//        simulationRepository.save(simulation);
+//
+//        List<SimulationSchedule> scheduleList = result.getSchedules().stream().map(one -> {
+//            return SimulationSchedule.builder().simulation(simulation)
+//                    .task(taskRepository.findById(one.getTaskId()).orElseThrow())
+//                    .startAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getStart()))
+//                    .endAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getEnd()))
+//                    .build();
+//        }).toList();
+//
+//        simulationScheduleRepository.saveAll(scheduleList);
+//
+//        return
 
     }
 
