@@ -1,5 +1,6 @@
 package com.example.cellphoneback.entity.simulation;
 
+import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.entity.operation.Product;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,10 @@ public class SimulationProduct {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "operation_id")
+    private Operation operation;
 
 
 }

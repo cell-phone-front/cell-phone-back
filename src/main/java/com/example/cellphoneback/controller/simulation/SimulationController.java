@@ -49,7 +49,7 @@ public class SimulationController {
     public ResponseEntity<?> getSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) {
         simulationService.getSimulation(member, simulationId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(simulationId);
     }
 
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
