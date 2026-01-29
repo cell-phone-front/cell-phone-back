@@ -3,11 +3,14 @@ package com.example.cellphoneback.service.community;
 
 import com.example.cellphoneback.dto.request.community.CreateCommunityRequest;
 import com.example.cellphoneback.dto.request.community.EditCommunityRequest;
+import com.example.cellphoneback.dto.response.community.SearchAllCommunityResponse;
+import com.example.cellphoneback.dto.response.community.SearchCommunityByIdResponse;
 import com.example.cellphoneback.entity.community.Community;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.repository.community.CommentRepository;
 import com.example.cellphoneback.repository.community.CommunityRepository;
+import com.example.cellphoneback.repository.notice.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +32,10 @@ public class CommunityService {
 
         Community community = request.toEntity();
         community.setMember(member);
+        community.setCommentCount(0);
+        communityRepository.save(community);
 
-        return communityRepository.save(community);
+        return community;
     }
 
     //    community	PUT	/api/community	게시글 수정	planner, worker
@@ -64,7 +69,9 @@ public class CommunityService {
     }
 
     //    community	GET	/api/community	게시글 전체 조회	all
-    public List<Community> searchAllCommunity(String keyword) {
+    public SearchAllCommunityResponse searchAllCommunity(String keyword) {
+
+        long totalCommunityCount = communityRepository.count();
 
         List<Community> communities = communityRepository.findAll();
 
@@ -73,7 +80,7 @@ public class CommunityService {
         }
 
         // 정렬 - 최신순/검색
-        List<Community> communityList = communities.stream()
+        List<SearchCommunityByIdResponse> communityList = communities.stream()
                 .sorted(Comparator.comparing(Community::getCreatedAt).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
@@ -83,16 +90,13 @@ public class CommunityService {
                     return (c.getTitle() != null && c.getTitle().contains(kw)) ||
                             (c.getDescription() != null && c.getDescription().contains(kw));
                 })
+                .map(SearchCommunityByIdResponse::fromEntity)
                 .toList();
 
-
-        // 각 글마다 댓글 수 설정
-        for (Community community : communityList) {
-            long commentCount = commentRepository.countByCommunityId(community.getId());
-            community.setCommentCount((int) commentCount);
-        }
-
-        return communityList;
+        return SearchAllCommunityResponse.builder()
+                .totalCount(totalCommunityCount)
+                .communityList(communityList)
+                .build();
     }
 
     // community	GET	/api/community/{communityId}	해당 게시글 조회	all
@@ -103,17 +107,5 @@ public class CommunityService {
 
 
         return community;
-    }
-
-    // community	GET	/api/community/{communityId}/comment-count	댓글 수 조회	all
-    public Community commentCount(Integer communityId) {
-
-        Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
-
-        community.setCommentCount(community.getCommentCount() + 1);
-
-        return community;
-
     }
 }
