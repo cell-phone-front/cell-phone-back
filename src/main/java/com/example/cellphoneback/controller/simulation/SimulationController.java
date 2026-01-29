@@ -3,7 +3,6 @@ package com.example.cellphoneback.controller.simulation;
 import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
 import com.example.cellphoneback.entity.member.Member;
-import com.example.cellphoneback.entity.simulation.Simulation;
 import com.example.cellphoneback.service.simulation.SimulationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
