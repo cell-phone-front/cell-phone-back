@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EditNoticeRequest {
     String title;
-    String description;
+    String content;
 
     public Notice toEntity(Notice notice) {
         return Notice.builder()
                 .title(this.title)
-                .description(this.description)
+                .content(this.content)
                 .build();
     }
 }

@@ -13,12 +13,10 @@ public class OperationParseResponse {
 
     @Getter
     @Builder
-    @JsonPropertyOrder({"id", "koreanName", "productId", "description", "duration"})
+    @JsonPropertyOrder({"id", "name", "description"})
     public static class xls{
         private String id;
-        private String koreanName;
-        private String productId;
+        private String name;
         private String description;
-        private int duration;
     }
 }

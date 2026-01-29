@@ -15,5 +15,5 @@ public class CreateSimulationRequest {
     int requiredStaff;
     LocalDate simulationStartDate;
     List<String> productList;
-    int workTime; //?????
+    int workTime;
 }

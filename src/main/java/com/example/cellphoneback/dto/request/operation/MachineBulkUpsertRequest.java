@@ -17,7 +17,7 @@ public class MachineBulkUpsertRequest {
     @Setter
     static public class Item {
         private String id;
-        private String koreanName;
+        private String name;
         private String description;
 
     }

@@ -78,7 +78,7 @@ public class MachineService {
 
         List<Machine> upsertMachine = items.stream().map(e -> Machine.builder()
                 .id(e.getId())
-                .koreanName(e.getKoreanName())
+                .name(e.getName())
                 .description(e.getDescription())
                 .build()).toList();
         machineRepository.saveAll(upsertMachine);

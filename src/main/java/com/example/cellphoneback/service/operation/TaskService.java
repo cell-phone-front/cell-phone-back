@@ -52,10 +52,11 @@ public class TaskService {
                 TaskParseResponse.xls one =
                         TaskParseResponse.xls.builder()
                                 .id(formatter.formatCellValue(row.getCell(0)))
-                                .koreanName(formatter.formatCellValue(row.getCell(1)))
-                                .operationId(formatter.formatCellValue(row.getCell(2)))
-                                .machineId(formatter.formatCellValue(row.getCell(3)))
-                                .description(formatter.formatCellValue(row.getCell(4)))
+                                .operationId(formatter.formatCellValue(row.getCell(1)))
+                                .machineId(formatter.formatCellValue(row.getCell(2)))
+                                .name(formatter.formatCellValue(row.getCell(3)))
+                                .duration(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
+                                .description(formatter.formatCellValue(row.getCell(5)))
                                 .build();
                 taskXls.add(one);
             }

@@ -36,7 +36,7 @@ public class MemberService {
         String token = JWT.create()
                 .withSubject(member.getId())
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                //.withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .withIssuer("cellPhone")
                 .sign(Algorithm.HMAC256("phoneKey"));
 

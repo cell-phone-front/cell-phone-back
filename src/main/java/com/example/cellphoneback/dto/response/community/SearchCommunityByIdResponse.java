@@ -12,7 +12,7 @@ public class SearchCommunityByIdResponse {
         Integer id;
         String memberId;
         String title;
-        String description;
+        String content;
         LocalDateTime createdAt;
 
         public static SearchCommunityByIdResponse fromEntity(Community community){
@@ -20,7 +20,7 @@ public class SearchCommunityByIdResponse {
                     .id(community.getId())
                     .memberId(community.getMember().getId())
                     .title(community.getTitle())
-                    .description(community.getDescription())
+                    .content(community.getContent())
                     .createdAt(community.getCreatedAt())
                     .build();
         }

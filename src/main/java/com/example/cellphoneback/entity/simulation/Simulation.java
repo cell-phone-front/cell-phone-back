@@ -23,10 +23,10 @@ public class Simulation {
     private String memberId;
     private String title;
     private String description;
-    private int workTime;
     private int requiredStaff;
     private String status;
     private LocalDate simulationStartDate;
+    private int workTime;
 
     @PrePersist
     public void prePersist() {

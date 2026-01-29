@@ -20,16 +20,18 @@ public class TaskBulkUpsertRequest {
     @Setter
     static public class Item {
         private String id;
-        private String koreanName;
         private String operationId;
         private String machineId;
+        private String name;
+        private int duration;
         private String description;
 
 
         public Task toEntity() {
             return Task.builder()
                     .id(this.id)
-                    .koreanName(this.koreanName)
+                    .name(this.name)
+                    .duration(this.duration)
                     .description(this.description)
                     .build();
         }

@@ -15,8 +15,9 @@ public class ProductParseResponse {
     @Builder
     @JsonPropertyOrder({"id", "brand", "variety"})
     public static class xls{
-        private int id;
+        private String id;
         private String brand;
-        private String variety;
+        private String name;
+        private String description;
     }
 }

@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 public class CreateCommunityResponse {
 
     String title;
-    String description;
+    String content;
     LocalDateTime createdAt;
 
     public static CreateCommunityResponse fromEntity(Community community){
         return CreateCommunityResponse.builder()
                 .title(community.getTitle())
-                .description(community.getDescription())
+                .content(community.getContent())
                 .createdAt(community.getCreatedAt())
                 .build();
     }

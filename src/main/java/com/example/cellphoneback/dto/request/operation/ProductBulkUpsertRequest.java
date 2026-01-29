@@ -17,9 +17,9 @@ public class ProductBulkUpsertRequest {
     @Getter
     @Setter
     static public class Item {
-        private int id;
+        private String id;
         private String brand;
-        private String variety;
-
+        private String name;
+        private String description;
     }
 }

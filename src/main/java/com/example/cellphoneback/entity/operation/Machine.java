@@ -15,7 +15,7 @@ public class Machine {
     @Id
     private String id;
 
-    private String koreanName;
+    private String name;
     private String description;
 
 }

@@ -49,7 +49,7 @@ public class CommunityService {
 
 
         community.setTitle(request.getTitle());
-        community.setDescription(request.getDescription());
+        community.setContent(request.getContent());
 
         return communityRepository.save(community);
     }
@@ -88,7 +88,7 @@ public class CommunityService {
 
                     String kw = keyword.trim();
                     return (c.getTitle() != null && c.getTitle().contains(kw)) ||
-                            (c.getDescription() != null && c.getDescription().contains(kw));
+                            (c.getContent() != null && c.getContent().contains(kw));
                 })
                 .map(SearchCommunityByIdResponse::fromEntity)
                 .toList();

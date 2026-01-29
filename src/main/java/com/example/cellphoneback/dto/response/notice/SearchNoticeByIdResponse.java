@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 public class SearchNoticeByIdResponse {
 
     String title;
-    String description;
+    String content;
     LocalDateTime createdAt;
 
     public static SearchNoticeByIdResponse fromEntity(Notice notice){
         return SearchNoticeByIdResponse.builder()
                 .title(notice.getTitle())
-                .description(notice.getDescription())
+                .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
                 .build();
     }

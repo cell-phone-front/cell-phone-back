@@ -18,13 +18,12 @@ public class SimulationSchedule {
     private int id;
 
     private String simulationId;
+    private String taskId;
     private String plannerId;
     private String workerId;
-    private String operationId;
-
     private LocalDateTime startAt;
     private LocalDateTime endAt;
-    private String aiResult;
+    private String aiSummary;
 
 
 }

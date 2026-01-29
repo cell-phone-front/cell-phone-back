@@ -50,8 +50,10 @@ public class ProductService {
                 // 해당 아이디가 int auto_increment면 엑셀 값을 안 받아도 됨 ( 값이 0으로 들어옴 )
                 ProductParseResponse.xls one =
                         ProductParseResponse.xls.builder()
+                                .id(formatter.formatCellValue(row.getCell(0)))
                                 .brand(formatter.formatCellValue(row.getCell(1)))
-                                .variety(formatter.formatCellValue(row.getCell(2)))
+                                .name(formatter.formatCellValue(row.getCell(2)))
+                                .description(formatter.formatCellValue(row.getCell(3)))
                                 .build();
                 productXls.add(one);
             }
@@ -70,7 +72,7 @@ public class ProductService {
         }
         List<ProductBulkUpsertRequest.Item> items = request.getProductList();
         // 아디가 String이 아닌 int 이므로 Integer로 받는다.
-        List<Integer> itemIds = items.stream().map(e -> e.getId()).toList();
+        List<String> itemIds = items.stream().map(e -> e.getId()).toList();
 
         List<Product> saveProduct = productRepository.findAll();
         List<Product> notContainsProduct =
@@ -84,7 +86,8 @@ public class ProductService {
                         // 아이디가 자동으로 int auto_increment으로 생성 됨
                         .id(e.getId())
                         .brand(e.getBrand())
-                        .variety(e.getVariety())
+                        .name(e.getName())
+                        .description(e.getDescription())
                         .build()).toList();
         productRepository.saveAll(UpsertProductList);
 

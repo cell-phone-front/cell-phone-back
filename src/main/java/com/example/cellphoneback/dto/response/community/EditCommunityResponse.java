@@ -8,12 +8,12 @@ import lombok.Getter;
 @Builder
 public class EditCommunityResponse {
     String title;
-    String description;
+    String content;
 
     public static EditCommunityResponse fromEntity(Community community) {
         return EditCommunityResponse.builder()
                 .title(community.getTitle())
-                .description(community.getDescription())
+                .content(community.getContent())
                 .build();
     }
 }

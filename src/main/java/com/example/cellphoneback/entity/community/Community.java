@@ -23,7 +23,7 @@ public class Community {
     private Member member;
 
     private String title;
-    private String description;
+    private String content;
     private LocalDateTime createdAt;
     private int commentCount;
 

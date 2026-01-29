@@ -2,6 +2,7 @@ package com.example.cellphoneback.controller.simulation;
 
 import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
+import com.example.cellphoneback.dto.response.simulation.GetSimulationResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.simulation.SimulationService;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +49,8 @@ public class SimulationController {
     @GetMapping("/{simulationId}/json")
     public ResponseEntity<?> getSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) {
-        simulationService.getSimulation(member, simulationId);
-        return ResponseEntity.ok().build();
+        GetSimulationResponse response = simulationService.getSimulation(member, simulationId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner

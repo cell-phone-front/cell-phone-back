@@ -23,7 +23,7 @@ public class Notice {
     private Member member;
 
     private String title;
-    private String description;
+    private String content;
     private LocalDateTime createdAt;
     private boolean pinned;
 

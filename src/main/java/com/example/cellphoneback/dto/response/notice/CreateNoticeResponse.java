@@ -13,14 +13,14 @@ public class CreateNoticeResponse {
 
     String memberId;
     String title;
-    String description;
+    String content;
     LocalDateTime createdAt;
 
     public static CreateNoticeResponse fromEntity(Notice notice){
         return CreateNoticeResponse.builder()
                 .memberId(notice.getMember().getId())
                 .title(notice.getTitle())
-                .description(notice.getDescription())
+                .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
                 .build();
     }

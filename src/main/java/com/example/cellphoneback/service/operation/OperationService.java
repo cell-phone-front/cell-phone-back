@@ -53,10 +53,8 @@ public OperationParseResponse operationParseService(Member member, MultipartFile
             OperationParseResponse.xls one =
                     OperationParseResponse.xls.builder()
                             .id(formatter.formatCellValue(row.getCell(0)))
-                            .koreanName(formatter.formatCellValue(row.getCell(1)))
-                            .productId(formatter.formatCellValue(row.getCell(2)))
-                            .description(formatter.formatCellValue(row.getCell(3)))
-                            .duration(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
+                            .name(formatter.formatCellValue(row.getCell(1)))
+                            .description(formatter.formatCellValue(row.getCell(2)))
                             .build();
             operationXls.add(one);
         }
@@ -85,10 +83,8 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
 
     List<Operation> UpsertOperations = items.stream().map(e -> Operation.builder()
             .id(e.getId())
-            .koreanName(e.getKoreanName())
-            .productId(Integer.parseInt(e.getProductId()))
+            .name(e.getName())
             .description(e.getDescription())
-            .duration(e.getDuration())
             .build()).toList();
     operationRepository.saveAll(UpsertOperations);
 

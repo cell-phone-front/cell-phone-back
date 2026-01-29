@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 public class EditNoticeResponse {
 
     String title;
-    String description;
+    String content;
     LocalDateTime createdAt;
 
     public static EditNoticeResponse fromEntity(Notice notice){
         return EditNoticeResponse.builder()
                 .title(notice.getTitle())
-                .description(notice.getDescription())
+                .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
                 .build();
     }

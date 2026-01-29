@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EditCommunityRequest {
     private String title;
-    private String description;
+    private String content;
 
 
     public Community toEntity() {
         return Community.builder()
                 .title(this.title)
-                .description(this.description)
+                .content(this.content)
                 .build();
     }
 }

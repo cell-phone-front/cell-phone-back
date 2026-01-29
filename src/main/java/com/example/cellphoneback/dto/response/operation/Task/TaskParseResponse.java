@@ -15,12 +15,13 @@ public class TaskParseResponse {
 
     @Getter
     @Builder
-    @JsonPropertyOrder({"id", "koreanName", "operationId", "machineId", "description"})
+    @JsonPropertyOrder({"id", "operationId", "machineId", "name", "duration" ,"description"})
     public static class xls {
         private String id;
-        private String koreanName;
         private String operationId;
         private String machineId;
+        private String name;
+        private int duration;
         private String description;
     }
 }

@@ -45,7 +45,7 @@ public class NoticeService {
 
 
         notice.setTitle(request.getTitle());
-        notice.setDescription(request.getDescription());
+        notice.setContent(request.getContent());
 
         return noticeRepository.save(notice);
     }
@@ -85,7 +85,7 @@ public class NoticeService {
 
                     String kw = keyword.trim();
                     return (c.getTitle() != null && c.getTitle().contains(kw)) ||
-                            (c.getDescription() != null && c.getDescription().contains(kw));
+                            (c.getContent() != null && c.getContent().contains(kw));
                 })
                 .map(SearchNoticeByIdResponse::fromEntity)
                 .toList();

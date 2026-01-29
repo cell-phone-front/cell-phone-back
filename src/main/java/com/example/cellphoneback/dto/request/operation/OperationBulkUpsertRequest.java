@@ -17,9 +17,7 @@ public class OperationBulkUpsertRequest {
     @Setter
     static public class Item {
         private String id;
-        private String koreanName;
-        private String productId;
+        private String name;
         private String description;
-        private int duration;
     }
 }
