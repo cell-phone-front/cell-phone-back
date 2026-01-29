@@ -34,8 +34,13 @@ public class CommentService {
         Comment comment = request.toEntity();
         comment.setMember(member);
         comment.setCommunity(community);
+        commentRepository.save(comment);
 
-        return commentRepository.save(comment);
+
+        community.setCommentCount(community.getCommentCount() + 1);
+        communityRepository.save(community);
+
+        return comment;
     }
 
     //    community	PUT	/api/comment/{communityId}/	댓글 수정	planner, worker	pathvariable={communityId}
@@ -59,12 +64,15 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
-
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
             throw new SecurityException("게시글 삭제 권한이 없습니다.");
         }
 
+        Community community = comment.getCommunity();
         commentRepository.delete(comment);
+
+        community.setCommentCount(community.getCommentCount() - 1);
+        communityRepository.save(community);
     }
 
     //    community	GET	/api/comment/{communityId}/	댓글  조회	all	pathvariable={communityId}

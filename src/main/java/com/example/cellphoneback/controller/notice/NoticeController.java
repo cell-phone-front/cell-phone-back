@@ -59,17 +59,13 @@ public class NoticeController {
 
     //4	notice	GET	/api/notice	공지사항 조회	all
     @GetMapping
-    public ResponseEntity<List<SearchAllNoticeResponse>> getNotice(@RequestAttribute Member member,
+    public ResponseEntity<SearchAllNoticeResponse> getNotice(@RequestAttribute Member member,
                                                                    @RequestParam(required = false) String keyword) {
-        List<Notice> response = noticeService.searchAllNotice(member, keyword);
-
-        List<SearchAllNoticeResponse> responseList = response.stream()
-                .map(n -> SearchAllNoticeResponse.fromEntity(member, n))
-                .collect(Collectors.toList());
-
+        SearchAllNoticeResponse response = noticeService.searchAllNotice(member, keyword);
+        
         return ResponseEntity
                 .status(HttpStatus.OK) //200
-                .body(responseList);
+                .body(response);
     }
 
     // 5	notice	GET	/api/notice/{noticeId}	해당 공지사항 조회	all	pathvariable = noticeId

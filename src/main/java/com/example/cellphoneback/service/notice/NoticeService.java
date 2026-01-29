@@ -3,6 +3,8 @@ package com.example.cellphoneback.service.notice;
 
 import com.example.cellphoneback.dto.request.notice.CreateNoticeRequest;
 import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
+import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
+import com.example.cellphoneback.dto.response.notice.SearchNoticeByIdResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.notice.Notice;
@@ -63,7 +65,9 @@ public class NoticeService {
     }
 
     //4	notice	GET	/api/notice	전체 공지사항 조회	all
-    public List<Notice> searchAllNotice(Member member, String keyword) {
+    public SearchAllNoticeResponse searchAllNotice(Member member, String keyword) {
+
+        long totalNoticeCount = noticeRepository.count();
 
         List<Notice> notices = noticeRepository.findAll();
 
@@ -73,7 +77,7 @@ public class NoticeService {
 
 
         // 정렬 - 최신순, 검색
-        List<Notice> noticeList = notices.stream()
+        List<SearchNoticeByIdResponse> noticeList = notices.stream()
                 .sorted(Comparator.comparing(Notice::getCreatedAt).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
@@ -82,10 +86,15 @@ public class NoticeService {
                     String kw = keyword.trim();
                     return (c.getTitle() != null && c.getTitle().contains(kw)) ||
                             (c.getDescription() != null && c.getDescription().contains(kw));
-                }).toList();
+                })
+                .map(SearchNoticeByIdResponse::fromEntity)
+                .toList();
 
 
-        return noticeList;
+        return SearchAllNoticeResponse.builder()
+                .totalNoticeCount(totalNoticeCount)
+                .noticeList(noticeList)
+                .build();
     }
 
     // community	GET	/api/notice/{noticeId}	해당 공지사항 조회	all
