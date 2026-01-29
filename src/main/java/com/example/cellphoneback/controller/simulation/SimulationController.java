@@ -1,5 +1,6 @@
 package com.example.cellphoneback.controller.simulation;
 
+import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.simulation.Simulation;
@@ -20,12 +21,12 @@ public class SimulationController {
 
     //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
     @PostMapping
-    public ResponseEntity<CreateSimulationResponse> createSimulation(@RequestAttribute Member member) {
+    public ResponseEntity<CreateSimulationResponse> createSimulation(@RequestAttribute Member member,
+                                                                     @RequestBody CreateSimulationRequest request) {
 
-        simulationService.createSimulation(member);
+        CreateSimulationResponse response = simulationService.createSimulation(member, request);
 
-        return ResponseEntity
-                .ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     //    simulation	POST	/api/simulation/{simulationId}	시뮬레이션 실행 요청	admin, planner

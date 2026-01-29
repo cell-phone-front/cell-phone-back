@@ -5,7 +5,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,10 +23,16 @@ public class Simulation {
     private String memberId;
     private String title;
     private String description;
-    private double workTime;
+    private int workTime;
     private int requiredStaff;
-    private String aiSummary;
-    private LocalDateTime createdStartAt;
-    private LocalDateTime createdEndAt;
+    private String status;
+    private LocalDate simulationStartDate;
+
+    @PrePersist
+    public void prePersist() {
+        this.id = UUID.randomUUID().toString().substring(0, 6);
+        this.status = "대기중";
+    }
+
 
 }

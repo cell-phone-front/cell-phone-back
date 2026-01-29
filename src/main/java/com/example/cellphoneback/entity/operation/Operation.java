@@ -20,5 +20,5 @@ public class Operation {
     private String koreanName;
     private int productId;
     private String description;
-    private double duration;
+    private int duration;
 }

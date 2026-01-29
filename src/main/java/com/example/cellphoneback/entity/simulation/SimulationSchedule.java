@@ -24,10 +24,7 @@ public class SimulationSchedule {
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
+    private String aiResult;
 
-    @PrePersist
-    public void prePersist() {
-            startAt = LocalDateTime.now();
-    }
 
 }
