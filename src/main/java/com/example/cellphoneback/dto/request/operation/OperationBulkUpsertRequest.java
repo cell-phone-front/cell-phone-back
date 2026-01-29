@@ -20,6 +20,6 @@ public class OperationBulkUpsertRequest {
         private String koreanName;
         private String productId;
         private String description;
-        private double duration;
+        private int duration;
     }
 }

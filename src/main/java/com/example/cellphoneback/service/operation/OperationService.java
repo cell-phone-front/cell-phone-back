@@ -56,7 +56,7 @@ public OperationParseResponse operationParseService(Member member, MultipartFile
                             .koreanName(formatter.formatCellValue(row.getCell(1)))
                             .productId(formatter.formatCellValue(row.getCell(2)))
                             .description(formatter.formatCellValue(row.getCell(3)))
-                            .duration(Double.parseDouble(formatter.formatCellValue(row.getCell(4))))
+                            .duration(Integer.parseInt(formatter.formatCellValue(row.getCell(4))))
                             .build();
             operationXls.add(one);
         }

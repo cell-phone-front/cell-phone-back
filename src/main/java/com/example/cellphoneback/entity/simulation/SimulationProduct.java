@@ -1,9 +1,7 @@
 package com.example.cellphoneback.entity.simulation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.cellphoneback.entity.operation.Product;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -18,8 +16,15 @@ public class SimulationProduct {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String simulationId;
-    private String productId;
+
+    @ManyToOne
+    @JoinColumn(name = "simulation_id")
+    private Simulation simulation;
+
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
 
 }
