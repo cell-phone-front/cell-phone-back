@@ -1,8 +1,10 @@
 package com.example.cellphoneback.entity.operation;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 
+@Entity
 @Getter
 @Setter
 @Builder
