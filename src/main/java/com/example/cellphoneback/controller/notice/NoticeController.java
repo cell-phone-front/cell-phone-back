@@ -80,7 +80,7 @@ public class NoticeController {
     }
 
     // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
-    @PatchMapping("/notices/{noticeId}/pin")
+    @PatchMapping("/{noticeId}/pin")
     public ResponseEntity<Notice> pinNotice(@RequestAttribute Member member,
                                             @PathVariable Integer noticeId) {
         Notice response = noticeService.pinNotice(noticeId, member);
