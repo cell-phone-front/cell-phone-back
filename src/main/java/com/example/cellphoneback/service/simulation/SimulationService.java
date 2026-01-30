@@ -7,6 +7,7 @@ import com.example.cellphoneback.dto.response.simulation.GetSimulationResponse;
 import com.example.cellphoneback.dto.response.simulation.SolveApiResult;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
+import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.entity.simulation.Simulation;
 import com.example.cellphoneback.entity.simulation.SimulationProduct;
 import com.example.cellphoneback.entity.simulation.SimulationSchedule;
@@ -56,8 +57,8 @@ public class SimulationService {
                         .product(productRepository.findById(one).orElseThrow())
                         .build()).toList();
         simulationProductRepository.saveAll(simulationProductList);
-
-        return CreateSimulationResponse.builder().simulation(simulation).build();
+return null;
+//        return CreateSimulationResponse.builder().createSimulationItems(simulation).build();
     }
 
 
@@ -70,9 +71,10 @@ public class SimulationService {
         Simulation simulation = simulationRepository.findById(simulationId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 시뮬레이션이 존재하지 않습니다."));
 
-//        RestClient restClient = RestClient.create();
-//
-//        SolveApiResult result = restClient.post()
+
+
+
+//         SolveApiResult result = restClient.post()
 //                .uri("http://localhost:5000/api/solve")
 //                .body(simulation).
 //                retrieve()

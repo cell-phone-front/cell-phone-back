@@ -1,5 +1,5 @@
 
-package com.example.cellphoneback.dto.response.operation.Machine;
+package com.example.cellphoneback.dto.response.operation.machine;
 
 import com.example.cellphoneback.entity.operation.Machine;
 import lombok.Builder;

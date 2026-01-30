@@ -20,6 +20,6 @@ public class Operation {
     private String description;
 
     @OneToMany(mappedBy = "operation")
-    private List<Task> tasks;
+    private List<Task> taskList;
 
 }

@@ -1,5 +1,6 @@
 package com.example.cellphoneback.entity.operation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -17,6 +18,7 @@ public class ProductRouting {
     public String name;
 
     @ManyToOne
+    @JsonIgnore
     public Product product;
 
     @ManyToOne

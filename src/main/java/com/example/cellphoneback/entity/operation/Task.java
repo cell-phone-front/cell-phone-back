@@ -1,5 +1,6 @@
 package com.example.cellphoneback.entity.operation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -18,11 +19,10 @@ public class Task {
     private String id;
 
     @ManyToOne
-    @JoinColumn (name = "operation_id")
+    @JsonIgnore
     private Operation operation;
 
     @ManyToOne
-    @JoinColumn (name = "machine_id")
     private Machine machine;
 
     private String name;

@@ -1,9 +1,9 @@
 package com.example.cellphoneback.controller.operation;
 
 import com.example.cellphoneback.dto.request.operation.TaskBulkUpsertRequest;
-import com.example.cellphoneback.dto.response.operation.Task.TaskBulkUpsertResponse;
-import com.example.cellphoneback.dto.response.operation.Task.TaskListResponse;
-import com.example.cellphoneback.dto.response.operation.Task.TaskParseResponse;
+import com.example.cellphoneback.dto.response.operation.task.TaskBulkUpsertResponse;
+import com.example.cellphoneback.dto.response.operation.task.TaskListResponse;
+import com.example.cellphoneback.dto.response.operation.task.TaskParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.operation.TaskService;
 import lombok.RequiredArgsConstructor;

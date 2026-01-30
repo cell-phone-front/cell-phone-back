@@ -1,5 +1,5 @@
 
-package com.example.cellphoneback.dto.response.operation.Task;
+package com.example.cellphoneback.dto.response.operation.task;
 
 import lombok.Builder;
 import lombok.Getter;
