@@ -20,8 +20,8 @@ public class Simulation {
     @Id
     private String id;
 
-    @ManyToOne
-    private Member member;
+
+    private String memberId;
     private String title;
     private String description;
     private int requiredStaff;
