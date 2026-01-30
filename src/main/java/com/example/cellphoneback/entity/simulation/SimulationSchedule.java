@@ -2,6 +2,7 @@ package com.example.cellphoneback.entity.simulation;
 
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.operation.Task;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class SimulationSchedule {
     private int id;
 
     @ManyToOne
+    @JsonIgnore
     private Simulation simulation;
 
     @ManyToOne

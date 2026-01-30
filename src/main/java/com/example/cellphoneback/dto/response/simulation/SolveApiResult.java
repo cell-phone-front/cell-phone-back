@@ -13,18 +13,20 @@ public class SolveApiResult {
     private int makespan;
     private String status;
 
-    private List<TaskSchedule> schedules;
+    private List<TaskSchedule> scheduleList;
 
 
     @Setter
     @Getter
     static public class TaskSchedule {
-        @JsonProperty("job_id")
-        private String jobId;
+        @JsonProperty("product_id")
+        private String productId;
         @JsonProperty("task_id")
         private String taskId;
-        @JsonProperty("tool_id")
-        private String tool_id;
+        @JsonProperty("planner_id")
+        private String plannerId;
+        @JsonProperty("worker_id")
+        private String workerId;
 
         private int start;
         private int end;

@@ -2,9 +2,7 @@
 package com.example.cellphoneback.service.simulation;
 
 import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
-import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
-import com.example.cellphoneback.dto.response.simulation.GetSimulationResponse;
-import com.example.cellphoneback.dto.response.simulation.SolveApiResult;
+import com.example.cellphoneback.dto.response.simulation.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Operation;
@@ -15,6 +13,7 @@ import com.example.cellphoneback.repository.member.MemberRepository;
 import com.example.cellphoneback.repository.operation.MachineRepository;
 import com.example.cellphoneback.repository.operation.OperationRepository;
 import com.example.cellphoneback.repository.operation.ProductRepository;
+import com.example.cellphoneback.repository.operation.TaskRepository;
 import com.example.cellphoneback.repository.simulation.SimulationProductRepository;
 import com.example.cellphoneback.repository.simulation.SimulationRepository;
 import com.example.cellphoneback.repository.simulation.SimulationScheduleRepository;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +34,8 @@ public class SimulationService {
     private final SimulationScheduleRepository simulationScheduleRepository;
     private final SimulationProductRepository simulationProductRepository;
     private final MemberRepository memberRepository;
+    private final TaskRepository taskRepository;
+
 
     //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
     public CreateSimulationResponse createSimulation(Member member, CreateSimulationRequest request) {
@@ -42,7 +44,7 @@ public class SimulationService {
         }
         // 시뮬레이션 생성 로직 구현
         Simulation simulation = Simulation.builder()
-                .memberId(member.getId())
+                .member(member)
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .requiredStaff(request.getRequiredStaff())
@@ -58,11 +60,20 @@ public class SimulationService {
                         .build()).toList();
         simulationProductRepository.saveAll(simulationProductList);
 
-        return CreateSimulationResponse.builder().simulation(simulation).build();
+        return CreateSimulationResponse.builder().simulation(CreateSimulationResponse.item.builder()
+                .id(simulation.getId())
+                .memberId(simulation.getMember().getId())
+                .title(simulation.getTitle())
+                .description(simulation.getDescription())
+                .requiredStaff(simulation.getRequiredStaff())
+                .status(simulation.getStatus())
+                .simulationStartDate(simulation.getSimulationStartDate())
+                .productList(simulationProductList.stream().map(sp -> sp.getProduct().getId()).toList())
+                .workTime(simulation.getWorkTime()).build()).build();
     }
 
 
-    //    simulation	POST	/api/{simulationId}/simulation	시뮬레이션 실행 요청	admin, planner
+    //    simulation	POST	/api/simulation/{simulationId}/	시뮬레이션 실행 요청	admin, planner
     public void runSimulation(Member member, String simulationId) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
@@ -71,30 +82,31 @@ public class SimulationService {
         Simulation simulation = simulationRepository.findById(simulationId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 시뮬레이션이 존재하지 않습니다."));
 
+        RestClient restClient = RestClient.create();
 
+        SolveApiResult result = restClient.post()
+                .uri("http://localhost:5000/api/solve")
+                .body(simulation)
+                .retrieve()
+                .body(SolveApiResult.class);
 
+        simulation.setStatus(result.getStatus());
+        simulation.setWorkTime(result.getMakespan());
+        simulationRepository.save(simulation);
 
-//         SolveApiResult result = restClient.post()
-//                .uri("http://localhost:5000/api/solve")
-//                .body(simulation).
-//                retrieve()
-//                .body(SolveApiResult.class);
-//
-//        simulation.setStatus(result.getStatus());
-//        simulation.setWorkTime(result.getMakespan());
-//        simulationRepository.save(simulation);
-//
-//        List<SimulationSchedule> scheduleList = result.getSchedules().stream().map(one -> {
-//            return SimulationSchedule.builder().simulation(simulation)
-//                    .task(taskRepository.findById(one.getTaskId()).orElseThrow())
-//                    .startAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getStart()))
-//                    .endAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getEnd()))
-//                    .build();
-//        }).toList();
-//
-//        simulationScheduleRepository.saveAll(scheduleList);
-//
-//        return
+        List<SimulationSchedule> scheduleList = result.getScheduleList().stream()
+                .map(one -> {
+                    return SimulationSchedule.builder().simulation(simulation)
+                            .task(taskRepository.findById(one.getTaskId()).orElseThrow())
+                            .plannerId(memberRepository.findById(one.getPlannerId()).orElseThrow())
+                            .workerId(memberRepository.findById(one.getWorkerId()).orElseThrow())
+                            .startAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getStart()))
+                            .endAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getEnd()))
+                            .build();
+                }).toList();
+        simulationScheduleRepository.saveAll(scheduleList);
+
+        return;
 
     }
 
@@ -103,6 +115,7 @@ public class SimulationService {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 삭제 권한이 없습니다.");
         }
+
 
     }
 
@@ -116,19 +129,36 @@ public class SimulationService {
     }
 
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
-    public void getAllSimulations(Member member) {
+    public GetAllSimulationResponse getAllSimulations(Member member) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 전체 조회 권한이 없습니다.");
         }
-        // 시뮬레이션 전체 조회 로직 구현
+        List<Simulation> simulationList = simulationRepository.findAllWithMember();
+
+        List<GetAllSimulationResponse.Item> items = simulationList.stream()
+                .map(one -> GetAllSimulationResponse.Item.builder()
+                        .id(one.getId())
+                        .memberName(one.getMember().getName())
+                        .title(one.getTitle())
+                        .description(one.getDescription())
+                        .productCount(one.getSimulationProductList().size())
+                        .requiredStaff(one.getRequiredStaff())
+                        .status(one.getStatus())
+                        .simulationStartDate(one.getSimulationStartDate())
+                        .workTime(one.getWorkTime()).build()).toList();
+
+        return GetAllSimulationResponse.builder().simulationScheduleList(items).build();
     }
 
-    //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
-    public void getSimulationSchedule(Member member, String simulationId) {
+    //    simulation	GET	/api/simulation/{simulationScheduleId}	작업 지시(스케쥴) 조회	admin, planner
+    public GetSimulationScheduleResponse getSimulationSchedule(Member member, int simulationScheduleId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 작업 지시(스케쥴) 조회 권한이 없습니다.");
         }
-        // 작업 지시(스케쥴) 조회 로직 구현
+
+        Optional<SimulationSchedule> simulationSchedule = simulationScheduleRepository.findById(simulationScheduleId);
+
+        return GetSimulationScheduleResponse.builder().simulationSchedule(simulationSchedule).build();
     }
 
 }

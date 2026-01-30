@@ -2,6 +2,7 @@ package com.example.cellphoneback.controller.simulation;
 
 import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
+import com.example.cellphoneback.dto.response.simulation.GetAllSimulationResponse;
 import com.example.cellphoneback.dto.response.simulation.GetSimulationResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.simulation.SimulationService;
@@ -55,16 +56,16 @@ public class SimulationController {
 
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
     @GetMapping
-    public ResponseEntity<?> getAllSimulations(@RequestAttribute Member member) {
-        simulationService.getAllSimulations(member);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<GetAllSimulationResponse> getAllSimulations(@RequestAttribute Member member) {
+        GetAllSimulationResponse response = simulationService.getAllSimulations(member);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
-    @GetMapping({"/{simulationId}"})
+    @GetMapping({"/{simulationScheduleId}"})
     public ResponseEntity<?> getSimulationSchedule(@RequestAttribute Member member,
-                                                   @PathVariable String simulationId) {
-        simulationService.getSimulationSchedule(member, simulationId);
+                                                                          @PathVariable int simulationScheduleId) {
+        simulationService.getSimulationSchedule(member, simulationScheduleId);
         return ResponseEntity.ok().build();
     }
 }

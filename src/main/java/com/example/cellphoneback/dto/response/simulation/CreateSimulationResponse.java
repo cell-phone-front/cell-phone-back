@@ -1,20 +1,45 @@
 
 package com.example.cellphoneback.dto.response.simulation;
 
-import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.simulation.Simulation;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
 public class CreateSimulationResponse {
-    Simulation simulation;
+
+    item simulation;
+
+
+    @Getter
+    @Builder
+    @JsonPropertyOrder({
+            "id",
+            "memberId",
+            "title",
+            "description",
+            "requiredStaff",
+            "status",
+            "simulationStartDate",
+            "productList",
+            "workTime"
+    })
+    public static class item {
+        String id;
+        String memberId;
+        String title;
+        String description;
+        int requiredStaff;
+        String status;
+        LocalDate simulationStartDate;
+        List<String> productList;
+        int workTime;
+    }
 
 }
