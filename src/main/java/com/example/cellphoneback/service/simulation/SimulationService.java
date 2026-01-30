@@ -42,7 +42,7 @@ public class SimulationService {
         }
         // 시뮬레이션 생성 로직 구현
         Simulation simulation = Simulation.builder()
-                .member(memberRepository.findById(member.getId()).orElseThrow())
+                .memberId(member.getId())
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .requiredStaff(request.getRequiredStaff())
@@ -57,8 +57,8 @@ public class SimulationService {
                         .product(productRepository.findById(one).orElseThrow())
                         .build()).toList();
         simulationProductRepository.saveAll(simulationProductList);
-return null;
-//        return CreateSimulationResponse.builder().createSimulationItems(simulation).build();
+
+        return CreateSimulationResponse.builder().simulation(simulation).build();
     }
 
 
