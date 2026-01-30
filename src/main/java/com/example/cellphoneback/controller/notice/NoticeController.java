@@ -60,22 +60,33 @@ public class NoticeController {
     //4	notice	GET	/api/notice	공지사항 조회	all
     @GetMapping
     public ResponseEntity<SearchAllNoticeResponse> getNotice(@RequestAttribute Member member,
-                                                                   @RequestParam(required = false) String keyword) {
+                                                             @RequestParam(required = false) String keyword) {
         SearchAllNoticeResponse response = noticeService.searchAllNotice(member, keyword);
-        
+
         return ResponseEntity
                 .status(HttpStatus.OK) //200
                 .body(response);
     }
 
-    // 5	notice	GET	/api/notice/{noticeId}	해당 공지사항 조회	all	pathvariable = noticeId
+    // 5	notice	GET	/api/notice/{noticeId}	해당 공지사항 조회	all
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@RequestParam Integer noticeId) {
+    public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@PathVariable Integer noticeId) {
 
         Notice response = noticeService.searchNoticeById(noticeId);
 
         return ResponseEntity
-                .status(HttpStatus.OK) //201
+                .status(HttpStatus.OK) //200
                 .body(SearchNoticeByIdResponse.fromEntity(response));
+    }
+
+    // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
+    @PatchMapping("/notices/{noticeId}/pin")
+    public ResponseEntity<Notice> pinNotice(@RequestAttribute Member member,
+                                            @PathVariable Integer noticeId) {
+        Notice response = noticeService.pinNotice(noticeId, member);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 }
