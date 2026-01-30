@@ -9,6 +9,7 @@ import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.simulation.Simulation;
 import com.example.cellphoneback.entity.simulation.SimulationProduct;
 import com.example.cellphoneback.entity.simulation.SimulationSchedule;
+import com.example.cellphoneback.repository.member.MemberRepository;
 import com.example.cellphoneback.repository.operation.MachineRepository;
 import com.example.cellphoneback.repository.operation.OperationRepository;
 import com.example.cellphoneback.repository.operation.ProductRepository;
@@ -30,6 +31,7 @@ public class SimulationService {
     private final ProductRepository productRepository;
     private final SimulationScheduleRepository simulationScheduleRepository;
     private final SimulationProductRepository simulationProductRepository;
+    private final MemberRepository memberRepository;
 
     //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
     public CreateSimulationResponse createSimulation(Member member, CreateSimulationRequest request) {
@@ -38,7 +40,7 @@ public class SimulationService {
         }
         // 시뮬레이션 생성 로직 구현
         Simulation simulation = Simulation.builder()
-                .memberId(member.getId())
+                .member(memberRepository.findById(member.getId()).orElseThrow())
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .requiredStaff(request.getRequiredStaff())
