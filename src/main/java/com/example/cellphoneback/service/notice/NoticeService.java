@@ -3,6 +3,7 @@ package com.example.cellphoneback.service.notice;
 
 import com.example.cellphoneback.dto.request.notice.CreateNoticeRequest;
 import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
+import com.example.cellphoneback.dto.response.notice.PinNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchNoticeByIdResponse;
 import com.example.cellphoneback.entity.member.Member;
@@ -97,7 +98,7 @@ public class NoticeService {
                 .build();
     }
 
-    // community	GET	/api/notice/{noticeId}	해당 공지사항 조회	all
+    // GET	/api/notice/{noticeId}	해당 공지사항 조회	all
     public Notice searchNoticeById(Integer communityId) {
 
         Notice notice = noticeRepository.findById(communityId)
@@ -105,5 +106,27 @@ public class NoticeService {
 
 
         return notice;
+    }
+
+    // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
+    public Notice pinNotice(Integer noticeId, Member member) {
+
+        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
+            throw new IllegalArgumentException("공지사항 핀 고정 권한이 없습니다.");
+        }
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
+
+
+        boolean currentPin = notice.isPinned(); // 현재 핀 상태
+        if(!currentPin){
+            long pinnedCount = noticeRepository.countByPinnedTrue(); // 현재 핀 고정된 공지사항 수
+            if(pinnedCount >= 3){
+                throw new IllegalStateException("최대 3개의 공지사항만 핀 고정할 수 있습니다.");
+            }
+        }
+        notice.setPinned(!currentPin);
+
+        return noticeRepository.save(notice);
     }
 }
