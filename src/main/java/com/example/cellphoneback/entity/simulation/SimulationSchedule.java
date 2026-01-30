@@ -27,10 +27,12 @@ public class SimulationSchedule {
     @ManyToOne
     private Task task;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "planner_id")
     private Member plannerId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "worker_id")
     private Member workerId;
 
     private LocalDateTime startAt;

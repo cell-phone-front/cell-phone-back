@@ -2,6 +2,7 @@ package com.example.cellphoneback.controller.simulation;
 
 import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
+import com.example.cellphoneback.dto.response.simulation.DeleteSimulationResponse;
 import com.example.cellphoneback.dto.response.simulation.GetAllSimulationResponse;
 import com.example.cellphoneback.dto.response.simulation.GetSimulationResponse;
 import com.example.cellphoneback.entity.member.Member;
@@ -40,10 +41,10 @@ public class SimulationController {
 
     //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
     @DeleteMapping("/{simulationId}")
-    public ResponseEntity<?> deleteSimulation(@RequestAttribute Member member,
-                                              @PathVariable String simulationId) {
-        simulationService.deleteSimulation(member, simulationId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<DeleteSimulationResponse> deleteSimulation(@RequestAttribute Member member,
+                                                                     @PathVariable String simulationId) {
+        DeleteSimulationResponse response = simulationService.deleteSimulation(member, simulationId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 단건 조회	admin, planner

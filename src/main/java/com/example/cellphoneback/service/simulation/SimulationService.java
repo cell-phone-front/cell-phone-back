@@ -62,7 +62,7 @@ public class SimulationService {
 
         return CreateSimulationResponse.builder().simulation(CreateSimulationResponse.item.builder()
                 .id(simulation.getId())
-                .memberId(simulation.getMember().getId())
+                .memberName(simulation.getMember().getName())
                 .title(simulation.getTitle())
                 .description(simulation.getDescription())
                 .requiredStaff(simulation.getRequiredStaff())
@@ -111,12 +111,24 @@ public class SimulationService {
     }
 
     //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
-    public void deleteSimulation(Member member, String simulationId) {
+    public DeleteSimulationResponse deleteSimulation(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 삭제 권한이 없습니다.");
         }
 
+        List<SimulationSchedule> simulationScheduleList = simulationScheduleRepository.findAll();
+        List<SimulationSchedule> simulationSchedule = simulationScheduleList.stream()
+                .filter(e -> e.getSimulation().getId().equals(simulationId)).toList();
+        simulationScheduleRepository.deleteAll(simulationSchedule);
 
+        List<SimulationProduct> simulationProductList = simulationProductRepository.findAll();
+        List<SimulationProduct> deleteSimulationProduct =
+                simulationProductList.stream().filter(e -> e.getSimulation().getId().equals(simulationId)).toList();
+        simulationProductRepository.deleteAll(deleteSimulationProduct);
+
+        simulationRepository.deleteById(simulationId);
+
+        return DeleteSimulationResponse.builder().message("정상적으로 삭제 되었습니다.").build();
     }
 
     //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 단건 조회	admin, planner
