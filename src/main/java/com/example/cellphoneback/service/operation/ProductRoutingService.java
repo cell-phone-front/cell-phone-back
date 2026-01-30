@@ -8,6 +8,7 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.ProductRouting;
 import com.example.cellphoneback.repository.operation.OperationRepository;
+import com.example.cellphoneback.repository.operation.ProductRepository;
 import com.example.cellphoneback.repository.operation.ProductRoutingRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -25,6 +26,7 @@ import java.util.NoSuchElementException;
 public class ProductRoutingService {
     private final ProductRoutingRepository productRoutingRepository;
     private final OperationRepository operationRepository;
+    private final ProductRepository  productRepository;
 
     //    operation	POST	/api/operation/product/routing/xls	프로덕트 라우팅 엑셀 파싱	admin, planner
     public ProductRoutingParseResponse productRoutingParseService(Member member, MultipartFile productRoutingFile) {
@@ -92,7 +94,7 @@ public class ProductRoutingService {
                         // 아이디가 자동으로 int auto_increment으로 생성 됨
                         .id(e.getId())
                         .name(e.getName())
-                        .productId(e.getProductId())
+                        .product(productRepository.findById(e.getProductId()).orElseThrow())
                         .operation(operationRepository.findById(e.getOperationId()).orElseThrow())
                         .operationSeq(e.getOperationSeq())
                         .description(e.getDescription())
