@@ -2,6 +2,7 @@ package com.example.cellphoneback.entity.simulation;
 
 import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.entity.operation.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,12 +20,11 @@ public class SimulationProduct {
 
 
     @ManyToOne
-    @JoinColumn(name = "simulation_id")
+    @JsonIgnore
     private Simulation simulation;
 
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
     private Product product;
 
 

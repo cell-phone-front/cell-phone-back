@@ -1,10 +1,9 @@
 package com.example.cellphoneback.entity.operation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +19,9 @@ public class Product {
     private String brand;
     private String name;
     private String description;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductRouting> ProductRoutingList;
 
 
 }

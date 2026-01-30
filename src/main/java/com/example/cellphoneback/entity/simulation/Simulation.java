@@ -29,6 +29,8 @@ public class Simulation {
     private LocalDate simulationStartDate;
     private int workTime;
 
+    @OneToMany(mappedBy = "simulation")
+    private List<SimulationProduct> simulationProductList;
 
     @PrePersist
     public void prePersist() {

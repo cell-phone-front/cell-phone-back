@@ -2,9 +2,9 @@
 package com.example.cellphoneback.service.operation;
 
 import com.example.cellphoneback.dto.request.operation.OperationBulkUpsertRequest;
-import com.example.cellphoneback.dto.response.operation.Operation.OperationBulkUpsertResponse;
-import com.example.cellphoneback.dto.response.operation.Operation.OperationListResponse;
-import com.example.cellphoneback.dto.response.operation.Operation.OperationParseResponse;
+import com.example.cellphoneback.dto.response.operation.operation.OperationBulkUpsertResponse;
+import com.example.cellphoneback.dto.response.operation.operation.OperationListResponse;
+import com.example.cellphoneback.dto.response.operation.operation.OperationParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Operation;

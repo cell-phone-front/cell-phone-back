@@ -1,4 +1,4 @@
-package com.example.cellphoneback.dto.response.operation.Operation;
+package com.example.cellphoneback.dto.response.operation.operation;
 
 import com.example.cellphoneback.entity.operation.Operation;
 import lombok.Builder;
