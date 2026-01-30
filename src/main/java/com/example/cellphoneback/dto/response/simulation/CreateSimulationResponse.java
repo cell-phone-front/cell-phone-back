@@ -21,7 +21,7 @@ public class CreateSimulationResponse {
     @Builder
     @JsonPropertyOrder({
             "id",
-            "memberId",
+            "memberName",
             "title",
             "description",
             "requiredStaff",
@@ -32,7 +32,7 @@ public class CreateSimulationResponse {
     })
     public static class item {
         String id;
-        String memberId;
+        String memberName;
         String title;
         String description;
         int requiredStaff;
