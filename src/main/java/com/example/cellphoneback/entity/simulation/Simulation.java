@@ -1,9 +1,7 @@
 package com.example.cellphoneback.entity.simulation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
+import com.example.cellphoneback.entity.member.Member;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,7 +20,8 @@ public class Simulation {
     @Id
     private String id;
 
-    private String memberId;
+    @ManyToOne
+    private Member member;
     private String title;
     private String description;
     private int requiredStaff;
@@ -30,8 +29,6 @@ public class Simulation {
     private LocalDate simulationStartDate;
     private int workTime;
 
-    @OneToMany(mappedBy = "simulation")
-    List<SimulationProduct> simulationProductList;
 
     @PrePersist
     public void prePersist() {

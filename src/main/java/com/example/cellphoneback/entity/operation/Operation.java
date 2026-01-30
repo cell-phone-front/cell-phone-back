@@ -1,10 +1,9 @@
 package com.example.cellphoneback.entity.operation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,5 +18,8 @@ public class Operation {
 
     private String name;
     private String description;
+
+    @OneToMany(mappedBy = "operation")
+    private List<Task> tasks;
 
 }

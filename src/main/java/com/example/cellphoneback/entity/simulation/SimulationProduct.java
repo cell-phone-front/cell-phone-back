@@ -27,9 +27,6 @@ public class SimulationProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "operation_id")
-    private Operation operation;
 
 
 }

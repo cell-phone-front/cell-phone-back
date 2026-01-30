@@ -7,6 +7,7 @@ import com.example.cellphoneback.dto.response.operation.productRouting.ProductRo
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.ProductRouting;
+import com.example.cellphoneback.repository.operation.OperationRepository;
 import com.example.cellphoneback.repository.operation.ProductRoutingRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -23,8 +24,9 @@ import java.util.NoSuchElementException;
 @Service
 public class ProductRoutingService {
     private final ProductRoutingRepository productRoutingRepository;
+    private final OperationRepository operationRepository;
 
-    //    operation	POST	/api/operation/product-routing/xls	프로덕트 라우팅 엑셀 파싱	admin, planner
+    //    operation	POST	/api/operation/product/routing/xls	프로덕트 라우팅 엑셀 파싱	admin, planner
     public ProductRoutingParseResponse productRoutingParseService(Member member, MultipartFile productRoutingFile) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
@@ -68,7 +70,7 @@ public class ProductRoutingService {
         }
     }
 
-    //    operation	POST	/api/operation/product-routing/upsert	프로덕트 라우팅  추가, 수정, 삭제	admin, planner
+    //    operation	POST	/api/operation/product/routing/upsert	프로덕트 라우팅  추가, 수정, 삭제	admin, planner
     public ProductRoutingBulkUpsertResponse productRoutingBulkUpsertService(Member member, ProductRoutingBulkUpsertRequest request) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
@@ -91,7 +93,7 @@ public class ProductRoutingService {
                         .id(e.getId())
                         .name(e.getName())
                         .productId(e.getProductId())
-                        .operationId(e.getOperationId())
+                        .operation(operationRepository.findById(e.getOperationId()).orElseThrow())
                         .operationSeq(e.getOperationSeq())
                         .description(e.getDescription())
                         .build())
@@ -109,7 +111,7 @@ public class ProductRoutingService {
                 .updateProductRouting(updated).build();
     }
 
-    //    operation	GET	/api/operation/product-routing	프로덕트 라우팅  전체 조회	admin, planner
+    //    operation	GET	/api/operation/product/routing	프로덕트 라우팅  전체 조회	admin, planner
     public ProductRoutingListResponse productRoutingListService(Member member) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {

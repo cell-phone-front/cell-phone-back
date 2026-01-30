@@ -1,5 +1,7 @@
 package com.example.cellphoneback.entity.simulation;
 
+import com.example.cellphoneback.entity.member.Member;
+import com.example.cellphoneback.entity.operation.Task;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,10 +19,18 @@ public class SimulationSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String simulationId;
-    private String taskId;
-    private String plannerId;
-    private String workerId;
+    @ManyToOne
+    private Simulation simulation;
+
+    @ManyToOne
+    private Task task;
+
+    @ManyToOne
+    private Member plannerId;
+
+    @ManyToOne
+    private Member workerId;
+
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private String aiSummary;

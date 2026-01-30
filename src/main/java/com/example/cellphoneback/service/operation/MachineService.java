@@ -48,7 +48,7 @@ public class MachineService {
                 MachineParseResponse.xls one =
                         MachineParseResponse.xls.builder()
                                 .id(formatter.formatCellValue(row.getCell(0)))
-                                .koreanName(formatter.formatCellValue(row.getCell(1)))
+                                .name(formatter.formatCellValue(row.getCell(1)))
                                 .description(formatter.formatCellValue(row.getCell(2)))
                                 .build();
                 machineXls.add(one);

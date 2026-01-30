@@ -15,10 +15,10 @@ public class MachineParseResponse {
 
     @Getter
     @Builder
-    @JsonPropertyOrder({"id", "koreanName", "description"})
+    @JsonPropertyOrder({"id", "name", "description"})
     public static class xls {
         private String id;
-        private String koreanName;
+        private String name;
         private String description;
     }
 }

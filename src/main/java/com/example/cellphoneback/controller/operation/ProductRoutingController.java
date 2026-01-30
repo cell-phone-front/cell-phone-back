@@ -21,11 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("/api/operation/product-routing")
+@RequestMapping("/api/operation/product/routing")
 public class ProductRoutingController {
     private final ProductRoutingService productRoutingService;
 
-    //    operation	POST	/api/operation/product-routing/xls	프로덕트 라우팅 엑셀 파싱	admin, planner
+    //    operation	POST	/api/operation/product/routing/xls	프로덕트 라우팅 엑셀 파싱	admin, planner
     @PostMapping("/xls")
     public ResponseEntity<?> productRoutingXls(@RequestBody MultipartFile file,
                                                @RequestAttribute Member member) {
@@ -35,7 +35,7 @@ public class ProductRoutingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //    operation	POST	/api/operation/product-routing/upsert	프로덕트 라우팅  추가, 수정, 삭제	admin, planner
+    //    operation	POST	/api/operation/product/routing/upsert	프로덕트 라우팅  추가, 수정, 삭제	admin, planner
     @PostMapping("/upsert")
     public ResponseEntity<?> productRoutingUpsert(@RequestBody ProductRoutingBulkUpsertRequest request,
                                                   @RequestAttribute Member member) {
@@ -44,7 +44,7 @@ public class ProductRoutingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //    operation	GET	/api/operation/product-routing	프로덕트 라우팅  전체 조회	admin, planner
+    //    operation	GET	/api/operation/product/routing	프로덕트 라우팅  전체 조회	admin, planner
     @GetMapping
     public ResponseEntity<?> getAllProductRouting(@RequestAttribute Member member) {
         ProductRoutingListResponse response = productRoutingService.productRoutingListService(member);
