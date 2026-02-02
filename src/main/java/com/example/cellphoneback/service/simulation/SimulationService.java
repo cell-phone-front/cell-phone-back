@@ -115,7 +115,7 @@ public class SimulationService {
                 }).toList();
         simulationScheduleRepository.saveAll(scheduleList);
 
-        return RunSimulationResponse.builder().makeSpan(result.getMakespan()).status(result.getStatus()).scheduleList(scheduleList).build();
+        return RunSimulationResponse.builder().status(result.getStatus()).build();
 
     }
 
