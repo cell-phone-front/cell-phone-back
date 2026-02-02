@@ -5,7 +5,6 @@ import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
-import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.entity.simulation.Simulation;
 import com.example.cellphoneback.entity.simulation.SimulationProduct;
 import com.example.cellphoneback.entity.simulation.SimulationSchedule;
@@ -17,11 +16,17 @@ import com.example.cellphoneback.repository.operation.TaskRepository;
 import com.example.cellphoneback.repository.simulation.SimulationProductRepository;
 import com.example.cellphoneback.repository.simulation.SimulationRepository;
 import com.example.cellphoneback.repository.simulation.SimulationScheduleRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,6 +40,10 @@ public class SimulationService {
     private final SimulationProductRepository simulationProductRepository;
     private final MemberRepository memberRepository;
     private final TaskRepository taskRepository;
+
+
+    @Value("OPENAI_API_KEY")
+    private String apiKey;
 
 
     //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
@@ -74,7 +83,7 @@ public class SimulationService {
 
 
     //    simulation	POST	/api/simulation/{simulationId}/	시뮬레이션 실행 요청	admin, planner
-    public void runSimulation(Member member, String simulationId) {
+    public RunSimulationResponse runSimulation(Member member, String simulationId) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 실행 요청 권한이 없습니다.");
@@ -85,7 +94,7 @@ public class SimulationService {
         RestClient restClient = RestClient.create();
 
         SolveApiResult result = restClient.post()
-                .uri("http://localhost:5000/api/solve")
+                .uri("http://127.0.0.1:5050/api/solve")
                 .body(simulation)
                 .retrieve()
                 .body(SolveApiResult.class);
@@ -106,7 +115,7 @@ public class SimulationService {
                 }).toList();
         simulationScheduleRepository.saveAll(scheduleList);
 
-        return;
+        return RunSimulationResponse.builder().makeSpan(result.getMakespan()).status(result.getStatus()).scheduleList(scheduleList).build();
 
     }
 
@@ -171,6 +180,42 @@ public class SimulationService {
         Optional<SimulationSchedule> simulationSchedule = simulationScheduleRepository.findById(simulationScheduleId);
 
         return GetSimulationScheduleResponse.builder().simulationSchedule(simulationSchedule).build();
+    }
+
+    // simulation POST /api/simulation/{simulationScheduleId}/summary 스케줄 ai 조언 admin, planner
+    public ScheduleSummaryResponse simulationScheduleGPTAdvice(Member member, int simulationScheduleId) throws JsonProcessingException {
+        if(!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
+            throw new SecurityException("프로그램 실행 권한이 없습니다.");
+        }
+
+
+        SimulationSchedule simulationSchedule = simulationScheduleRepository.findById(simulationScheduleId).orElseThrow();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String , Object> body = new HashMap<>();
+
+        body.put("model","gpt-4o-mini");
+        body.put("instructions","");
+        body.put("input",objectMapper.writeValueAsString(simulationSchedule));
+
+        RestClient restClient = RestClient.create();
+        String json = restClient
+                .post()
+                .header("Content-type", "application/json")
+                .header("Authorization", "Bearer " + apiKey)
+                .body(body)
+                .retrieve()
+                .body(String.class);
+        JsonNode jsonNode = objectMapper.readTree(json);
+        String msg = jsonNode.get("outPut").get(0).get("content").get(0).get("text").asText();
+        String[] advice = objectMapper.readValue(msg, String[].class);
+
+        simulationSchedule.setAiSummary(msg);
+        simulationScheduleRepository.save(simulationSchedule);
+
+        return ScheduleSummaryResponse.builder().success(true).schedule(simulationSchedule).advice(advice).build();
+
+
     }
 
 }
