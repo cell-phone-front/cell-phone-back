@@ -1,10 +1,7 @@
 package com.example.cellphoneback.controller.simulation;
 
 import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
-import com.example.cellphoneback.dto.response.simulation.CreateSimulationResponse;
-import com.example.cellphoneback.dto.response.simulation.DeleteSimulationResponse;
-import com.example.cellphoneback.dto.response.simulation.GetAllSimulationResponse;
-import com.example.cellphoneback.dto.response.simulation.GetSimulationResponse;
+import com.example.cellphoneback.dto.response.simulation.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.simulation.SimulationService;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +32,10 @@ public class SimulationController {
     @PostMapping("/{simulationId}")
     public ResponseEntity<?> runSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) {
-        simulationService.runSimulation(member, simulationId);
-        return ResponseEntity.ok().build();
+        RunSimulationResponse response = simulationService.runSimulation(member, simulationId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
     }
 
     //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
