@@ -42,7 +42,7 @@ public class SimulationService {
     private final TaskRepository taskRepository;
 
 
-    @Value("OPENAI_API_KEY")
+    @Value("${OPENAI_API_KEY}")
     private String apiKey;
 
 
@@ -95,7 +95,7 @@ public class SimulationService {
 
         SolveApiResult result = restClient.post()
                 .uri("http://127.0.0.1:5050/api/solve")
-                .body(simulation)
+                .body(Map.of("simulation", simulation))
                 .retrieve()
                 .body(SolveApiResult.class);
 
