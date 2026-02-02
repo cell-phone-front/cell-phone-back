@@ -1,17 +1,11 @@
 
 package com.example.cellphoneback.dto.response.simulation;
 
-import com.example.cellphoneback.entity.simulation.SimulationSchedule;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder
 public class RunSimulationResponse {
-    int makeSpan;
     String status;
-    List<SimulationSchedule > scheduleList;
-
 }
