@@ -30,12 +30,10 @@ public class SimulationController {
 
     //    simulation	POST	/api/simulation/{simulationId}	시뮬레이션 실행 요청	admin, planner
     @PostMapping("/{simulationId}")
-    public ResponseEntity<?> runSimulation(@RequestAttribute Member member,
+    public ResponseEntity<RunSimulationResponse> runSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) {
         RunSimulationResponse response = simulationService.runSimulation(member, simulationId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
@@ -46,9 +44,9 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 단건 조회	admin, planner
+    //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 세팅 데이터 조회	admin, planner
     @GetMapping("/{simulationId}/json")
-    public ResponseEntity<?> getSimulation(@RequestAttribute Member member,
+    public ResponseEntity<GetSimulationResponse> getSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) {
         GetSimulationResponse response = simulationService.getSimulation(member, simulationId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -62,10 +60,10 @@ public class SimulationController {
     }
 
     //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
-    @GetMapping({"/{simulationScheduleId}"})
-    public ResponseEntity<?> getSimulationSchedule(@RequestAttribute Member member,
-                                                                          @PathVariable int simulationScheduleId) {
-        simulationService.getSimulationSchedule(member, simulationScheduleId);
-        return ResponseEntity.ok().build();
+    @GetMapping({"/{simulationId}"})
+    public ResponseEntity<GetSimulationScheduleResponse> getSimulationSchedule(@RequestAttribute Member member,
+                                                                          @PathVariable String simulationId) {
+        GetSimulationScheduleResponse response = simulationService.getSimulationSchedule(member, simulationId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
