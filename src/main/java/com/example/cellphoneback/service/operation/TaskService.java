@@ -117,21 +117,27 @@ public class TaskService {
         if(!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)){
             throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
         }
-        List<Task> taskList = taskRepository.findAll();
+        List<TaskListResponse.Item> taskList = taskRepository.findAll().stream()
+                .map(t -> TaskListResponse.Item.builder()
+                        .id(t.getId())
+                        .operationId(t.getOperation().getId())
+                        .machineId(t.getMachine().getId())
+                        .name(t.getName())
+                        .duration(t.getDuration())
+                        .description(t.getDescription()).build()).toList();
 
         // 검색
-        List<Task> operations = taskList.stream()
-                .filter(c -> {
+        List<TaskListResponse.Item> tasks = taskList.stream()
+                .filter(t -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String kw = keyword.trim();
-                    return (c.getName() != null && c.getName().contains(kw)) ||
-                            (c.getDescription() != null && c.getDescription().contains(kw));
+
+                    return t.getName().contains(keyword) || t.getDescription().contains(keyword);
                 })
                 .toList();
 
-        return TaskListResponse.builder().taskList(taskList).build();
+        return TaskListResponse.builder().taskList(tasks).build();
     }
 
 }

@@ -114,13 +114,33 @@ public class ProductRoutingService {
     }
 
     //    operation	GET	/api/operation/product/routing	프로덕트 라우팅  전체 조회	admin, planner
-    public ProductRoutingListResponse productRoutingListService(Member member) {
+    public ProductRoutingListResponse productRoutingListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("생산 대상 조회 권한이 없습니다.");
         }
 
-        List<ProductRouting> productRoutingList = productRoutingRepository.findAll();
+        List<ProductRoutingListResponse.Item> productRoutingList = productRoutingRepository.findAll().stream()
+                .map(r -> ProductRoutingListResponse.Item.builder()
+                        .id(r.getId())
+                        .name(r.getName())
+                        .productId(r.getProduct().getId())
+                        .operationId(r.getOperation().getId())
+                        .operationSeq(r.getOperationSeq())
+                        .description(r.getDescription())
+                        .build()).toList();
+
+        List<ProductRoutingListResponse.Item> productRouting = productRoutingList.stream()
+                .filter(r -> {
+                    if(keyword == null || keyword.isBlank()) {
+                        return true;
+                    }
+
+                    return r.getName().contains(keyword) || r.getDescription().contains(keyword);
+                }).toList();
+
+
+
         return ProductRoutingListResponse.builder().productRoutingList(productRoutingList).build();
     }
 }

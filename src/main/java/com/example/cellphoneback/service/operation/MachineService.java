@@ -101,20 +101,23 @@ public class MachineService {
             throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
         }
 
-        List<Machine> machineList = machineRepository.findAll();
+        List<MachineListResponse.Item> machineList = machineRepository.findAll().stream()
+                .map(m -> MachineListResponse.Item.builder()
+                        .id(m.getId())
+                        .name(m.getName())
+                        .description(m.getDescription())
+                        .build()).toList();
 
         // 검색
-        List<Machine> machines = machineList.stream()
-                .filter(c -> {
+        List<MachineListResponse.Item> machines = machineList.stream()
+                .filter(m -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String kw = keyword.trim();
-                    return (c.getName() != null && c.getName().contains(kw)) ||
-                            (c.getDescription() != null && c.getDescription().contains(kw));
+                    return m.getName().contains(keyword) ||  m.getDescription().contains(keyword);
                 })
                 .toList();
 
-        return MachineListResponse.builder().machineList(machineList).build();
+        return MachineListResponse.builder().machineList(machines).build();
     }
 }

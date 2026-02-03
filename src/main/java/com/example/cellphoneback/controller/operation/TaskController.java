@@ -42,7 +42,7 @@ public class TaskController {
     // GET	/api/operation/task	기계 전체 조회	admin,planner
     @GetMapping
     public ResponseEntity<TaskListResponse> taskList(@RequestAttribute Member member,
-                                                     @RequestBody( required = false) String keyword) {
+                                                     @RequestParam String keyword) {
 
         TaskListResponse response = taskService.taskListService(member, keyword);
 

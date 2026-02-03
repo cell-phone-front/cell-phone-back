@@ -43,7 +43,7 @@ public class OperationController {
     // 	operation	GET	/api/operation	공정 단계 전체 조회	admin, planner
     @GetMapping
     public ResponseEntity<?> getAllOperations(@RequestAttribute Member member,
-                                              @RequestBody(required = false) String keyword) {
+                                              @RequestParam String keyword) {
 
         OperationListResponse response = operationService.operationListService(member, keyword);
 

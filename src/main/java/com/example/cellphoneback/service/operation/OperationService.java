@@ -107,17 +107,20 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
             throw new SecurityException("공정 단계 조회 권한이 없습니다.");
         }
 
-        List<Operation> operationList = operationRepository.findAll();
+        List<OperationListResponse.Item> operationList = operationRepository.findAll().stream()
+                .map(o -> OperationListResponse.Item.builder()
+                        .id(o.getId())
+                        .name(o.getName())
+                        .description(o.getDescription())
+                        .build()).toList();
 
         // 검색
-        List<Operation> operations = operationList.stream()
-                .filter(c -> {
+        List<OperationListResponse.Item> operations = operationList.stream()
+                .filter(o -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String kw = keyword.trim();
-                    return (c.getName() != null && c.getName().contains(kw)) ||
-                            (c.getDescription() != null && c.getDescription().contains(kw));
+                    return o.getName().contains(keyword) || o.getDescription().contains(keyword);
                 })
                 .toList();
 

@@ -22,4 +22,5 @@ public class Operation {
     @OneToMany(mappedBy = "operation")
     private List<Task> taskList;
 
+
 }

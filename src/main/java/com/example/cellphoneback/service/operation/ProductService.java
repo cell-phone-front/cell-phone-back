@@ -109,20 +109,24 @@ public class ProductService {
             throw new SecurityException("생산 대상 조회 권한이 없습니다.");
         }
 
-        List<Product> productList = productRepository.findAll();
+        List<ProductListResponse.Item> productList = productRepository.findAll().stream()
+                .map(p -> ProductListResponse.Item.builder()
+                        .id(p.getId())
+                        .brand(p.getBrand())
+                        .name(p.getName())
+                        .description(p.getDescription())
+                        .build()).toList();
 
         // 검색
-        List<Product> products = productList.stream()
-                .filter(c -> {
+        List<ProductListResponse.Item> products = productList.stream()
+                .filter(p -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String kw = keyword.trim();
-                    return (c.getName() != null && c.getName().contains(kw)) ||
-                            (c.getDescription() != null && c.getDescription().contains(kw));
+                    return p.getName().contains(keyword) || p.getDescription().contains(keyword);
                 })
                 .toList();
 
-        return ProductListResponse.builder().productList(productList).build();
+        return ProductListResponse.builder().productList(products).build();
     }
 }
