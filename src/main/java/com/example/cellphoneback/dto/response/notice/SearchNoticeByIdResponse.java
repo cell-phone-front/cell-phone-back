@@ -10,15 +10,23 @@ import java.time.LocalDateTime;
 @Builder
 public class SearchNoticeByIdResponse {
 
+    int id;
+    String memberId;
     String title;
     String content;
     LocalDateTime createdAt;
+    boolean pinned;
+    int viewCount;
 
-    public static SearchNoticeByIdResponse fromEntity(Notice notice){
+    public static SearchNoticeByIdResponse fromEntity(Notice notice) {
         return SearchNoticeByIdResponse.builder()
+                .id(notice.getId())
+                .memberId(notice.getMember().getId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
+                .pinned(notice.isPinned())
+                .viewCount(notice.getViewCount())
                 .build();
     }
 }

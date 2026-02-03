@@ -3,6 +3,7 @@ package com.example.cellphoneback.service.notice;
 
 import com.example.cellphoneback.dto.request.notice.CreateNoticeRequest;
 import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
+import com.example.cellphoneback.dto.response.notice.PinNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchNoticeByIdResponse;
 import com.example.cellphoneback.entity.member.Member;
@@ -50,6 +51,7 @@ public class NoticeService {
         for (Member m : members) {
             NoticeNotification noticeNotification = NoticeNotification.builder()
                     .memberId(m.getId())
+                    .noticeId(savedNotice.getId())
                     .message(notice.getTitle()) // 공지사항 제목을 메시지로 사용
                     .link("/notices/" + savedNotice.getId())
                     .isRead(false)
@@ -107,7 +109,8 @@ public class NoticeService {
 
         // 정렬 - 최신순, 검색
         List<SearchNoticeByIdResponse> noticeList = notices.stream()
-                .sorted(Comparator.comparing(Notice::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(Notice::isPinned).reversed()
+                        .thenComparing(Notice::getCreatedAt).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
@@ -140,7 +143,7 @@ public class NoticeService {
     }
 
     // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
-    public Notice pinNotice(Integer noticeId, Member member) {
+    public PinNoticeResponse pinNotice(Integer noticeId, Member member) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new IllegalArgumentException("공지사항 핀 고정 권한이 없습니다.");
@@ -158,7 +161,12 @@ public class NoticeService {
         }
         notice.setPinned(!currentPin);
 
-        return noticeRepository.save(notice);
+        noticeRepository.save(notice);
+
+        return PinNoticeResponse.builder()
+                .noticeId(notice.getId())
+                .pinned(notice.isPinned())
+                .build();
     }
 
     // notice	POST	/api/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
