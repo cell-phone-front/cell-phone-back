@@ -5,6 +5,7 @@ import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
+import com.example.cellphoneback.entity.operation.Task;
 import com.example.cellphoneback.entity.simulation.Simulation;
 import com.example.cellphoneback.entity.simulation.SimulationProduct;
 import com.example.cellphoneback.entity.simulation.SimulationSchedule;
@@ -24,10 +25,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -103,16 +104,65 @@ public class SimulationService {
         simulation.setWorkTime(result.getMakespan());
         simulationRepository.save(simulation);
 
-        List<SimulationSchedule> scheduleList = result.getScheduleList().stream()
-                .map(one -> {
-                    return SimulationSchedule.builder().simulation(simulation)
-                            .task(taskRepository.findById(one.getTaskId()).orElseThrow())
-                            .plannerId(memberRepository.findById(one.getPlannerId()).orElseThrow())
-                            .workerId(memberRepository.findById(one.getWorkerId()).orElseThrow())
-                            .startAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getStart()))
-                            .endAt(simulation.getSimulationStartDate().atStartOfDay().plusHours(one.getEnd()))
-                            .build();
-                }).toList();
+        // 팀장 공정별 1명 고정 배치
+        List<Member> planners = memberRepository.findByRole(Role.PLANNER);
+        Map<String, Member> plannerByTask = new HashMap<>();
+
+        Iterator<Member> plannerIterator = planners.iterator();
+
+        // 직원 그룹별 리스트 생성
+        List<Member> workers = memberRepository.findByRole(Role.WORKER);
+        Map<String, List<Member>> workerByTeam = workers.stream()
+                .collect(Collectors.groupingBy(m -> m.getWorkTeam()));
+
+        // 직원별 다음 배정 가능 시간
+        Map<String, LocalDateTime> workerAvailableAt = new HashMap<>();
+
+        List<SimulationSchedule> scheduleList = new ArrayList<>();
+
+        for (SolveApiResult.TaskSchedule one : result.getScheduleList()) {
+
+            Task task = taskRepository.findById(one.getTaskId()).orElseThrow();
+
+            // 팀방 배정 공정별 1명 고정
+            Member planner = plannerByTask.computeIfAbsent(
+                    task.getId(),
+                    k -> {
+                        if (!plannerIterator.hasNext()) {
+                            throw new NoSuchElementException("팀장 수가 부족합니다.");
+                        }
+                        return plannerIterator.next();
+                    });
+            // 작업 시간 계산
+            LocalDateTime startAt = simulation.getSimulationStartDate()
+                    .atStartOfDay().plusHours(one.getStart());
+
+            LocalDateTime endAt = simulation.getSimulationStartDate()
+                    .atStartOfDay().plusHours(one.getEnd());
+
+            // 공정별 필요한 직원 수
+
+            Member worker = workers.stream()
+                    .filter(w -> {
+                        LocalDateTime availableAt = workerAvailableAt.get(w.getId());
+                        return availableAt == null || !availableAt.isAfter(startAt);
+                    })
+                    .min(Comparator.comparing(w -> workerAvailableAt.getOrDefault(w.getId(), LocalDateTime.MIN)))
+                    .orElseThrow(() -> new IllegalStateException("해당 시간에 투입 가능한 직원이 없습니다."));
+
+            workerAvailableAt.put(worker.getId(), endAt);
+
+            scheduleList.add(
+                    SimulationSchedule.builder()
+                            .simulation(simulation)
+                            .task(task)
+                            .plannerId(planner)
+                            .workerId(worker)
+                            .startAt(startAt)
+                            .endAt(endAt)
+                            .build()
+            );
+        }
         simulationScheduleRepository.saveAll(scheduleList);
 
         return RunSimulationResponse.builder().status(result.getStatus()).build();
@@ -140,7 +190,7 @@ public class SimulationService {
         return DeleteSimulationResponse.builder().message("정상적으로 삭제 되었습니다.").build();
     }
 
-    //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 단건 조회	admin, planner
+    //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 세팅 데이터 조회	admin, planner
     public GetSimulationResponse getSimulation(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 단건 조회 권한이 없습니다.");
@@ -171,20 +221,23 @@ public class SimulationService {
         return GetAllSimulationResponse.builder().simulationScheduleList(items).build();
     }
 
-    //    simulation	GET	/api/simulation/{simulationScheduleId}	작업 지시(스케쥴) 조회	admin, planner
-    public GetSimulationScheduleResponse getSimulationSchedule(Member member, int simulationScheduleId) {
+    //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
+    public GetSimulationScheduleResponse getSimulationSchedule(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 작업 지시(스케쥴) 조회 권한이 없습니다.");
         }
+        List<SimulationSchedule> scheduleList = simulationScheduleRepository.findAll();
+        List<SimulationSchedule> selectSchedule = scheduleList.stream()
+                .filter(e -> e.getSimulation().getId().equals(simulationId)).toList();
+        List<GetSimulationScheduleResponse.Item> items =
+                selectSchedule.stream().map(entity -> GetSimulationScheduleResponse.Item.fromEntity(entity)).toList();
 
-        Optional<SimulationSchedule> simulationSchedule = simulationScheduleRepository.findById(simulationScheduleId);
-
-        return GetSimulationScheduleResponse.builder().simulationSchedule(simulationSchedule).build();
+        return GetSimulationScheduleResponse.builder().scheduleList(items).build();
     }
 
     // simulation POST /api/simulation/{simulationScheduleId}/summary 스케줄 ai 조언 admin, planner
     public ScheduleSummaryResponse simulationScheduleGPTAdvice(Member member, int simulationScheduleId) throws JsonProcessingException {
-        if(!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
+        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("프로그램 실행 권한이 없습니다.");
         }
 
@@ -192,11 +245,11 @@ public class SimulationService {
         SimulationSchedule simulationSchedule = simulationScheduleRepository.findById(simulationScheduleId).orElseThrow();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String , Object> body = new HashMap<>();
+        Map<String, Object> body = new HashMap<>();
 
-        body.put("model","gpt-4o-mini");
-        body.put("instructions","");
-        body.put("input",objectMapper.writeValueAsString(simulationSchedule));
+        body.put("model", "gpt-4o-mini");
+        body.put("instructions", "");
+        body.put("input", objectMapper.writeValueAsString(simulationSchedule));
 
         RestClient restClient = RestClient.create();
         String json = restClient
@@ -213,7 +266,7 @@ public class SimulationService {
         simulationSchedule.setAiSummary(msg);
         simulationScheduleRepository.save(simulationSchedule);
 
-        return ScheduleSummaryResponse.builder().success(true).schedule(simulationSchedule).advice(advice).build();
+        return null;//ScheduleSummaryResponse.builder().success(true).schedule(simulationSchedule).advice(advice).build();
 
 
     }

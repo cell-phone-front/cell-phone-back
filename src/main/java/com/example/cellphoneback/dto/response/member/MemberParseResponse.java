@@ -4,6 +4,7 @@ import com.example.cellphoneback.entity.member.Role;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class MemberParseResponse {
 
     @Getter
     @Builder
+    @ToString
     @JsonPropertyOrder({"id", "name", "email", "phoneNumber", "dept", "workTeam", "role", "hireDate"})
     public static class xls{
         private String id;

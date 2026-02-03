@@ -23,10 +23,6 @@ public class SolveApiResult {
         private String productId;
         @JsonProperty("task_id")
         private String taskId;
-        @JsonProperty("planner_id")
-        private String plannerId;
-        @JsonProperty("worker_id")
-        private String workerId;
 
         private int start;
         private int end;
