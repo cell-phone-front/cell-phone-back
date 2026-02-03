@@ -10,6 +10,7 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.notice.Notice;
 import com.example.cellphoneback.repository.notice.NoticeRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -99,7 +100,10 @@ public class NoticeService {
     }
 
     // GET	/api/notice/{noticeId}	해당 공지사항 조회	all
+    @Transactional
     public Notice searchNoticeById(Integer communityId) {
+
+        noticeRepository.increaseViewCount(communityId);
 
         Notice notice = noticeRepository.findById(communityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
