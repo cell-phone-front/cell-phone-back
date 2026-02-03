@@ -54,8 +54,9 @@ public class SimulationController {
 
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
     @GetMapping
-    public ResponseEntity<GetAllSimulationResponse> getAllSimulations(@RequestAttribute Member member) {
-        GetAllSimulationResponse response = simulationService.getAllSimulations(member);
+    public ResponseEntity<GetAllSimulationResponse> getAllSimulations(@RequestAttribute Member member,
+                                                                      @RequestParam String keyword) {
+        GetAllSimulationResponse response = simulationService.getAllSimulations(member, keyword);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
