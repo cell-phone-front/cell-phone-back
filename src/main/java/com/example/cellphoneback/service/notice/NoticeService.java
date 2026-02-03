@@ -6,21 +6,28 @@ import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
 import com.example.cellphoneback.dto.response.notice.PinNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchNoticeByIdResponse;
+import com.example.cellphoneback.dto.response.notice.UploadFilesResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.notice.Notice;
+import com.example.cellphoneback.entity.notice.NoticeAttachment;
+import com.example.cellphoneback.repository.notice.NoticeAttachmentRepository;
 import com.example.cellphoneback.repository.notice.NoticeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Comparator;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
 public class NoticeService {
     private final NoticeRepository noticeRepository;
+    private final NoticeAttachmentRepository noticeAttachmentRepository;
 
     //   1	notice	POST	/api/notice	공지사항 작성	admin, planner
     public Notice createNotice(Member member, CreateNoticeRequest request) {
@@ -132,5 +139,55 @@ public class NoticeService {
         notice.setPinned(!currentPin);
 
         return noticeRepository.save(notice);
+    }
+
+    // notice	POST	/api/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    public List<NoticeAttachment> uploadFiles(Integer noticeId, List<MultipartFile> files) {
+
+
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
+
+        if (files == null || files.isEmpty()) {
+            throw new IllegalArgumentException("업로드할 파일이 없습니다."); //400
+        }
+
+        // 업로드 디렉토리 생성
+        Path uploadPath = Path.of(System.getProperty("user.home"), "cellphone", "notice", String.valueOf(noticeId));
+
+        try {
+            Files.createDirectories(uploadPath);
+        } catch (IOException e) {
+            throw new RuntimeException("업로드 폴더 생성 실패", e); //500
+        }
+
+        // 파일 저장 및 DB 기록
+        List<NoticeAttachment> attachments = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) continue;
+
+            String savedFileName = UUID.randomUUID().toString()
+                    .replace("-", "") + "_" + file.getOriginalFilename();
+
+            try {
+                file.transferTo(uploadPath.resolve(savedFileName));
+            } catch (IOException e) {
+                throw new RuntimeException("파일 저장 실패", e); //500
+            }
+
+            NoticeAttachment attachment = NoticeAttachment.builder()
+                    .noticeId(noticeId)
+                    .fileSize(file.getSize())
+                    .fileType(file.getContentType())
+                    .fileUrl("/files/notice/" + noticeId + "/" + savedFileName)
+                    .build();
+
+            attachments.add(attachment);
+        }
+
+        noticeAttachmentRepository.saveAll(attachments);
+
+        return attachments;
     }
 }
