@@ -26,6 +26,7 @@ public class Community {
     private String content;
     private LocalDateTime createdAt;
     private int commentCount;
+    private int viewCount;
 
     @PrePersist
     public void prePersist() {

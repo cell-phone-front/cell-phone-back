@@ -26,6 +26,7 @@ public class Notice {
     private String content;
     private LocalDateTime createdAt;
     private boolean pinned;
+    private int viewCount;
 
     @PrePersist
     public void prePersist() {
