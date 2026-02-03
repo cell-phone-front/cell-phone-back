@@ -46,9 +46,10 @@ public class MachineController {
 
     // GET	/api/operation/machine	기계 전체 조회	admin,planner
     @GetMapping
-    public ResponseEntity<MachineListResponse> machineList(@RequestAttribute Member member){
+    public ResponseEntity<MachineListResponse> machineList(@RequestAttribute Member member,
+                                                           @RequestBody(required = false) String keyword){
 
-        MachineListResponse response = machineService.machineListService(member);
+        MachineListResponse response = machineService.machineListService(member, keyword);
 
        return ResponseEntity.status(HttpStatus.OK).body(response);
     }

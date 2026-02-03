@@ -40,8 +40,9 @@ public class ProductController {
     }
 // 	operation	GET	/api/operation/product	생산 대상 전체 조회	admin, planner
     @GetMapping
-    public ResponseEntity<?> getAllProducts(@RequestAttribute Member member) {
-        ProductListResponse response = productService.productListService(member);
+    public ResponseEntity<?> getAllProducts(@RequestAttribute Member member,
+                                            @RequestBody (required = false) String keyword) {
+        ProductListResponse response = productService.productListService(member, keyword);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

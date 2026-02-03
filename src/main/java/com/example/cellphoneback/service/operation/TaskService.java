@@ -7,6 +7,7 @@ import com.example.cellphoneback.dto.response.operation.task.TaskListResponse;
 import com.example.cellphoneback.dto.response.operation.task.TaskParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
+import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.entity.operation.Task;
 import com.example.cellphoneback.repository.operation.MachineRepository;
 import com.example.cellphoneback.repository.operation.OperationRepository;
@@ -112,11 +113,23 @@ public class TaskService {
 
 
     // GET	/api/operation/task	기계 전체 조회	admin,planner
-    public TaskListResponse taskListService(Member member){
+    public TaskListResponse taskListService(Member member, String keyword){
         if(!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)){
             throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
         }
         List<Task> taskList = taskRepository.findAll();
+
+        // 검색
+        List<Task> operations = taskList.stream()
+                .filter(c -> {
+                    if (keyword == null || keyword.isBlank())
+                        return true;
+
+                    String kw = keyword.trim();
+                    return (c.getName() != null && c.getName().contains(kw)) ||
+                            (c.getDescription() != null && c.getDescription().contains(kw));
+                })
+                .toList();
 
         return TaskListResponse.builder().taskList(taskList).build();
     }

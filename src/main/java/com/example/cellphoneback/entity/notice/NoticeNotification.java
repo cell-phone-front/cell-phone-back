@@ -1,6 +1,5 @@
-package com.example.cellphoneback.entity.community;
+package com.example.cellphoneback.entity.notice;
 
-import com.example.cellphoneback.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,28 +8,26 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Community {
+@Entity
+public class NoticeNotification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
-
-    private String title;
-    private String content;
+    private int noticeId;
+    private String memberId;
+    private String message;
+    private String link;
+    private boolean isRead;
     private LocalDateTime createdAt;
-    private int commentCount;
-    private int viewCount;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
     }
+
 
 }

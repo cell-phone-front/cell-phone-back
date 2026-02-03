@@ -2,9 +2,11 @@
 package com.example.cellphoneback.service.operation;
 
 import com.example.cellphoneback.dto.request.operation.OperationBulkUpsertRequest;
+import com.example.cellphoneback.dto.response.community.SearchCommunityByIdResponse;
 import com.example.cellphoneback.dto.response.operation.operation.OperationBulkUpsertResponse;
 import com.example.cellphoneback.dto.response.operation.operation.OperationListResponse;
 import com.example.cellphoneback.dto.response.operation.operation.OperationParseResponse;
+import com.example.cellphoneback.entity.community.Community;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Operation;
@@ -99,13 +101,26 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
 }
 
     // 	operation	GET	/api/operation	공정 단계 전체 조회	admin, planner
-    public OperationListResponse operationListService(Member member) {
+    public OperationListResponse operationListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("공정 단계 조회 권한이 없습니다.");
         }
 
         List<Operation> operationList = operationRepository.findAll();
-        return OperationListResponse.builder().operationList(operationList).build();
+
+        // 검색
+        List<Operation> operations = operationList.stream()
+                .filter(c -> {
+                    if (keyword == null || keyword.isBlank())
+                        return true;
+
+                    String kw = keyword.trim();
+                    return (c.getName() != null && c.getName().contains(kw)) ||
+                            (c.getDescription() != null && c.getDescription().contains(kw));
+                })
+                .toList();
+
+        return OperationListResponse.builder().operationList(operations).build();
     }
 }

@@ -5,11 +5,13 @@ import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
 import com.example.cellphoneback.dto.response.notice.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.notice.Notice;
+import com.example.cellphoneback.entity.notice.NoticeAttachment;
 import com.example.cellphoneback.service.notice.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,6 +89,18 @@ public class NoticeController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .body(response);
+    }
+
+    // notice	POST	/api/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    @PostMapping("/{noticeId}/attachment")
+    public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@PathVariable Integer noticeId,
+                                                               @RequestParam("files") List<MultipartFile> files)  {
+
+        List<NoticeAttachment> response = noticeService.uploadFiles(noticeId, files);
+
+        return ResponseEntity
+                .status(HttpStatus.OK) //200
                 .body(response);
     }
 }
