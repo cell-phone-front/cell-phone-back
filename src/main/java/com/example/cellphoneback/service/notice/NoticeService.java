@@ -108,7 +108,8 @@ public class NoticeService {
 
         // 정렬 - 최신순, 검색
         List<SearchNoticeByIdResponse> noticeList = notices.stream()
-                .sorted(Comparator.comparing(Notice::getCreatedAt).reversed())
+                .sorted(Comparator.comparing(Notice::isPinned).reversed()
+                        .thenComparing(Notice::getCreatedAt).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
