@@ -13,11 +13,13 @@ import lombok.NoArgsConstructor;
 public class CreateNoticeRequest {
     String title;
     String content;
+    boolean isPinned;
 
     public Notice toEntity() {
         return Notice.builder()
                 .title(this.title)
                 .content(this.content)
+                .pinned(this.isPinned)
                 .build();
     }
 }

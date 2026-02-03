@@ -43,7 +43,8 @@ public class NoticeService {
 
         Notice notice = request.toEntity();
         notice.setMember(member);
-        Notice savedNotice =  noticeRepository.save(notice);
+        notice.setPinned(request.isPinned());
+        Notice savedNotice = noticeRepository.save(notice);
 
         List<Member> members = memberRepository.findAll();
 
@@ -52,7 +53,7 @@ public class NoticeService {
             NoticeNotification noticeNotification = NoticeNotification.builder()
                     .memberId(m.getId())
                     .noticeId(savedNotice.getId())
-                    .message(notice.getTitle()) // 공지사항 제목을 메시지로 사용
+                    .message(notice.getTitle())
                     .link("/notices/" + savedNotice.getId())
                     .isRead(false)
                     .build();
@@ -153,9 +154,9 @@ public class NoticeService {
 
 
         boolean currentPin = notice.isPinned(); // 현재 핀 상태
-        if(!currentPin){
+        if (!currentPin) {
             long pinnedCount = noticeRepository.countByPinnedTrue(); // 현재 핀 고정된 공지사항 수
-            if(pinnedCount >= 3){
+            if (pinnedCount >= 3) {
                 throw new IllegalStateException("최대 3개의 공지사항만 핀 고정할 수 있습니다.");
             }
         }
