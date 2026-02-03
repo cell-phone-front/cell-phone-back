@@ -141,6 +141,6 @@ public class ProductRoutingService {
 
 
 
-        return ProductRoutingListResponse.builder().productRoutingList(productRoutingList).build();
+        return ProductRoutingListResponse.builder().productRoutingList(productRouting).build();
     }
 }
