@@ -200,13 +200,12 @@ public class SimulationService {
     }
 
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
-    public GetAllSimulationResponse getAllSimulations(Member member) {
+    public GetAllSimulationResponse getAllSimulations(Member member, String keyword) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 전체 조회 권한이 없습니다.");
         }
-        List<Simulation> simulationList = simulationRepository.findAllWithMember();
 
-        List<GetAllSimulationResponse.Item> items = simulationList.stream()
+        List<GetAllSimulationResponse.Item> simulationList = simulationRepository.findAllWithMember().stream()
                 .map(one -> GetAllSimulationResponse.Item.builder()
                         .id(one.getId())
                         .memberName(one.getMember().getName())
@@ -217,8 +216,16 @@ public class SimulationService {
                         .status(one.getStatus())
                         .simulationStartDate(one.getSimulationStartDate())
                         .workTime(one.getWorkTime()).build()).toList();
+        List<GetAllSimulationResponse.Item> simulations = simulationList.stream()
+                .filter(s -> {
+                    if(keyword == null || keyword.isBlank())
+                        return true;
 
-        return GetAllSimulationResponse.builder().simulationScheduleList(items).build();
+                    return s.getMemberName().contains(keyword) || s.getTitle().contains(keyword)
+                            || s.getDescription().contains(keyword);
+                }).toList();
+
+        return GetAllSimulationResponse.builder().simulationScheduleList(simulations).build();
     }
 
     //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
