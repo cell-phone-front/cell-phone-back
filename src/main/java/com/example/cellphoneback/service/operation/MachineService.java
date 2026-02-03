@@ -8,6 +8,7 @@ import com.example.cellphoneback.dto.response.operation.machine.MachineParseResp
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.operation.Machine;
+import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.repository.operation.MachineRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -94,13 +95,25 @@ public class MachineService {
     }
 
     // GET	/api/operation/machine	기계 전체 조회	admin,planner
-    public MachineListResponse machineListService(Member member) {
+    public MachineListResponse machineListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
         }
 
         List<Machine> machineList = machineRepository.findAll();
+
+        // 검색
+        List<Machine> machines = machineList.stream()
+                .filter(c -> {
+                    if (keyword == null || keyword.isBlank())
+                        return true;
+
+                    String kw = keyword.trim();
+                    return (c.getName() != null && c.getName().contains(kw)) ||
+                            (c.getDescription() != null && c.getDescription().contains(kw));
+                })
+                .toList();
 
         return MachineListResponse.builder().machineList(machineList).build();
     }

@@ -7,6 +7,7 @@ import com.example.cellphoneback.dto.response.operation.product.ProductListRespo
 import com.example.cellphoneback.dto.response.operation.product.ProductParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
+import com.example.cellphoneback.entity.operation.Operation;
 import com.example.cellphoneback.entity.operation.Product;
 import com.example.cellphoneback.repository.operation.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -102,13 +103,26 @@ public class ProductService {
     }
 
     // 	operation	GET	/api/operation/product	생산 대상 전체 조회	admin, planner
-    public ProductListResponse productListService(Member member) {
+    public ProductListResponse productListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("생산 대상 조회 권한이 없습니다.");
         }
 
         List<Product> productList = productRepository.findAll();
+
+        // 검색
+        List<Product> products = productList.stream()
+                .filter(c -> {
+                    if (keyword == null || keyword.isBlank())
+                        return true;
+
+                    String kw = keyword.trim();
+                    return (c.getName() != null && c.getName().contains(kw)) ||
+                            (c.getDescription() != null && c.getDescription().contains(kw));
+                })
+                .toList();
+
         return ProductListResponse.builder().productList(productList).build();
     }
 }
