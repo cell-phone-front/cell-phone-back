@@ -13,6 +13,7 @@ import com.example.cellphoneback.repository.community.CommunityRepository;
 import com.example.cellphoneback.repository.notice.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -100,7 +101,10 @@ public class CommunityService {
     }
 
     // community	GET	/api/community/{communityId}	해당 게시글 조회	all
+    @Transactional
     public Community searchCommunityById(Integer communityId) {
+
+        communityRepository.increaseViewCount(communityId);
 
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
