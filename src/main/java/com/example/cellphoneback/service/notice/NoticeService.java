@@ -50,6 +50,7 @@ public class NoticeService {
         for (Member m : members) {
             NoticeNotification noticeNotification = NoticeNotification.builder()
                     .memberId(m.getId())
+                    .noticeId(savedNotice.getId())
                     .message(notice.getTitle()) // 공지사항 제목을 메시지로 사용
                     .link("/notices/" + savedNotice.getId())
                     .isRead(false)
