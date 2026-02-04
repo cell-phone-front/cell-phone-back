@@ -170,7 +170,7 @@ public class NoticeService {
                 .build();
     }
 
-    // notice	POST	/api/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
     public List<NoticeAttachment> uploadFiles(Integer noticeId, List<MultipartFile> files) {
 
 
