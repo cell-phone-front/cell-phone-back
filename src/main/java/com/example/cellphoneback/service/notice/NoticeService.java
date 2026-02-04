@@ -85,7 +85,7 @@ public class NoticeService {
     //3	notice	DELETE	/api/notice	공지사항 삭제	admin, planner
     public void deleteNotice(Member member, Integer noticeId) {
 
-        if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
+        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("공지사항 삭제 권한이 없습니다.");
         }
 
