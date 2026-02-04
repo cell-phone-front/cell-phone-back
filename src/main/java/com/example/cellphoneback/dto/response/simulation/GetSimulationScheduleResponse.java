@@ -34,8 +34,7 @@ public class GetSimulationScheduleResponse {
             "operationId",
             "operationName",
             "startAt",
-            "endAt",
-            "aiSummary"
+            "endAt"
     })
     public static class Item {
         private int id;
