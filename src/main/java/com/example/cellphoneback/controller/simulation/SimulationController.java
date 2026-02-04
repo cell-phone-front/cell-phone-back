@@ -32,7 +32,7 @@ public class SimulationController {
     //    simulation	POST	/api/simulation/{simulationId}	시뮬레이션 실행 요청	admin, planner
     @PostMapping("/{simulationId}")
     public ResponseEntity<RunSimulationResponse> runSimulation(@RequestAttribute Member member,
-                                           @PathVariable String simulationId) {
+                                           @PathVariable String simulationId) throws JsonProcessingException {
         RunSimulationResponse response = simulationService.runSimulation(member, simulationId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -66,16 +66,6 @@ public class SimulationController {
     public ResponseEntity<GetSimulationScheduleResponse> getSimulationSchedule(@RequestAttribute Member member,
                                                                           @PathVariable String simulationId) {
         GetSimulationScheduleResponse response = simulationService.getSimulationSchedule(member, simulationId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    // simulation POST /api/simulation/{simulationScheduleId}/summary 스케줄 ai 조언 admin, planner
-    @PostMapping("/{simulationId}/summary")
-    public ResponseEntity<ScheduleSummaryResponse> simulationScheduleGPTAdvice(@RequestAttribute Member member,
-                                                                               @PathVariable String simulationId) throws JsonProcessingException {
-
-        ScheduleSummaryResponse response = simulationService.simulationScheduleGPTAdvice(member, simulationId);
-
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

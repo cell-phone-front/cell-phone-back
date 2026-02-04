@@ -8,4 +8,5 @@ import lombok.Getter;
 @Builder
 public class RunSimulationResponse {
     String status;
+    String aiSummary;
 }

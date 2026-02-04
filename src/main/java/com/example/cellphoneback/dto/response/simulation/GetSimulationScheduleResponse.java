@@ -34,8 +34,7 @@ public class GetSimulationScheduleResponse {
             "operationId",
             "operationName",
             "startAt",
-            "endAt",
-            "aiSummary"
+            "endAt"
     })
     public static class Item {
         private int id;
@@ -75,7 +74,6 @@ public class GetSimulationScheduleResponse {
                     .operationName(schedule.getTask().getOperation().getName())//
                     .startAt(schedule.getStartAt())//
                     .endAt(schedule.getEndAt())//
-                    .aiSummary(schedule.getAiSummary())//
                     .build();
 
         }
