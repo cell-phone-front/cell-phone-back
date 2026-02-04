@@ -1,6 +1,5 @@
 package com.example.cellphoneback.dto.response.notice;
 
-import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.notice.Notice;
 import lombok.Builder;
 import lombok.Getter;
