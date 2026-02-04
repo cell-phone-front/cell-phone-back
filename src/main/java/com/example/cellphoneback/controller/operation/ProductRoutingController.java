@@ -47,7 +47,7 @@ public class ProductRoutingController {
     //    operation	GET	/api/operation/product/routing	프로덕트 라우팅  전체 조회	admin, planner
     @GetMapping
     public ResponseEntity<?> getAllProductRouting(@RequestAttribute Member member,
-                                                  @RequestParam String keyword) {
+                                                  @RequestParam(required = false) String keyword) {
         ProductRoutingListResponse response = productRoutingService.productRoutingListService(member, keyword);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

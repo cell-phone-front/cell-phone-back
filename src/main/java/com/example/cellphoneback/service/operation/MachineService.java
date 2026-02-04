@@ -114,7 +114,8 @@ public class MachineService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    return m.getName().contains(keyword) ||  m.getDescription().contains(keyword);
+                    return m.getName() != null && m.getName().contains(keyword)
+                            || m.getDescription() != null && m.getDescription().contains(keyword);
                 })
                 .toList();
 

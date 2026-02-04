@@ -133,7 +133,8 @@ public class TaskService {
                         return true;
 
 
-                    return t.getName().contains(keyword) || t.getDescription().contains(keyword);
+                    return t.getName() != null && t.getName().contains(keyword)
+                            || t.getDescription() != null && t.getDescription().contains(keyword);
                 })
                 .toList();
 

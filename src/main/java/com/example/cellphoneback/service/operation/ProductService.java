@@ -123,7 +123,8 @@ public class ProductService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    return p.getName().contains(keyword) || p.getDescription().contains(keyword);
+                    return p.getName() != null && p.getName().contains(keyword)
+                            || p.getDescription() != null && p.getDescription().contains(keyword);
                 })
                 .toList();
 

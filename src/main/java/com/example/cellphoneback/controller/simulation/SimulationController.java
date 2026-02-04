@@ -4,6 +4,7 @@ import com.example.cellphoneback.dto.request.simulation.CreateSimulationRequest;
 import com.example.cellphoneback.dto.response.simulation.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.simulation.SimulationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class SimulationController {
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
     @GetMapping
     public ResponseEntity<GetAllSimulationResponse> getAllSimulations(@RequestAttribute Member member,
-                                                                      @RequestParam String keyword) {
+                                                                      @RequestParam(required = false) String keyword) {
         GetAllSimulationResponse response = simulationService.getAllSimulations(member, keyword);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -65,6 +66,16 @@ public class SimulationController {
     public ResponseEntity<GetSimulationScheduleResponse> getSimulationSchedule(@RequestAttribute Member member,
                                                                           @PathVariable String simulationId) {
         GetSimulationScheduleResponse response = simulationService.getSimulationSchedule(member, simulationId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // simulation POST /api/simulation/{simulationScheduleId}/summary 스케줄 ai 조언 admin, planner
+    @PostMapping("/{simulationId}/summary")
+    public ResponseEntity<ScheduleSummaryResponse> simulationScheduleGPTAdvice(@RequestAttribute Member member,
+                                                                               @PathVariable String simulationId) throws JsonProcessingException {
+
+        ScheduleSummaryResponse response = simulationService.simulationScheduleGPTAdvice(member, simulationId);
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
