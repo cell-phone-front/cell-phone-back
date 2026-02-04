@@ -25,7 +25,8 @@ public class GetAllSimulationResponse {
             "requiredStaff",
             "status",
             "simulationStartDate",
-            "workTime"
+            "workTime",
+            "aiSummary"
     })
     public static class Item{
         String id;
@@ -37,6 +38,7 @@ public class GetAllSimulationResponse {
         String status;
         LocalDate simulationStartDate;
         int workTime;
+        String aiSummary;
 
 
     }
