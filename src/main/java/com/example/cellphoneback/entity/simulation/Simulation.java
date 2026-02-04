@@ -29,6 +29,7 @@ public class Simulation {
     private String status;
     private LocalDate simulationStartDate;
     private int workTime;
+    private String aiSummary;
 
     @OneToMany(mappedBy = "simulation")
     private List<SimulationProduct> simulationProductList;

@@ -37,7 +37,6 @@ public class SimulationSchedule {
 
     private LocalDateTime startAt;
     private LocalDateTime endAt;
-    private String aiSummary;
 
 
 }

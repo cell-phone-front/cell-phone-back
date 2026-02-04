@@ -29,7 +29,6 @@ import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -86,7 +85,7 @@ public class SimulationService {
 
 
     //    simulation	POST	/api/simulation/{simulationId}/	시뮬레이션 실행 요청	admin, planner
-    public RunSimulationResponse runSimulation(Member member, String simulationId) {
+    public RunSimulationResponse runSimulation(Member member, String simulationId) throws JsonProcessingException {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 실행 요청 권한이 없습니다.");
@@ -94,9 +93,9 @@ public class SimulationService {
         Simulation simulation = simulationRepository.findById(simulationId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 시뮬레이션이 존재하지 않습니다."));
 
-        RestClient restClient = RestClient.create();
+        RestClient python = RestClient.create();
 
-        SolveApiResult result = restClient.post()
+        SolveApiResult result = python.post()
                 .uri("http://127.0.0.1:5050/api/solve")
                 .body(Map.of("simulation", simulation))
                 .retrieve()
@@ -167,7 +166,60 @@ public class SimulationService {
         }
         simulationScheduleRepository.saveAll(scheduleList);
 
-        return RunSimulationResponse.builder().status(result.getStatus()).build();
+        // 여기서부터는 OpenAI API 에 대한 로직
+        List<SimulationSchedule> schedules = simulationScheduleRepository.findAll().stream()
+                .filter(s -> s.getSimulation().getId().equals(simulationId)).toList();
+
+        if (scheduleList.isEmpty()){
+            throw new NoSuchElementException("존재하지 않는 스케줄 입니다.");
+        }
+
+        // JPA Entity(SimulationSchedule)를
+        // API 응답용 DTO(GetSimulationScheduleResponse)로 변환하는 로직
+        // Entity를 재사용하기 위해 필요한 로직
+        List<GetSimulationScheduleResponse.Item> items = schedules.stream()
+                .map(schedule -> GetSimulationScheduleResponse.Item.fromEntity(schedule)).toList();
+
+        // Java 객체, LocalDateTime 을 JSON으로 받기위해
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // OpenAI API 보낼 요청 JSON 전체 구조를 만들기 위한 Map
+        Map<String, Object> body = new HashMap<>();
+
+        // 사용할 모델 지정, 지시문 역할,
+        // objectMapper로 JSON 문자열로 변환 input에 문자열(text) 형태로 전달
+        body.put("model", "gpt-4o-mini");
+        body.put("instructions", "내가 보내는 작업 스케쥴에 대해 적절한 개선 포인트에 대한 피드백을 보내줘.");
+        body.put("input", objectMapper.writeValueAsString(items));
+
+        // RestClient로 OpenAI 호출
+        RestClient openAI = RestClient.create("https://api.openai.com/v1/responses");
+        String json = openAI
+                .post()
+                .header("Content-type", "application/json") // JSON 형식으로 요청 보낸다는 의미
+                .header("Authorization", "Bearer " + apiKey)
+                .body(body) // Map을 JSON으로 변환해서 전송
+                .retrieve()
+                .body(String.class); // 응답을 String(json 원문) 으로 받음
+
+        // GPT 응답 파싱 (path 사용으로 NPE 방지)
+        System.out.println(json);
+        JsonNode root = objectMapper.readTree(json); // json 문자열 트리 구조로 변환
+        JsonNode output = root.path("output");
+
+        String msg = output.path(0) // 첫번째 응답 르록
+                .path("content").path(0) // 실제 텍스트가 들어있는 객체
+                .path("text") // GPT가 생성한 자연어 답변
+                .asText(); // String으로 변환
+        System.out.println(msg);
+
+
+        simulation.setAiSummary(msg);
+        simulationRepository.save(simulation);
+
+        return RunSimulationResponse.builder().status(result.getStatus()).aiSummary(msg).build();
 
     }
 
@@ -243,54 +295,6 @@ public class SimulationService {
                 selectSchedule.stream().map(entity -> GetSimulationScheduleResponse.Item.fromEntity(entity)).toList();
 
         return GetSimulationScheduleResponse.builder().scheduleList(items).build();
-    }
-
-    // simulation POST /api/simulation/{simulationId}/summary 스케줄 ai 조언 admin, planner
-    public ScheduleSummaryResponse simulationScheduleGPTAdvice(Member member, String simulationId ) throws JsonProcessingException {
-        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("프로그램 실행 권한이 없습니다.");
-        }
-
-
-        List<SimulationSchedule> scheduleList = simulationScheduleRepository.findAll().stream()
-                .filter(s -> s.getSimulation().getId().equals(simulationId)).toList();
-
-
-        // JPA Entity(SimulationSchedule)를
-        // API 응답용 DTO(GetSimulationScheduleResponse)로 변환하는 로직
-        // Entity를 재사용하기 위해 필요한 로직
-        List<GetSimulationScheduleResponse.Item> items = scheduleList.stream()
-                .map(schedule -> GetSimulationScheduleResponse.Item.fromEntity(schedule)).toList();
-
-        // LocalDateTime 을 JSON으로 받기위해
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-        Map<String, Object> body = new HashMap<>();
-
-        body.put("model", "gpt-4o-mini");
-        body.put("instructions", "이렇게 스케줄이 나왔는데 여기서 인원을 얼마나 투입 시켜야 최대한 많이 생산할 수 있을까?");
-        body.put("input", objectMapper.writeValueAsString(items));
-
-        RestClient restClient = RestClient.create("https://api.openai.com/v1/responses");
-        String json = restClient
-                .post()
-                .header("Content-type", "application/json")
-                .header("Authorization", "Bearer " + apiKey)
-                .body(body)
-                .retrieve()
-                .body(String.class);
-        JsonNode jsonNode = objectMapper.readTree(json);
-        String msg = jsonNode.get("outPut").get(0).get("content").get(0).get("text").asText();
-        String[] advice = objectMapper.readValue(msg, String[].class);
-
-        scheduleList.forEach(e -> e.setAiSummary(msg));
-        simulationScheduleRepository.saveAll(scheduleList);
-
-        return ScheduleSummaryResponse.builder().success(true).schedule(items).advice(advice).build();
-
-
     }
 
 }
