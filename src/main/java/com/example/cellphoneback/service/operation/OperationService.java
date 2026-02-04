@@ -120,7 +120,8 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    return o.getName().contains(keyword) || o.getDescription().contains(keyword);
+                    return o.getName() != null &&o.getName().contains(keyword)
+                            || o.getDescription() != null && o.getDescription().contains(keyword);
                 })
                 .toList();
 

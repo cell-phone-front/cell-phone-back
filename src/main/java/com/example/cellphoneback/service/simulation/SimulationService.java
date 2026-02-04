@@ -20,6 +20,8 @@ import com.example.cellphoneback.repository.simulation.SimulationScheduleReposit
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -221,8 +223,9 @@ public class SimulationService {
                     if(keyword == null || keyword.isBlank())
                         return true;
 
-                    return s.getMemberName().contains(keyword) || s.getTitle().contains(keyword)
-                            || s.getDescription().contains(keyword);
+                    return s.getMemberName() != null && s.getMemberName().contains(keyword)
+                            || s.getTitle() != null && s.getTitle().contains(keyword)
+                            || s.getDescription() != null && s.getDescription().contains(keyword);
                 }).toList();
 
         return GetAllSimulationResponse.builder().simulationScheduleList(simulations).build();
@@ -242,23 +245,35 @@ public class SimulationService {
         return GetSimulationScheduleResponse.builder().scheduleList(items).build();
     }
 
-    // simulation POST /api/simulation/{simulationScheduleId}/summary 스케줄 ai 조언 admin, planner
-    public ScheduleSummaryResponse simulationScheduleGPTAdvice(Member member, int simulationScheduleId) throws JsonProcessingException {
+    // simulation POST /api/simulation/{simulationId}/summary 스케줄 ai 조언 admin, planner
+    public ScheduleSummaryResponse simulationScheduleGPTAdvice(Member member, String simulationId ) throws JsonProcessingException {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("프로그램 실행 권한이 없습니다.");
         }
 
 
-        SimulationSchedule simulationSchedule = simulationScheduleRepository.findById(simulationScheduleId).orElseThrow();
+        List<SimulationSchedule> scheduleList = simulationScheduleRepository.findAll().stream()
+                .filter(s -> s.getSimulation().getId().equals(simulationId)).toList();
 
+
+        // JPA Entity(SimulationSchedule)를
+        // API 응답용 DTO(GetSimulationScheduleResponse)로 변환하는 로직
+        // Entity를 재사용하기 위해 필요한 로직
+        List<GetSimulationScheduleResponse.Item> items = scheduleList.stream()
+                .map(schedule -> GetSimulationScheduleResponse.Item.fromEntity(schedule)).toList();
+
+        // LocalDateTime 을 JSON으로 받기위해
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         Map<String, Object> body = new HashMap<>();
 
         body.put("model", "gpt-4o-mini");
-        body.put("instructions", "");
-        body.put("input", objectMapper.writeValueAsString(simulationSchedule));
+        body.put("instructions", "이렇게 스케줄이 나왔는데 여기서 인원을 얼마나 투입 시켜야 최대한 많이 생산할 수 있을까?");
+        body.put("input", objectMapper.writeValueAsString(items));
 
-        RestClient restClient = RestClient.create();
+        RestClient restClient = RestClient.create("https://api.openai.com/v1/responses");
         String json = restClient
                 .post()
                 .header("Content-type", "application/json")
@@ -270,10 +285,10 @@ public class SimulationService {
         String msg = jsonNode.get("outPut").get(0).get("content").get(0).get("text").asText();
         String[] advice = objectMapper.readValue(msg, String[].class);
 
-        simulationSchedule.setAiSummary(msg);
-        simulationScheduleRepository.save(simulationSchedule);
+        scheduleList.forEach(e -> e.setAiSummary(msg));
+        simulationScheduleRepository.saveAll(scheduleList);
 
-        return null;//ScheduleSummaryResponse.builder().success(true).schedule(simulationSchedule).advice(advice).build();
+        return ScheduleSummaryResponse.builder().success(true).schedule(items).advice(advice).build();
 
 
     }
