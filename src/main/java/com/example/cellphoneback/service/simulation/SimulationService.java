@@ -297,4 +297,19 @@ public class SimulationService {
         return GetSimulationScheduleResponse.builder().scheduleList(items).build();
     }
 
+    // simulation GET /api/simulation/schedule/{memberId} 작업스케줄 개인 조회 all
+    public SchedulePersonalResponse getSchedulePersonal (Member member){
+        Member user = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new NoSuchElementException("로그인 사용자 정보가 없습니다."));
+
+        List<SimulationSchedule> scheduleList = simulationScheduleRepository.findAll().stream()
+                .filter(s -> s.getWorkerId().getId().equals(user.getId()) ||
+                        s.getPlannerId().getId().equals(user.getId())).toList();
+        List<SchedulePersonalResponse.Item> items =
+                scheduleList.stream().map(entity -> SchedulePersonalResponse.Item.fromEntity(entity)).toList();
+
+        return SchedulePersonalResponse.builder().schedule(items).build();
+    }
+
+
 }
