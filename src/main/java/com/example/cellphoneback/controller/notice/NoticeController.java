@@ -74,11 +74,11 @@ public class NoticeController {
     @GetMapping("/{noticeId}")
     public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@PathVariable Integer noticeId) {
 
-        Notice response = noticeService.searchNoticeById(noticeId);
+        SearchNoticeByIdResponse response = noticeService.searchNoticeById(noticeId);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200
-                .body(SearchNoticeByIdResponse.fromEntity(response));
+                .body(response);
     }
 
     // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
@@ -92,7 +92,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    // notice	POST	/api/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
     @PostMapping("/{noticeId}/attachment")
     public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@PathVariable Integer noticeId,
                                                                @RequestParam("files") List<MultipartFile> files)  {
