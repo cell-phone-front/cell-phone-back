@@ -132,15 +132,17 @@ public class NoticeService {
 
     // GET	/api/notice/{noticeId}	해당 공지사항 조회	all
     @Transactional
-    public Notice searchNoticeById(Integer communityId) {
+    public SearchNoticeByIdResponse searchNoticeById(Integer noticeId) {
 
-        noticeRepository.increaseViewCount(communityId);
+        noticeRepository.increaseViewCount(noticeId);
 
-        Notice notice = noticeRepository.findById(communityId)
+        Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
 
-        return notice;
+        List<NoticeAttachment> attachments = noticeAttachmentRepository.findByNoticeId(noticeId);
+
+        return SearchNoticeByIdResponse.fromEntity(notice, attachments);
     }
 
     // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner

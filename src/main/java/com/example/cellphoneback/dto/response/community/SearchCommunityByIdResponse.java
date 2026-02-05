@@ -14,6 +14,8 @@ public class SearchCommunityByIdResponse {
         String title;
         String content;
         LocalDateTime createdAt;
+        int commentCount;
+        int viewCount;
 
         public static SearchCommunityByIdResponse fromEntity(Community community){
             return SearchCommunityByIdResponse.builder()
@@ -22,6 +24,8 @@ public class SearchCommunityByIdResponse {
                     .title(community.getTitle())
                     .content(community.getContent())
                     .createdAt(community.getCreatedAt())
+                    .commentCount(community.getCommentCount())
+                    .viewCount(community.getViewCount())
                     .build();
         }
     }
