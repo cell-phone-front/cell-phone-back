@@ -3,6 +3,7 @@ package com.example.cellphoneback.service.notice;
 
 import com.example.cellphoneback.dto.request.notice.CreateNoticeRequest;
 import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
+import com.example.cellphoneback.dto.response.notice.NoticeNotificationResponse;
 import com.example.cellphoneback.dto.response.notice.PinNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
 import com.example.cellphoneback.dto.response.notice.SearchNoticeByIdResponse;
@@ -20,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.management.Notification;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -173,11 +173,14 @@ public class NoticeService {
     }
 
     // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
-    public List<NoticeAttachment> uploadFiles(Integer noticeId, List<MultipartFile> files) {
+    public List<NoticeAttachment> uploadFiles(Member member, Integer noticeId, String noticeAttachmentId, List<MultipartFile> files) {
 
+        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
+            throw new IllegalArgumentException("공지사항 파일 첨부 권한이 없습니다.");
+        }
 
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new NoSuchElementException("커뮤니티 글 없음"));
+                .orElseThrow(() -> new NoSuchElementException("공지사항 없음"));
 
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("업로드할 파일이 없습니다."); //400
@@ -211,7 +214,7 @@ public class NoticeService {
                     .noticeId(noticeId)
                     .fileSize(file.getSize())
                     .fileType(file.getContentType())
-                    .fileUrl("/files/notice/" + noticeId + "/" + savedFileName)
+                    .fileUrl(savedFileName)
                     .build();
 
             attachments.add(attachment);
@@ -220,5 +223,28 @@ public class NoticeService {
         noticeAttachmentRepository.saveAll(attachments);
 
         return attachments;
+    }
+
+    // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 다운로드 admin, planner
+    public NoticeAttachment getNoticeAttachment(Member member, Integer noticeId, String noticeAttachmentId) {
+
+        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
+            throw new IllegalArgumentException("공지사항 파일 조회 권한이 없습니다.");
+        }
+
+        noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new NoSuchElementException("공지사항 없음"));
+
+        return noticeAttachmentRepository.findByNoticeIdAndId(noticeId, noticeAttachmentId)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("첨부파일 없음"));
+    }
+
+    // notice	GET	/api/notice/notification/{memberId}	공지사항 알림 조회	all	pathvariable = memberId
+    public List<NoticeNotificationResponse> getNoticeNotifications(Member member) {
+
+        return noticeNotificationRepository.findByMemberId(member.getId());
+
     }
 }

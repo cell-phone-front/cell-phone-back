@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 //@SecurityRequirement(name = "bearerAuth")
 //@Tag(name = "Comment", description = "댓글 관련 API")
 @RestController
