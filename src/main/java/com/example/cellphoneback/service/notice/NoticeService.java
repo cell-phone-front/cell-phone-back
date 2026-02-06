@@ -241,7 +241,7 @@ public class NoticeService {
                 .orElseThrow(() -> new NoSuchElementException("첨부파일 없음"));
     }
 
-    // notice	GET	/api/notice/notification/{memberId}	공지사항 알림 조회	all	pathvariable = memberId
+    // notice	GET	/api/notice/notification	공지사항 알림 조회	all	pathvariable = memberId
     public List<NoticeNotificationResponse> getNoticeNotifications(Member member) {
 
         return noticeNotificationRepository.findByMemberId(member.getId());
