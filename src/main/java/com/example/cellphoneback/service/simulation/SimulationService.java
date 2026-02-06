@@ -135,11 +135,11 @@ public class SimulationService {
                         return plannerIterator.next();
                     });
             // 작업 시간 계산
-            LocalDateTime startAt = simulation.getSimulationStartDate()
-                    .atStartOfDay().plusHours(one.getStart());
+            LocalDateTime startAt = simulation.getSimulationStartDate().atStartOfDay().plusMinutes(one.getStart());
+
 
             LocalDateTime endAt = simulation.getSimulationStartDate()
-                    .atStartOfDay().plusHours(one.getEnd());
+                    .atStartOfDay().plusMinutes(one.getEnd());
 
             // 공정별 필요한 직원 수
 
@@ -310,6 +310,5 @@ public class SimulationService {
 
         return SchedulePersonalResponse.builder().schedule(items).build();
     }
-
 
 }
