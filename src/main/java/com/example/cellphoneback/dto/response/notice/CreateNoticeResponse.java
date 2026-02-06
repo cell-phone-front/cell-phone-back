@@ -15,7 +15,7 @@ public class CreateNoticeResponse {
     String title;
     String content;
     LocalDateTime createdAt;
-    boolean pinned;
+   Boolean pinned;
     int viewCount;
 
     public static CreateNoticeResponse fromEntity(Notice notice){
@@ -25,7 +25,7 @@ public class CreateNoticeResponse {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
-                .pinned(notice.isPinned())
+                .pinned(notice.getPinned())
                 .viewCount(notice.getViewCount())
                 .build();
     }

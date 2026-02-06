@@ -32,7 +32,7 @@ public class SearchNoticeByIdResponse {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
-                .pinned(notice.isPinned())
+                .pinned(notice.getPinned())
                 .viewCount(notice.getViewCount())
                 .attachments(
                         attachments.stream()
@@ -50,7 +50,7 @@ public class SearchNoticeByIdResponse {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
-                .pinned(notice.isPinned())
+                .pinned(notice.getPinned())
                 .viewCount(notice.getViewCount())
                 .attachments(List.of())
                 .build();
