@@ -32,7 +32,6 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         return  (uri.equals("/api/member/login"))
-                || uri.contains("/attachment/")
                 || method.equals("OPTIONS"); // 메소드 요청이 OPTIONS 라고 오면 필터를 거치지 않겠다.
     }
 

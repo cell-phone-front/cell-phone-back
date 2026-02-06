@@ -12,11 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -110,22 +113,22 @@ public class NoticeController {
                 .body(response);
     }
 
-    // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 조회	admin, planner
+    // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 다운로드	admin, planner
     @GetMapping("/{noticeId}/attachment/{noticeAttachmentId}")
     public ResponseEntity<Resource> getNoticeAttachments(@RequestAttribute Member member,
                                                          @PathVariable Integer noticeId,
                                                          @PathVariable String noticeAttachmentId) throws MalformedURLException {
 
-        NoticeAttachment attachment = noticeService.getNoticeAttachment(member, noticeId, noticeAttachmentId);
+        Path filePath = noticeService.getNoticeAttachmentPath(member, noticeId, noticeAttachmentId);
+        Resource resource = new UrlResource(filePath.toUri());
 
-        Path path = Paths.get(attachment.getFileUrl());
-        Resource resource = new UrlResource(path.toUri());
-        String fileName = path.getFileName().toString();
+        String fileName = filePath.getFileName().toString();
 
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 
-        return ResponseEntity
-                .status(HttpStatus.OK) //200
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName)
                 .body(resource);
     }
 

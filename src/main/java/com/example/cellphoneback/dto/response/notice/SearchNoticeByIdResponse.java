@@ -21,10 +21,9 @@ public class SearchNoticeByIdResponse {
     int viewCount;
     List<NoticeAttachmentResponse> attachments;
 
-    // 상세 조회용 (첨부파일 포함)
     public static SearchNoticeByIdResponse fromEntity(
             Notice notice,
-            List<NoticeAttachment> attachments
+            List<NoticeAttachment> attachments // null 가능
     ) {
         return SearchNoticeByIdResponse.builder()
                 .id(notice.getId())
@@ -32,27 +31,14 @@ public class SearchNoticeByIdResponse {
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
-                .pinned(notice.getPinned())
+                .pinned(Boolean.TRUE.equals(notice.getPinned())) // null-safe
                 .viewCount(notice.getViewCount())
                 .attachments(
-                        attachments.stream()
-                                .map(NoticeAttachmentResponse::fromEntity)
-                                .toList()
+                        attachments == null ? List.of() :
+                                attachments.stream()
+                                        .map(NoticeAttachmentResponse::fromEntity)
+                                        .toList()
                 )
-                .build();
-    }
-
-    // 목록 조회용 (첨부파일 없음)
-    public static SearchNoticeByIdResponse fromEntity(Notice notice) {
-        return SearchNoticeByIdResponse.builder()
-                .id(notice.getId())
-                .memberId(notice.getMember().getId())
-                .title(notice.getTitle())
-                .content(notice.getContent())
-                .createdAt(notice.getCreatedAt())
-                .pinned(notice.getPinned())
-                .viewCount(notice.getViewCount())
-                .attachments(List.of())
                 .build();
     }
 }
