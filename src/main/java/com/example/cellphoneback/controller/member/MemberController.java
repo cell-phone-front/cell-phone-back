@@ -49,9 +49,10 @@ public class MemberController {
 
     // GET /api/member	전체 멤버 조회	admin
     @GetMapping
-    public ResponseEntity<MemberListResponse> MemberList(@RequestAttribute Member member){
+    public ResponseEntity<MemberListResponse> MemberList(@RequestAttribute Member member,
+                                                         @RequestParam(required = false) String keyword){
 
-        MemberListResponse response = memberService.memberListService(member);
+        MemberListResponse response = memberService.memberListService(member, keyword);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
