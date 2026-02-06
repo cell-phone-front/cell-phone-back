@@ -70,4 +70,13 @@ public class SimulationController {
         GetSimulationScheduleResponse response = simulationService.getSimulationSchedule(member, simulationId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // simulation GET /api/simulation/schedule/{memberId} 작업스케줄 개인 조회 all
+    @GetMapping("/schedule/{memberId}")
+    public ResponseEntity<SchedulePersonalResponse> getSchedulePersonal(@RequestAttribute Member member){
+
+        SchedulePersonalResponse response = simulationService.getSchedulePersonal(member);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
