@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 @Setter
 public class NoticeNotificationResponse {
 
-    private Long id;
+    private int id;
     private String message;
     private String link;
     private Boolean isRead;
     private LocalDateTime createdAt;
 
-    public NoticeNotificationResponse(Long id, String message, String link, Boolean isRead, LocalDateTime createdAt) {
+    public NoticeNotificationResponse(int id, String message, String link, Boolean isRead, LocalDateTime createdAt) {
         this.id = id;
         this.message = message;
         this.link = link;

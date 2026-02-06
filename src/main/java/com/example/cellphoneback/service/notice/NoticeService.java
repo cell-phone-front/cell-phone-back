@@ -110,7 +110,7 @@ public class NoticeService {
 
         // 정렬 - 최신순, 검색
         List<SearchNoticeByIdResponse> noticeList = notices.stream()
-                .sorted(Comparator.comparing(Notice::getPinned).reversed()
+                .sorted(Comparator.comparing((Notice n) -> n.getPinned() != null && n.getPinned())
                         .thenComparing(Notice::getCreatedAt).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
@@ -120,7 +120,7 @@ public class NoticeService {
                     return (c.getTitle() != null && c.getTitle().contains(kw)) ||
                             (c.getContent() != null && c.getContent().contains(kw));
                 })
-                .map(SearchNoticeByIdResponse::fromEntity)
+                .map(n->SearchNoticeByIdResponse.fromEntity(n, null))
                 .toList();
 
 
@@ -226,7 +226,7 @@ public class NoticeService {
     }
 
     // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 다운로드 admin, planner
-    public NoticeAttachment getNoticeAttachment(Member member, Integer noticeId, String noticeAttachmentId) {
+    public Path getNoticeAttachmentPath(Member member, Integer noticeId, String noticeAttachmentId) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new IllegalArgumentException("공지사항 파일 조회 권한이 없습니다.");
@@ -235,10 +235,20 @@ public class NoticeService {
         noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new NoSuchElementException("공지사항 없음"));
 
-        return noticeAttachmentRepository.findByNoticeIdAndId(noticeId, noticeAttachmentId)
+        NoticeAttachment attachment = noticeAttachmentRepository.findByNoticeIdAndId(noticeId, noticeAttachmentId)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("첨부파일 없음"));
+
+
+        Path uploadPath = Path.of(System.getProperty("user.home"), "cellphone", "notice", String.valueOf(noticeId));
+        Path filePath = uploadPath.resolve(attachment.getFileUrl());
+
+        if (!Files.exists(filePath)) {
+            throw new NoSuchElementException("파일이 서버에 존재하지 않습니다.");
+        }
+
+        return filePath;
     }
 
     // notice	GET	/api/notice/notification	공지사항 알림 조회	all	pathvariable = memberId
