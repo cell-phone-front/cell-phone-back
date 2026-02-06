@@ -7,6 +7,9 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.notice.Notice;
 import com.example.cellphoneback.entity.notice.NoticeAttachment;
 import com.example.cellphoneback.service.notice.NoticeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.UrlResource;
@@ -21,11 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-//@SecurityRequirement(name = "bearerAuth")
-//@Tag(name = "Comment", description = "댓글 관련 API")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Notice", description = "공지사항 관련 API")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ import java.util.List;
 public class NoticeController {
     private final NoticeService noticeService;
 
-    //1	notice	POST	/api/notice	공지사항 작성	admin, planner
+    @Operation(summary = "공지사항 작성", description = "새 공지사항을 작성합니다.")
     @PostMapping
     public ResponseEntity<CreateNoticeResponse> createNotice(@RequestAttribute Member member,
                                                              @RequestBody CreateNoticeRequest request) {
@@ -45,7 +47,7 @@ public class NoticeController {
                 .body(CreateNoticeResponse.fromEntity(response));
     }
 
-    //2	notice	PUT	/api/notice	공지사항 수정	admin, planner
+    @Operation(summary = "공지사항 수정", description = "기존 공지사항을 수정합니다.")
     @PutMapping("/{noticeId}")
     public ResponseEntity<EditNoticeResponse> updateNotice(@RequestAttribute Member member,
                                                            @PathVariable Integer noticeId,
@@ -56,7 +58,7 @@ public class NoticeController {
                 .body(EditNoticeResponse.fromEntity(response));
     }
 
-    //3	notice	DELETE	/api/notice	공지사항 삭제	admin, planner
+    @Operation(summary = "공지사항 삭제", description = "기존 공지사항을 삭제합니다.")
     @DeleteMapping("/{noticeId}")
     public ResponseEntity<DeleteNoticeResponse> deleteNotice(@RequestAttribute Member member,
                                                              @PathVariable Integer noticeId) {
@@ -67,7 +69,7 @@ public class NoticeController {
                 .body(DeleteNoticeResponse.fromEntity());
     }
 
-    //4	notice	GET	/api/notice	공지사항 조회	all
+    @Operation(summary = "공지사항 전체 목록 조회", description = "모든 공지사항을 조회합니다.")
     @GetMapping
     public ResponseEntity<SearchAllNoticeResponse> getNotice(@RequestAttribute Member member,
                                                              @RequestParam(required = false) String keyword) {
@@ -78,7 +80,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    // 5	notice	GET	/api/notice/{noticeId}	해당 공지사항 조회	all
+    @Operation(summary = "공지사항 상세 조회", description = "공지사항을 ID로 조회합니다.")
     @GetMapping("/{noticeId}")
     public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@PathVariable Integer noticeId) {
 
@@ -89,7 +91,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
+    @Operation(summary = "공지사항 고정/고정해제", description = "공지사항을 고정하거나 고정해제합니다.")
     @PatchMapping("/{noticeId}/pin")
     public ResponseEntity<PinNoticeResponse> pinNotice(@RequestAttribute Member member,
                                                        @PathVariable Integer noticeId) {
@@ -100,7 +102,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    @Operation(summary = "공지사항 파일 업로드", description = "공지사항에 파일을 업로드합니다.")
     @PostMapping("/{noticeId}/attachment")
     public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@RequestAttribute Member member,
                                                                   @PathVariable Integer noticeId,
@@ -113,7 +115,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 다운로드	admin, planner
+    @Operation(summary = "공지사항 첨부파일 다운로드", description = "공지사항 첨부파일을 다운로드합니다.")
     @GetMapping("/{noticeId}/attachment/{noticeAttachmentId}")
     public ResponseEntity<Resource> getNoticeAttachments(@RequestAttribute Member member,
                                                          @PathVariable Integer noticeId,
@@ -132,7 +134,7 @@ public class NoticeController {
                 .body(resource);
     }
 
-    // notice	GET	/api/notice/notification	공지사항 알림 조회	all	pathvariable = memberId
+    @Operation(summary = "공지 알림 조회", description = "멤버의 공지 알림 목록을 조회합니다.")
     @GetMapping("/notification")
     public ResponseEntity<List<NoticeNotificationResponse>> getNoticeNotifications(@RequestAttribute Member member) {
         List<NoticeNotificationResponse> response = noticeService.getNoticeNotifications(member);

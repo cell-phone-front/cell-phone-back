@@ -6,14 +6,17 @@ import com.example.cellphoneback.dto.response.operation.machine.MachineListRespo
 import com.example.cellphoneback.dto.response.operation.machine.MachineParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.operation.MachineService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-//@SecurityRequirement(name = "bearerAuth")
-//@Tag(name = "Comment", description = "댓글 관련 API")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Machine", description = "기계 관련 API")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -22,7 +25,7 @@ public class MachineController {
     private final MachineService machineService;
 
 
-    // POST	/api/operation/machine/xls	기계 엑셀 파싱	admin,planner
+    @Operation(summary = "기계 엑셀 파싱", description = "기계 엑셀 파일을 파싱합니다. admin, planner 권한 필요")
     @PostMapping("/xls")
     public ResponseEntity<MachineParseResponse> machineParse(@RequestAttribute Member member,
                                                              @RequestBody MultipartFile file) {
@@ -33,7 +36,7 @@ public class MachineController {
     }
 
 
-    // POST	/api/operation/machine/upsert	기계 등록, 수정, 삭제	admin,planner
+    @Operation(summary = "기계 일괄 생성, 수정, 삭제", description = "기계 정보를 일괄적으로 생성, 수정, 삭제합니다. admin, planner 권한 필요")
     @PostMapping("/upsert")
     public ResponseEntity<MachineBulkUpsertResponse> machineUpsert(@RequestAttribute Member member,
                                                                    @RequestBody MachineBulkUpsertRequest request){
@@ -44,7 +47,7 @@ public class MachineController {
     }
 
 
-    // GET	/api/operation/machine	기계 전체 조회	admin,planner
+    @Operation(summary = "기계 목록 조회", description = "기계 목록을 조회합니다. admin, planner 권한 필요")
     @GetMapping
     public ResponseEntity<MachineListResponse> machineList(@RequestAttribute Member member,
                                                            @RequestParam(required = false) String keyword){

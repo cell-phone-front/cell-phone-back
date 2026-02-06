@@ -9,6 +9,9 @@ import com.example.cellphoneback.dto.response.community.comment.SearchAllComment
 import com.example.cellphoneback.entity.community.Comment;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.community.CommentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@SecurityRequirement(name = "bearerAuth")
-//@Tag(name = "Comment", description = "댓글 관련 API")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Comment", description = "커뮤니티 댓글 관련 API")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ import java.util.stream.Collectors;
 public class CommentController {
     private final CommentService commentService;
 
-    // POST	/api/comment/{communityId}/	댓글 작성	planner, worker	pathvariable={communityId}
+    @Operation(summary = "댓글 작성", description = "커뮤니티 글에 새 댓글을 작성합니다.")
     @PostMapping("/{communityId}")
     public ResponseEntity<CreateCommentResponse> createComment(@PathVariable Integer communityId,
                                                                @RequestAttribute Member member,
@@ -39,7 +42,7 @@ public class CommentController {
                 .body(CreateCommentResponse.fromEntity(response));
     }
 
-    // PUT	/api/comment/{commentId}/	댓글 수정	planner, worker	pathvariable={communityId}
+    @Operation(summary = "댓글 수정", description = "커뮤니티에 작성된 댓글을 수정합니다.")
     @PutMapping("/{communityId}/{commentId}")
     public ResponseEntity<EditCommentResponse> updateComment(@PathVariable Integer communityId,
                                                              @PathVariable Integer commentId,
@@ -51,7 +54,7 @@ public class CommentController {
                 .body(EditCommentResponse.fromEntity(response));
     }
 
-    //DELETE	/api/comment/{commentId}/	댓글 삭제	planner, worker	pathvariable={communityId}
+    @Operation(summary = "댓글 삭제", description = "커뮤니티에 작성된 댓글을 삭제합니다.")
     @DeleteMapping("/{communityId}/{commentId}")
     public ResponseEntity<DeleteCommentResponse> deleteComment(@PathVariable Integer communityId,
                                                                @PathVariable Integer commentId,
@@ -63,7 +66,7 @@ public class CommentController {
                 .body(DeleteCommentResponse.fromEntity());
     }
 
-    // GET	/api/comment/{communityId}/	댓글  조회	all	pathvariable={communityId}
+    @Operation(summary = "댓글 전체 목록 조회", description = "커뮤니티 글에 작성된 모든 댓글을 조회합니다.")
     @GetMapping("/{communityId}")
     public ResponseEntity<List<SearchAllCommentResponse>> getComments(@PathVariable Integer communityId) {
         List<Comment> response = commentService.searchAllComment(communityId);

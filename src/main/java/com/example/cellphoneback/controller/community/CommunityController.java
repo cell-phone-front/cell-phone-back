@@ -6,6 +6,9 @@ import com.example.cellphoneback.dto.response.community.*;
 import com.example.cellphoneback.entity.community.Community;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.community.CommunityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@SecurityRequirement(name = "bearerAuth")
-//@Tag(name = "Comment", description = "댓글 관련 API")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Community", description = "커뮤니티 관련 API")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
 public class CommunityController {
     final CommunityService communityService;
 
-    //    community	POST	/api/community	게시글 작성	planner, worker
+    @Operation(summary = "게시글 작성", description = "커뮤니티에 새 게시글을 작성합니다.")
     @PostMapping
     public ResponseEntity<CreateCommunityResponse> createCommunity(@RequestAttribute Member member,
                                                                    @RequestBody CreateCommunityRequest request) {
@@ -36,7 +39,7 @@ public class CommunityController {
 
     }
 
-    //    community	PUT	/api/community	게시글 수정	planner, worker
+    @Operation(summary = "게시글 수정", description = "커뮤니티에 작성된 게시글을 수정합니다.")
     @PutMapping("/{communityId}")
     public ResponseEntity<EditCommunityResponse> editCommunity(@RequestAttribute Member member,
                                                                @PathVariable Integer communityId,
@@ -48,7 +51,7 @@ public class CommunityController {
                 .body(EditCommunityResponse.fromEntity(response));
     }
 
-    //    community	DELETE	/api/community	게시글 삭제	planner, worker
+    @Operation(summary = "게시글 삭제", description = "커뮤니티에 작성된 게시글을 삭제합니다.")
     @DeleteMapping("/{communityId}")
     public ResponseEntity<DeleteCommunityResponse> deleteCommunity(@RequestAttribute Member member,
                                                                     @PathVariable Integer communityId) {
@@ -60,7 +63,7 @@ public class CommunityController {
                 .body(DeleteCommunityResponse.fromEntity());
     }
 
-    //    community	GET	/api/community	게시글 조회	all
+    @Operation(summary = "게시글 전체 목록 조회", description = "커뮤니티에 작성된 모든 게시글을 조회합니다.")
     @GetMapping
     public ResponseEntity<SearchAllCommunityResponse> searchAllCommunity(@RequestParam(required = false) String keyword) {
 
@@ -71,7 +74,7 @@ public class CommunityController {
                 .body(response);
     }
 
-    // community	GET	/api/community/{communityId}	해당 게시글 조회	all
+    @Operation(summary = "게시글 상세 조회", description = "커뮤니티에 작성된 게시글을 상세 조회합니다.")
     @GetMapping("/{communityId}")
     public ResponseEntity<SearchCommunityByIdResponse> searchCommunityById(@PathVariable Integer communityId) {
 
