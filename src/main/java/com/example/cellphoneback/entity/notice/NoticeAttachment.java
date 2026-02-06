@@ -1,10 +1,8 @@
 package com.example.cellphoneback.entity.notice;
 
-import com.example.cellphoneback.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter

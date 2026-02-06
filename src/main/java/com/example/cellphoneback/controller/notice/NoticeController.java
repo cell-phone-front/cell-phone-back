@@ -7,14 +7,19 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.notice.Notice;
 import com.example.cellphoneback.entity.notice.NoticeAttachment;
 import com.example.cellphoneback.service.notice.NoticeService;
+import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //@SecurityRequirement(name = "bearerAuth")
 //@Tag(name = "Comment", description = "댓글 관련 API")
@@ -84,7 +89,7 @@ public class NoticeController {
     // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
     @PatchMapping("/{noticeId}/pin")
     public ResponseEntity<PinNoticeResponse> pinNotice(@RequestAttribute Member member,
-                                            @PathVariable Integer noticeId) {
+                                                       @PathVariable Integer noticeId) {
         PinNoticeResponse response = noticeService.pinNotice(noticeId, member);
 
         return ResponseEntity
@@ -92,13 +97,43 @@ public class NoticeController {
                 .body(response);
     }
 
-    // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
-    @PostMapping("/{noticeId}/attachment")
-    public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@PathVariable Integer noticeId,
-                                                               @RequestParam("files") List<MultipartFile> files)  {
+    // notice	POST	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    @PostMapping("/{noticeId}/attachment/{noticeAttachmentId}")
+    public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@RequestAttribute Member member,
+                                                                  @PathVariable Integer noticeId,
+                                                                  @PathVariable String noticeAttachmentId,
+                                                                  @RequestParam("files") List<MultipartFile> files) {
 
-        List<NoticeAttachment> response = noticeService.uploadFiles(noticeId, files);
+        List<NoticeAttachment> response = noticeService.uploadFiles(member, noticeId, noticeAttachmentId, files);
 
+        return ResponseEntity
+                .status(HttpStatus.OK) //200
+                .body(response);
+    }
+
+    // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 조회	admin, planner
+    @GetMapping("/{noticeId}/attachment/{noticeAttachmentId}")
+    public ResponseEntity<Resource> getNoticeAttachments(@RequestAttribute Member member,
+                                                         @PathVariable Integer noticeId,
+                                                         @PathVariable String noticeAttachmentId) throws MalformedURLException {
+
+        NoticeAttachment attachment = noticeService.getNoticeAttachment(member, noticeId, noticeAttachmentId);
+
+        Path path = Paths.get(attachment.getFileUrl());
+        Resource resource = new UrlResource(path.toUri());
+        String fileName = path.getFileName().toString();
+
+
+        return ResponseEntity
+                .status(HttpStatus.OK) //200
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(resource);
+    }
+
+    // notice	GET	/api/notice/notification	공지사항 알림 조회	all	pathvariable = memberId
+    @GetMapping("/notification")
+    public ResponseEntity<List<NoticeNotificationResponse>> getNoticeNotifications(@RequestAttribute Member member) {
+        List<NoticeNotificationResponse> response = noticeService.getNoticeNotifications(member);
         return ResponseEntity
                 .status(HttpStatus.OK) //200
                 .body(response);

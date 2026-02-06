@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -296,5 +297,6 @@ public class SimulationService {
 
         return GetSimulationScheduleResponse.builder().scheduleList(items).build();
     }
+
 
 }

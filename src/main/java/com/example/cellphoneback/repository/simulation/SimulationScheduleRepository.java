@@ -4,6 +4,10 @@ import com.example.cellphoneback.entity.simulation.SimulationSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface SimulationScheduleRepository extends JpaRepository<SimulationSchedule,Integer> {
+    List<SimulationSchedule> findByWorkerIdAndStartAtBetween(String id, LocalDateTime localDateTime, LocalDateTime localDateTime1);
 }
