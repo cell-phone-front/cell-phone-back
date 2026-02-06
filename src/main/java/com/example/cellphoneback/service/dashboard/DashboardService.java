@@ -36,6 +36,10 @@ public class DashboardService {
 
     public DashboardSearchResponse dashboardSearchAll(Member member, String keyword) {
 
+        if (keyword == null || keyword.isBlank()) {
+            return DashboardSearchResponse.empty();
+        }
+
         SearchAllCommunityResponse communities = safeCall(
                 () -> communityService.searchAllCommunity(keyword),
                 SearchAllCommunityResponse.builder()
@@ -108,7 +112,7 @@ public class DashboardService {
     private <T> T safeCall(Supplier<T> supplier, T emptyValue) {
         try {
             return supplier.get();
-        } catch (IllegalArgumentException | SecurityException e) {
+        } catch (Exception e) {
             return emptyValue;
         }
     }

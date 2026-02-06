@@ -23,4 +23,34 @@ public class DashboardSearchResponse {
     private ProductListResponse products;
     private TaskListResponse tasks;
     private GetAllSimulationResponse simulations;
+
+    public static DashboardSearchResponse empty() {
+        return DashboardSearchResponse.builder()
+                .communities(SearchAllCommunityResponse.builder()
+                        .totalCount(0L)
+                        .communityList(java.util.List.of())
+                        .build())
+                .members(MemberListResponse.builder()
+                        .memberList(java.util.List.of())
+                        .build())
+                .notices(SearchAllNoticeResponse.builder()
+                        .noticeList(java.util.List.of())
+                        .build())
+                .machines(MachineListResponse.builder()
+                        .machineList(java.util.List.of())
+                        .build())
+                .operations(OperationListResponse.builder()
+                        .operationList(java.util.List.of())
+                        .build())
+                .products(ProductListResponse.builder()
+                        .productList(java.util.List.of())
+                        .build())
+                .tasks(TaskListResponse.builder()
+                        .taskList(java.util.List.of())
+                        .build())
+                .simulations(GetAllSimulationResponse.builder()
+                        .simulationScheduleList(java.util.List.of())
+                        .build())
+                .build();
+    }
 }
