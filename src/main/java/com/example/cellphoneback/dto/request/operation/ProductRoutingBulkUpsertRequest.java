@@ -1,6 +1,7 @@
 package com.example.cellphoneback.dto.request.operation;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,8 @@ import java.util.List;
 @Setter
 public class ProductRoutingBulkUpsertRequest {
 
-    List<Item> productRoutingList;
+    @Schema(description = "제품 라우팅 목록", required = true)
+    private List<Item> productRoutingList;
 
     @Getter
     @Setter

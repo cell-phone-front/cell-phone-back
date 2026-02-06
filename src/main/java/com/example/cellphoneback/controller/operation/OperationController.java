@@ -6,14 +6,17 @@ import com.example.cellphoneback.dto.response.operation.operation.OperationListR
 import com.example.cellphoneback.dto.response.operation.operation.OperationParseResponse;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.service.operation.OperationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-//@SecurityRequirement(name = "bearerAuth")
-//@Tag(name = "Comment", description = "댓글 관련 API")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Operation", description = "공정 단계 관련 API")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -21,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class OperationController {
     private final OperationService operationService;
 
-//    operation	POST	/api/operation/xls	공정 단계 엑셀 파싱	admin, planner
+    @Operation(summary = "공정 단계 엑셀 파싱", description = "공정 단계 엑셀 파일을 파싱합니다. admin, planner 권한 필요")
     @PostMapping("/xls")
     public ResponseEntity<?> operationXls(@RequestBody MultipartFile file,
                                           @RequestAttribute Member member) {
@@ -30,7 +33,7 @@ public class OperationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-//    operation	POST	/api/operation/upsert	공정 단계 추가, 수정, 삭제	admin, planner
+    @Operation(summary = "공정 단계 등록, 수정, 삭제", description = "공정 단계를 등록, 수정, 삭제합니다. admin, planner 권한 필요")
     @PostMapping("/upsert")
     public ResponseEntity<?> operationUpsert(@RequestBody OperationBulkUpsertRequest request,
                                              @RequestAttribute Member member) {
@@ -40,7 +43,7 @@ public class OperationController {
     }
 
 
-    // 	operation	GET	/api/operation	공정 단계 전체 조회	admin, planner
+    @Operation(summary = "공정 단계 전체 조회", description = "모든 공정 단계를 조회합니다. admin, planner 권한 필요")
     @GetMapping
     public ResponseEntity<?> getAllOperations(@RequestAttribute Member member,
                                               @RequestParam(required = false) String keyword) {
