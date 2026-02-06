@@ -26,11 +26,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     // POST	/api/member/login	로그인	all
-    public MemberLoginResponse memberLoginService(MemberLoginRequest request){
+    public MemberLoginResponse memberLoginService(MemberLoginRequest request) {
         Member member = memberRepository.findById(request.getId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 멤버입니다."));
 
-        if(!member.getName().equals(request.getName())){
+        if (!member.getName().equals(request.getName())) {
             throw new IllegalStateException("정보가 일치하지 않습니다.");
         }
 
@@ -46,7 +46,7 @@ public class MemberService {
     }
 
     // POST	/api/member/parse/xls	멤버 엑셀 파싱	admin
-    public MemberParseResponse memberParseService(Member member, MultipartFile memberFile){
+    public MemberParseResponse memberParseService(Member member, MultipartFile memberFile) {
         if (!member.getRole().equals(Role.ADMIN)) {
             throw new SecurityException("ADMIN 권한이 없습니다.");
         }
@@ -72,7 +72,7 @@ public class MemberService {
 
                 MemberParseResponse.xls one =
                         MemberParseResponse.xls.builder()
-                                .id(UUID.randomUUID().toString().substring(0,6))
+                                .id(UUID.randomUUID().toString().substring(0, 6))
                                 .name(formatter.formatCellValue(row.getCell(1)))
                                 .email(formatter.formatCellValue(row.getCell(2)))
                                 .phoneNumber(formatter.formatCellValue(row.getCell(3)))
@@ -127,17 +127,25 @@ public class MemberService {
 
 
     // GET	/api/member	전체 멤버 조회	admin
-    public MemberListResponse memberListService(Member member) {
+    public MemberListResponse memberListService(Member member, String keyword) {
         if (!member.getRole().equals(Role.ADMIN)) {
             throw new SecurityException("ADMIN 권한이 없습니다.");
         }
 
-        List<Member> memberList = memberRepository.findAll();
+        List<Member> memberList = memberRepository.findAll().stream()
+                .filter(m -> {
+                    if (keyword == null || keyword.isBlank())
+                        return true;
+
+                    return (m.getName() != null && m.getName().contains(keyword))
+                            || (m.getDept() != null && m.getDept().contains(keyword))
+                            || (m.getWorkTeam() != null && m.getWorkTeam().contains(keyword));
+                }).toList();
         return MemberListResponse.builder().memberList(memberList).build();
     }
 
     // GET	/api/member/{memberId}	계정 조회	본인
-    public MemberSearchByIdResponse memberSearchByIdService(Member member){
+    public MemberSearchByIdResponse memberSearchByIdService(Member member) {
         Member self = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다."));
 
