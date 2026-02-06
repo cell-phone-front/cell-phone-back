@@ -43,7 +43,7 @@ public class NoticeService {
 
         Notice notice = request.toEntity();
         notice.setMember(member);
-        notice.setPinned(request.isPinned());
+        notice.setPinned(request.getPinned());
         Notice savedNotice = noticeRepository.save(notice);
 
         List<Member> members = memberRepository.findAll();
@@ -110,7 +110,7 @@ public class NoticeService {
 
         // 정렬 - 최신순, 검색
         List<SearchNoticeByIdResponse> noticeList = notices.stream()
-                .sorted(Comparator.comparing(Notice::isPinned).reversed()
+                .sorted(Comparator.comparing(Notice::getPinned).reversed()
                         .thenComparing(Notice::getCreatedAt).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
@@ -155,7 +155,7 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
 
-        boolean currentPin = notice.isPinned(); // 현재 핀 상태
+        boolean currentPin = notice.getPinned(); // 현재 핀 상태
         if (!currentPin) {
             long pinnedCount = noticeRepository.countByPinnedTrue(); // 현재 핀 고정된 공지사항 수
             if (pinnedCount >= 3) {
@@ -168,12 +168,12 @@ public class NoticeService {
 
         return PinNoticeResponse.builder()
                 .noticeId(notice.getId())
-                .pinned(notice.isPinned())
+                .pinned(notice.getPinned())
                 .build();
     }
 
     // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
-    public List<NoticeAttachment> uploadFiles(Member member, Integer noticeId, String noticeAttachmentId, List<MultipartFile> files) {
+    public List<NoticeAttachment> uploadFiles(Member member, Integer noticeId, List<MultipartFile> files) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new IllegalArgumentException("공지사항 파일 첨부 권한이 없습니다.");

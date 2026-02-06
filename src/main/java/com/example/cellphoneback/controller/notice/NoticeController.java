@@ -97,14 +97,13 @@ public class NoticeController {
                 .body(response);
     }
 
-    // notice	POST	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
-    @PostMapping("/{noticeId}/attachment/{noticeAttachmentId}")
+    // notice	POST	/api/notice/{noticeId}/attachment	공지사항 파일 첨부	admin, planner	pathvariable = noticeId
+    @PostMapping("/{noticeId}/attachment")
     public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@RequestAttribute Member member,
                                                                   @PathVariable Integer noticeId,
-                                                                  @PathVariable String noticeAttachmentId,
                                                                   @RequestParam("files") List<MultipartFile> files) {
 
-        List<NoticeAttachment> response = noticeService.uploadFiles(member, noticeId, noticeAttachmentId, files);
+        List<NoticeAttachment> response = noticeService.uploadFiles(member, noticeId, files);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200
