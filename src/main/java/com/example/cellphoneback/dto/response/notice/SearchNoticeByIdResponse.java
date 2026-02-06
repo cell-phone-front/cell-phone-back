@@ -2,6 +2,7 @@ package com.example.cellphoneback.dto.response.notice;
 
 import com.example.cellphoneback.entity.notice.Notice;
 import com.example.cellphoneback.entity.notice.NoticeAttachment;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,16 +11,32 @@ import java.util.List;
 
 @Getter
 @Builder
+@Schema(description = "공지사항 단건 조회 응답 DTO")
 public class SearchNoticeByIdResponse {
 
-    int id;
-    String memberId;
-    String title;
-    String content;
-    LocalDateTime createdAt;
-    boolean pinned;
-    int viewCount;
-    List<NoticeAttachmentResponse> attachments;
+    @Schema(description = "공지사항 ID", example = "123")
+    private int id;
+
+    @Schema(description = "작성자 멤버 ID", example = "member-001")
+    private String memberId;
+
+    @Schema(description = "공지사항 제목", example = "공지사항 제목 예시")
+    private String title;
+
+    @Schema(description = "공지사항 내용", example = "공지사항 내용 예시입니다.")
+    private String content;
+
+    @Schema(description = "작성일", example = "2026-02-06T09:00:00")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "공지사항 고정 여부", example = "true")
+    private boolean pinned;
+
+    @Schema(description = "조회수", example = "45")
+    private int viewCount;
+
+    @Schema(description = "첨부파일 리스트")
+    private List<NoticeAttachmentResponse> attachments;
 
     public static SearchNoticeByIdResponse fromEntity(
             Notice notice,
