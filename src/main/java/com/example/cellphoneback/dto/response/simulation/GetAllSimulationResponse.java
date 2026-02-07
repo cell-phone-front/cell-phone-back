@@ -1,6 +1,5 @@
 package com.example.cellphoneback.dto.response.simulation;
 
-import com.example.cellphoneback.entity.simulation.Simulation;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
