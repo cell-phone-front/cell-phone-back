@@ -1,6 +1,7 @@
 package com.example.cellphoneback.dto.request.community;
 
 import com.example.cellphoneback.entity.community.Comment;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "댓글 생성 요청 DTO")
 public class CreateCommentRequest {
-    private String content;
 
+    @Schema(description = "댓글 내용", example = "댓글 내용입니다.")
+    private String content;
 
     public Comment toEntity() {
         return Comment.builder()
