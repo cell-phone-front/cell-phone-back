@@ -37,6 +37,7 @@ public class GetSimulationScheduleResponse {
             "machineName",
             "operationId",
             "operationName",
+            "operationSeq",
             "startAt",
             "endAt"
     })
@@ -81,6 +82,9 @@ public class GetSimulationScheduleResponse {
         @Schema(description = "작업의 오퍼레이션 이름", example = "조립")
         private String operationName;
 
+        @Schema(description = "작업의 오페레이션 순서")
+        private int operationSeq;
+
         @Schema(description = "작업 시작 시간", example = "2024-07-01T08:00:00")
         private LocalDateTime startAt;
 
@@ -95,10 +99,7 @@ public class GetSimulationScheduleResponse {
                     .id(schedule.getId())//
                     .title(schedule.getSimulation().getTitle())//
                     .description(schedule.getSimulation().getDescription())//
-                    .productName(schedule.getSimulation()
-                            .getSimulationProductList().stream()
-                            .map(e -> e.getProduct().getName())
-                            .collect(Collectors.joining(", ")))//
+                    .productName(schedule.getProduct().getName())//
                     .requiredStaff(schedule.getSimulation().getRequiredStaff())//
                     .plannerName(schedule.getPlannerId().getName())//
                     .workerName(schedule.getWorkerId().getName())//
@@ -108,6 +109,11 @@ public class GetSimulationScheduleResponse {
                     .machineName(schedule.getTask().getMachine().getName())//
                     .operationId(schedule.getTask().getOperation().getId())//
                     .operationName(schedule.getTask().getOperation().getName())//
+                    .operationSeq(schedule.getProduct().getProductRoutingList().stream()
+                            .filter(p -> p.getOperation() != null)
+                            .filter(p -> p.getOperation().getId().equals(schedule.getTask().getOperation().getId()))
+                            .mapToInt(p -> p.getOperationSeq())
+                            .findFirst().orElse(0))//
                     .startAt(schedule.getStartAt())//
                     .endAt(schedule.getEndAt())//
                     .build();

@@ -156,6 +156,7 @@ public class SimulationService {
             scheduleList.add(
                     SimulationSchedule.builder()
                             .simulation(simulation)
+                            .product(productRepository.findById(one.getProductId()).orElseThrow())
                             .task(task)
                             .plannerId(planner)
                             .workerId(worker)

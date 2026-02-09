@@ -89,6 +89,16 @@ public class NoticeService {
             throw new SecurityException("공지사항 삭제 권한이 없습니다.");
         }
 
+        List<NoticeNotification> notification = noticeNotificationRepository.findAll().stream()
+                .filter(e -> e.getNoticeId() == noticeId).toList();
+
+        noticeNotificationRepository.deleteAll(notification);
+
+        List<NoticeAttachment> attachments = noticeAttachmentRepository.findAll().stream()
+                .filter(e -> e.getNoticeId() == noticeId).toList();
+
+        noticeAttachmentRepository.deleteAll(attachments);
+
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
