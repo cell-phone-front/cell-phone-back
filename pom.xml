@@ -30,6 +30,7 @@
         <java.version>21</java.version>
     </properties>
     <dependencies>
+        <!-- SwaggerConfig -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
