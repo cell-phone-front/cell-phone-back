@@ -43,7 +43,7 @@ public class OperationController {
     }
 
 
-    @Operation(summary = "공정 단계 전체 조회", description = "모든 공정 단계를 조회합니다. admin, planner 권한 필요")
+    @Operation(summary = "공정 단계 전체 조회", description = "모든 공정 단계를 조회합니다. 키워드로 필터링할 수 있습니다. admin, planner 권한 필요")
     @GetMapping
     public ResponseEntity<?> getAllOperations(@RequestAttribute Member member,
                                               @RequestParam(required = false) String keyword) {

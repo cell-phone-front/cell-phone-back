@@ -47,7 +47,7 @@ public class MachineController {
     }
 
 
-    @Operation(summary = "기계 목록 조회", description = "기계 목록을 조회합니다. admin, planner 권한 필요")
+    @Operation(summary = "기계 목록 조회", description = "기계 목록을 조회합니다. 키워드로 필터링할 수 있습니다. admin, planner 권한 필요")
     @GetMapping
     public ResponseEntity<MachineListResponse> machineList(@RequestAttribute Member member,
                                                            @RequestParam(required = false) String keyword){

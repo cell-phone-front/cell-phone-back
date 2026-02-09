@@ -58,7 +58,7 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "모든 시뮬레이션 조회", description = "모든 시뮬레이션의 요약 정보를 조회합니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "모든 시뮬레이션 조회", description = "모든 시뮬레이션의 요약 정보를 조회합니다. 키워드로 필터링할 수 있습니다. 관리자와 기획자만 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<GetAllSimulationResponse> getAllSimulations(@RequestAttribute Member member,
                                                                       @RequestParam(required = false) String keyword) {

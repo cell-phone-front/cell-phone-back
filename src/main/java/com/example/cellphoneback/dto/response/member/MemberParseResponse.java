@@ -14,14 +14,14 @@ import java.util.List;
 public class MemberParseResponse {
 
     @Schema(description = "회원 리스트")
-    private List<Xls> memberList;
+    private List<xls> memberList;
 
     @Getter
     @Builder
     @ToString
     @JsonPropertyOrder({"id", "name", "email", "phoneNumber", "dept", "workTeam", "role", "hireDate"})
     @Schema(description = "회원 정보")
-    public static class Xls {
+    public static class xls {
 
         @Schema(description = "회원 ID", example = "user123")
         private String id;

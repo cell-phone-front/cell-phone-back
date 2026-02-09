@@ -44,7 +44,7 @@ public class ProductRoutingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "프로덕트 라우팅 전체 조회", description = "모든 프로덕트 라우팅을 조회합니다.")
+    @Operation(summary = "프로덕트 라우팅 전체 조회", description = "모든 프로덕트 라우팅을 조회합니다. 키워드로 필터링할 수 있습니다.")
     @GetMapping
     public ResponseEntity<?> getAllProductRouting(@RequestAttribute Member member,
                                                   @RequestParam(required = false) String keyword) {

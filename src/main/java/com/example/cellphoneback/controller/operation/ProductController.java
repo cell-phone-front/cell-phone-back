@@ -42,7 +42,7 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    @Operation(summary = "생산 대상 전체 조회", description = "모든 생산 대상 정보를 조회합니다.")
+    @Operation(summary = "생산 대상 전체 조회", description = "모든 생산 대상 정보를 조회합니다. 키워드로 필터링할 수 있습니다.")
     @GetMapping
     public ResponseEntity<?> getAllProducts(@RequestAttribute Member member,
                                             @RequestParam(required = false) String keyword) {
