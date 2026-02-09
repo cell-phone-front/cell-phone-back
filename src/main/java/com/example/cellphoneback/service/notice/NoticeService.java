@@ -238,10 +238,6 @@ public class NoticeService {
     // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 다운로드 admin, planner
     public Path getNoticeAttachmentPath(Member member, Integer noticeId, String noticeAttachmentId) {
 
-        if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new IllegalArgumentException("공지사항 파일 조회 권한이 없습니다.");
-        }
-
         noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new NoSuchElementException("공지사항 없음"));
 
