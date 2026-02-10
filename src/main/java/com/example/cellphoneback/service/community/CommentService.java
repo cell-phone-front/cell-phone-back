@@ -13,6 +13,7 @@ import com.example.cellphoneback.repository.community.CommunityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class CommentService {
         Comment comment = request.toEntity();
         comment.setMember(member);
         comment.setCommunity(community);
+        comment.setCreatedAt(LocalDateTime.now());
         commentRepository.save(comment);
 
 

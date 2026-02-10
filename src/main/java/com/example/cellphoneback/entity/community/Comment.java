@@ -4,6 +4,8 @@ import com.example.cellphoneback.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -25,5 +27,12 @@ public class Comment {
     private Member member;
 
     private String content;
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    private void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 
 }
