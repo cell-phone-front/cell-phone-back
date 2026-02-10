@@ -47,9 +47,12 @@ public class NoticeService {
         Notice savedNotice = noticeRepository.save(notice);
 
         List<Member> members = memberRepository.findAll();
-
         List<NoticeNotification> notifications = new ArrayList<>();
         for (Member m : members) {
+
+            // ✅ 작성자 제외
+            if (m.getId().equals(member.getId())) continue;
+
             NoticeNotification noticeNotification = NoticeNotification.builder()
                     .memberId(m.getId())
                     .noticeId(savedNotice.getId())
@@ -57,6 +60,7 @@ public class NoticeService {
                     .link("/notices/" + savedNotice.getId())
                     .isRead(false)
                     .build();
+
             notifications.add(noticeNotification);
         }
 
@@ -142,13 +146,15 @@ public class NoticeService {
 
     // GET	/api/notice/{noticeId}	해당 공지사항 조회	all
     @Transactional
-    public SearchNoticeByIdResponse searchNoticeById(Integer noticeId) {
+    public SearchNoticeByIdResponse searchNoticeById(Member member, Integer noticeId) {
 
         noticeRepository.increaseViewCount(noticeId);
 
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
+
+        noticeNotificationRepository.markAsRead(member.getId(), noticeId);
 
         List<NoticeAttachment> attachments = noticeAttachmentRepository.findByNoticeId(noticeId);
 
@@ -263,4 +269,5 @@ public class NoticeService {
         return noticeNotificationRepository.findByMemberId(member.getId());
 
     }
+
 }

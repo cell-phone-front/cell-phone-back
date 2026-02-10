@@ -82,9 +82,10 @@ public class NoticeController {
 
     @Operation(summary = "공지사항 상세 조회", description = "공지사항을 ID로 조회합니다.")
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@PathVariable Integer noticeId) {
+    public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@PathVariable Integer noticeId,
+                                                                     @RequestAttribute Member member) {
 
-        SearchNoticeByIdResponse response = noticeService.searchNoticeById(noticeId);
+        SearchNoticeByIdResponse response = noticeService.searchNoticeById(member, noticeId);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200

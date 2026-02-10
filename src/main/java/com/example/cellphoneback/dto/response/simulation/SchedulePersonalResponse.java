@@ -56,9 +56,7 @@ public class SchedulePersonalResponse {
             LocalDateTime end = schedule.getEndAt();
 
             return Item.builder()
-                    .productName(schedule.getSimulation().getSimulationProductList().stream()
-                            .map(e -> e.getProduct().getName())
-                            .collect(Collectors.joining(", ")))
+                    .productName(schedule.getProduct().getName())
                     .operationName(schedule.getTask().getOperation().getName())
                     .taskId(schedule.getTask().getId())
                     .taskName(schedule.getTask().getName())

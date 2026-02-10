@@ -21,6 +21,9 @@ public class GetSimulationScheduleResponse {
     @Schema(description = "시뮬레이션 스케줄 리스트", example = "[]")
     List<Item> scheduleList;
 
+    @Schema(description = "AI 스케줄링 요약", example = "효율적인 작업 배치 완료")
+    String aiSummary;
+
     @Builder
     @Getter
     @JsonPropertyOrder({
@@ -90,9 +93,6 @@ public class GetSimulationScheduleResponse {
 
         @Schema(description = "작업 종료 시간", example = "2024-07-01T16:00:00")
         private LocalDateTime endAt;
-
-        @Schema(description = "AI 스케줄링 요약", example = "효율적인 작업 배치 완료")
-        private String aiSummary;
 
         public static Item fromEntity(SimulationSchedule schedule) {
             return Item.builder()//

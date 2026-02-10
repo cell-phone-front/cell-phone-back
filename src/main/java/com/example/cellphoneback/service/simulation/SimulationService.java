@@ -289,13 +289,16 @@ public class SimulationService {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("시뮬레이션 작업 지시(스케쥴) 조회 권한이 없습니다.");
         }
+        Simulation simulation =  simulationRepository.findById(simulationId).orElseThrow();
         List<SimulationSchedule> scheduleList = simulationScheduleRepository.findAll();
         List<SimulationSchedule> selectSchedule = scheduleList.stream()
                 .filter(e -> e.getSimulation().getId().equals(simulationId)).toList();
         List<GetSimulationScheduleResponse.Item> items =
                 selectSchedule.stream().map(entity -> GetSimulationScheduleResponse.Item.fromEntity(entity)).toList();
 
-        return GetSimulationScheduleResponse.builder().scheduleList(items).build();
+        String aiSummary = simulation.getAiSummary();
+
+        return GetSimulationScheduleResponse.builder().scheduleList(items).aiSummary(aiSummary).build();
     }
 
     // simulation GET /api/simulation/schedule/{memberId} 작업스케줄 개인 조회 all
