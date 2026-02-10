@@ -17,8 +17,8 @@ public class SearchNoticeByIdResponse {
     @Schema(description = "공지사항 ID", example = "123")
     private int id;
 
-    @Schema(description = "작성자 멤버 ID", example = "member-001")
-    private String memberId;
+    @Schema(description = "작성자 멤버 이름", example = "홍길동")
+    private String memberName;
 
     @Schema(description = "공지사항 제목", example = "공지사항 제목 예시")
     private String title;
@@ -44,7 +44,7 @@ public class SearchNoticeByIdResponse {
     ) {
         return SearchNoticeByIdResponse.builder()
                 .id(notice.getId())
-                .memberId(notice.getMember().getId())
+                .memberName(notice.getMember().getName())
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .createdAt(notice.getCreatedAt())
