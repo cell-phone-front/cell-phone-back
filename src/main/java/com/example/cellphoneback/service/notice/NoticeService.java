@@ -130,9 +130,9 @@ public class NoticeService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String kw = keyword.trim();
-                    return (c.getTitle() != null && c.getTitle().contains(kw)) ||
-                            (c.getContent() != null && c.getContent().contains(kw));
+                    String kw = keyword.trim().toLowerCase().replaceAll("\\s+", "");
+                    return (c.getTitle() != null && c.getTitle().toLowerCase().replaceAll("\\s+", "").contains(kw)) ||
+                            (c.getContent() != null && c.getContent().toLowerCase().replaceAll("\\s+", "").contains(kw));
                 })
                 .map(n->SearchNoticeByIdResponse.fromEntity(n, null))
                 .toList();

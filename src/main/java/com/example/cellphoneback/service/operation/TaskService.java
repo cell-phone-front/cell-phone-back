@@ -132,10 +132,10 @@ public class TaskService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String k = keyword.trim().toLowerCase();
+                    String k = keyword.trim().toLowerCase().replaceAll("\\s+", "");
 
-                    return t.getName() != null && t.getName().contains(k)
-                            || t.getDescription() != null && t.getDescription().contains(k);
+                    return t.getName() != null && t.getName().toLowerCase().replaceAll("\\s+", "").contains(k)
+                            || t.getDescription() != null && t.getDescription().toLowerCase().replaceAll("\\s+", "").contains(k);
                 })
                 .toList();
 

@@ -114,10 +114,10 @@ public class MachineService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    String k = keyword.trim().toLowerCase();
+                    String k = keyword.trim().toLowerCase().replaceAll("\\s+", "");
 
-                    return m.getName() != null && m.getName().contains(k)
-                            || m.getDescription() != null && m.getDescription().contains(k);
+                    return m.getName() != null && m.getName().toLowerCase().replaceAll("\\s+", "").contains(k)
+                            || m.getDescription() != null && m.getDescription().toLowerCase().replaceAll("\\s+", "").contains(k);
                 })
                 .toList();
 

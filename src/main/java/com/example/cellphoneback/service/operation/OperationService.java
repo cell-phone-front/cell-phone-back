@@ -120,10 +120,10 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
                         if (keyword == null || keyword.isBlank())
                             return true;
 
-                        String k = keyword.trim().toLowerCase();
+                        String k = keyword.trim().toLowerCase().replaceAll("\\s+", "");
 
-                    return o.getName() != null && o.getName().contains(k)
-                            || o.getDescription() != null && o.getDescription().contains(k);
+                    return o.getName() != null && o.getName().toLowerCase().replaceAll("\\s+", "").contains(k)
+                            || o.getDescription() != null && o.getDescription().toLowerCase().replaceAll("\\s+", "").contains(k);
                 })
                 .toList();
 

@@ -136,10 +136,10 @@ public class ProductRoutingService {
                         return true;
                     }
 
-                    String k = keyword.trim().toLowerCase();
+                    String k = keyword.trim().toLowerCase().replaceAll("\\s+", "");
 
-                    return r.getName() != null && r.getName().contains(k)
-                            || r.getDescription() != null && r.getDescription().contains(k);
+                    return r.getName() != null && r.getName().toLowerCase().replaceAll("\\s+", "").contains(k)
+                            || r.getDescription() != null && r.getDescription().toLowerCase().replaceAll("\\s+", "").contains(k);
                 }).toList();
 
 
