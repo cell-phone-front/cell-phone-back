@@ -39,88 +39,7 @@ public class DashboardService {
 
     public DashboardSearchResponse dashboardSearchAll(Member member, String keyword) {
 
-        if (member.getRole() == Role.ADMIN ) {
-
-            if (keyword == null || keyword.isBlank()) {
-                return DashboardSearchResponse.empty();
-            }
-
-            SearchAllCommunityResponse communities = safeCall(
-                    () -> communityService.searchAllCommunity(keyword),
-                    SearchAllCommunityResponse.builder()
-                            .totalCount(0L)
-                            .communityList(List.of())
-                            .build()
-            );
-
-            MemberListResponse members = safeCall(
-                    () -> memberService.memberListService(member, keyword),
-                    MemberListResponse.builder()
-                            .memberList(List.of())
-                            .build()
-            );
-
-            SearchAllNoticeResponse notices = safeCall(
-                    () -> noticeService.searchAllNotice(member, keyword),
-                    SearchAllNoticeResponse.builder()
-                            .noticeList(List.of())
-                            .build()
-            );
-
-            MachineListResponse machines = safeCall(
-                    () -> machineService.machineListService(member, keyword),
-                    MachineListResponse.builder()
-                            .machineList(List.of())
-                            .build()
-            );
-
-            OperationListResponse operations = safeCall(
-                    () -> operationService.operationListService(member, keyword),
-                    OperationListResponse.builder()
-                            .operationList(List.of())
-                            .build()
-            );
-
-            ProductListResponse products = safeCall(
-                    () -> productService.productListService(member, keyword),
-                    ProductListResponse.builder()
-                            .productList(List.of())
-                            .build()
-            );
-
-            ProductRoutingListResponse productRoutingList = safeCall(
-                    () -> productRoutingService.productRoutingListService(member, keyword),
-                    ProductRoutingListResponse.builder()
-                            .productRoutingList(List.of())
-                            .build()
-            );
-
-            TaskListResponse tasks = safeCall(
-                    () -> taskService.taskListService(member, keyword),
-                    TaskListResponse.builder()
-                            .taskList(List.of())
-                            .build()
-            );
-
-            GetAllSimulationResponse simulations = safeCall(
-                    () -> simulationService.getAllSimulations(member, keyword),
-                    GetAllSimulationResponse.builder()
-                            .simulationScheduleList(List.of())
-                            .build()
-            );
-
-            return DashboardSearchResponse.builder()
-                    .communities(communities)
-                    .members(members)
-                    .notices(notices)
-                    .machines(machines)
-                    .operations(operations)
-                    .products(products)
-                    .productRouting(productRoutingList)
-                    .tasks(tasks)
-                    .simulations(simulations)
-                    .build();
-        } else if (member.getRole() == Role.PLANNER) {
+        if (member.getRole() == Role.ADMIN || member.getRole() == Role.PLANNER ) {
 
             if (keyword == null || keyword.isBlank()) {
                 return DashboardSearchResponse.empty();
@@ -193,6 +112,7 @@ public class DashboardService {
                     .tasks(tasks)
                     .simulations(simulations)
                     .build();
+
         } else if(member.getRole() == Role.WORKER) {
 
             if (keyword == null || keyword.isBlank()) {
