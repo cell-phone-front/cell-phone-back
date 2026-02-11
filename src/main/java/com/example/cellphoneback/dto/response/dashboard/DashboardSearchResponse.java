@@ -6,11 +6,14 @@ import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
 import com.example.cellphoneback.dto.response.operation.machine.MachineListResponse;
 import com.example.cellphoneback.dto.response.operation.operation.OperationListResponse;
 import com.example.cellphoneback.dto.response.operation.product.ProductListResponse;
+import com.example.cellphoneback.dto.response.operation.productRouting.ProductRoutingListResponse;
 import com.example.cellphoneback.dto.response.operation.task.TaskListResponse;
 import com.example.cellphoneback.dto.response.simulation.GetAllSimulationResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -34,6 +37,9 @@ public class DashboardSearchResponse {
 
     @Schema(description = "상품 리스트")
     private ProductListResponse products;
+
+    @Schema(description = "상품 공정 단계 리스트")
+    private ProductRoutingListResponse productRouting;
 
     @Schema(description = "태스크 리스트")
     private TaskListResponse tasks;
@@ -61,6 +67,9 @@ public class DashboardSearchResponse {
                         .build())
                 .products(ProductListResponse.builder()
                         .productList(java.util.List.of())
+                        .build())
+                .productRouting(ProductRoutingListResponse.builder()
+                        .productRoutingList(List.of())
                         .build())
                 .tasks(TaskListResponse.builder()
                         .taskList(java.util.List.of())
