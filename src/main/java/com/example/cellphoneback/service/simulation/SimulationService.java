@@ -276,9 +276,11 @@ public class SimulationService {
                     if(keyword == null || keyword.isBlank())
                         return true;
 
-                    return s.getMemberName() != null && s.getMemberName().contains(keyword)
-                            || s.getTitle() != null && s.getTitle().contains(keyword)
-                            || s.getDescription() != null && s.getDescription().contains(keyword);
+                    String k = keyword.trim().toLowerCase();
+
+                    return s.getMemberName() != null && s.getMemberName().contains(k)
+                            || s.getTitle() != null && s.getTitle().contains(k)
+                            || s.getDescription() != null && s.getDescription().contains(k);
                 }).toList();
 
         return GetAllSimulationResponse.builder().simulationScheduleList(simulations).build();

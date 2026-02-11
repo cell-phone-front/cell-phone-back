@@ -137,9 +137,11 @@ public class MemberService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
-                    return (m.getName() != null && m.getName().contains(keyword))
-                            || (m.getDept() != null && m.getDept().contains(keyword))
-                            || (m.getWorkTeam() != null && m.getWorkTeam().contains(keyword));
+                    String k = keyword.trim().toLowerCase();
+
+                    return (m.getName() != null && m.getName().contains(k))
+                            || (m.getDept() != null && m.getDept().contains(k))
+                            || (m.getWorkTeam() != null && m.getWorkTeam().contains(k));
                 }).toList();
         return MemberListResponse.builder().memberList(memberList).build();
     }

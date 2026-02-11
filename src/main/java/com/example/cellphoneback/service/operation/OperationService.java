@@ -117,11 +117,13 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
         // 검색
         List<OperationListResponse.Item> operations = operationList.stream()
                 .filter(o -> {
-                    if (keyword == null || keyword.isBlank())
-                        return true;
+                        if (keyword == null || keyword.isBlank())
+                            return true;
 
-                    return o.getName() != null &&o.getName().contains(keyword)
-                            || o.getDescription() != null && o.getDescription().contains(keyword);
+                        String k = keyword.trim().toLowerCase();
+
+                    return o.getName() != null && o.getName().contains(k)
+                            || o.getDescription() != null && o.getDescription().contains(k);
                 })
                 .toList();
 

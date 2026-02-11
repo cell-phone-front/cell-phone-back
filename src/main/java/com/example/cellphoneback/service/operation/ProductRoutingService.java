@@ -136,8 +136,10 @@ public class ProductRoutingService {
                         return true;
                     }
 
-                    return r.getName() != null && r.getName().contains(keyword)
-                            || r.getDescription() != null && r.getDescription().contains(keyword);
+                    String k = keyword.trim().toLowerCase();
+
+                    return r.getName() != null && r.getName().contains(k)
+                            || r.getDescription() != null && r.getDescription().contains(k);
                 }).toList();
 
 

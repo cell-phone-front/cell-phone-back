@@ -132,9 +132,10 @@ public class TaskService {
                     if (keyword == null || keyword.isBlank())
                         return true;
 
+                    String k = keyword.trim().toLowerCase();
 
-                    return t.getName() != null && t.getName().contains(keyword)
-                            || t.getDescription() != null && t.getDescription().contains(keyword);
+                    return t.getName() != null && t.getName().contains(k)
+                            || t.getDescription() != null && t.getDescription().contains(k);
                 })
                 .toList();
 
