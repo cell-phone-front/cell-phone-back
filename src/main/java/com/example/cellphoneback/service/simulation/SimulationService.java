@@ -270,7 +270,8 @@ public class SimulationService {
                         .requiredStaff(one.getRequiredStaff())
                         .status(one.getStatus())
                         .simulationStartDate(one.getSimulationStartDate())
-                        .workTime(one.getWorkTime()).build()).toList();
+                        .workTime(one.getWorkTime())
+                        .aiSummary(one.getAiSummary()).build()).toList();
         List<GetAllSimulationResponse.Item> simulations = simulationList.stream()
                 .filter(s -> {
                     if(keyword == null || keyword.isBlank())
