@@ -14,7 +14,7 @@ public class NoticeNotificationResponse {
     @Schema(description = "알림 ID", example = "101")
     private int id;
 
-    @Schema(description = "알림 메시지", example = "새로운 공지가 등록되었습니다.")
+    @Schema(description = "알림 메시지", example = "새로운 공지사항이 등록되었습니다.")
     private String message;
 
     @Schema(description = "관련 링크", example = "/api/notice/123")

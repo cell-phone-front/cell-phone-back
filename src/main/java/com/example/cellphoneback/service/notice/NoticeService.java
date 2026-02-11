@@ -56,7 +56,7 @@ public class NoticeService {
             NoticeNotification noticeNotification = NoticeNotification.builder()
                     .memberId(m.getId())
                     .noticeId(savedNotice.getId())
-                    .message(notice.getTitle())
+                    .message("새로운 공지사항이 등록되었습니다.")
                     .link("/notices/" + savedNotice.getId())
                     .isRead(false)
                     .build();

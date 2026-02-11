@@ -15,6 +15,7 @@ public interface NoticeNotificationRepository extends JpaRepository<NoticeNotifi
 
     List<NoticeNotificationResponse> findByMemberId(String id);
 
+    // 읽음 처리를 하기 위한 로직
     @Modifying
     @Query("""
     update NoticeNotification n 
