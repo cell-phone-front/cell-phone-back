@@ -1,5 +1,6 @@
 package com.example.cellphoneback.entity.notice;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,10 @@ public class NoticeAttachment {
     @Id
     private String id;
 
-    private int noticeId;
+    @ManyToOne
+    @JsonIgnore
+    private Notice notice;
+
     private long fileSize;
     private String fileUrl;
     private String fileType;

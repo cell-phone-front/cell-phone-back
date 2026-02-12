@@ -27,7 +27,7 @@ public class ProductController {
 
     @Operation(summary = "생산 대상 엑셀 파싱", description = "생산 대상 엑셀 파일을 파싱합니다.")
     @PostMapping("/xls")
-    public ResponseEntity<?> productXls(@RequestBody MultipartFile file,
+    public ResponseEntity<ProductParseResponse> productXls(@RequestBody MultipartFile file,
                                         @RequestAttribute Member member) {
 
        ProductParseResponse response = productService.productParseService(member, file);

@@ -3,10 +3,7 @@ package com.example.cellphoneback.service.notice;
 
 import com.example.cellphoneback.dto.request.notice.CreateNoticeRequest;
 import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
-import com.example.cellphoneback.dto.response.notice.NoticeNotificationResponse;
-import com.example.cellphoneback.dto.response.notice.PinNoticeResponse;
-import com.example.cellphoneback.dto.response.notice.SearchAllNoticeResponse;
-import com.example.cellphoneback.dto.response.notice.SearchNoticeByIdResponse;
+import com.example.cellphoneback.dto.response.notice.*;
 import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.member.Role;
 import com.example.cellphoneback.entity.notice.Notice;
@@ -24,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -69,8 +67,8 @@ public class NoticeService {
         return savedNotice;
     }
 
-    //2	notice	PUT	/api/notice	공지사항 수정	admin, planner
-    public Notice editNotice(Integer noticeId, Member member, EditNoticeRequest request) {
+    //2	notice	PUT	/api/notice/{noticeId}	공지사항 수정	admin, planner
+    public EditNoticeResponse editNotice(Integer noticeId, Member member, EditNoticeRequest request, List<MultipartFile> files) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("공지사항 작성 권한이 없습니다.");
@@ -79,12 +77,29 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
-
         notice.setTitle(request.getTitle());
         notice.setContent(request.getContent());
+        notice.setCreatedAt(LocalDateTime.now());
 
-        return noticeRepository.save(notice);
+        // 삭제할 ID 리스트가 null 아니거나 비어있지 않다면 해당 noticeId로 조회하고 request로 받은 ID에 포함되어 있다면 삭제
+        if(request.getDeleteAttachmentIds() != null && !request.getDeleteAttachmentIds().isEmpty()) {
+            List<NoticeAttachment> delete =
+                    noticeAttachmentRepository.findByNoticeId(noticeId).stream()
+                            .filter(e -> request.getDeleteAttachmentIds().contains(e.getId())).toList();
+
+            noticeAttachmentRepository.deleteAll(delete);
+        }
+
+        // 파일이 null이 아니고 비어있지 않다면 업로드
+        if(files != null && !files.isEmpty()) {
+            uploadFiles(member, noticeId, files);
+        }
+
+        List<NoticeAttachment> attachments = noticeAttachmentRepository.findByNoticeId(noticeId);
+
+        return EditNoticeResponse.fromEntity(notice,attachments );
     }
+
 
     //3	notice	DELETE	/api/notice	공지사항 삭제	admin, planner
     public void deleteNotice(Member member, Integer noticeId) {
@@ -99,7 +114,7 @@ public class NoticeService {
         noticeNotificationRepository.deleteAll(notification);
 
         List<NoticeAttachment> attachments = noticeAttachmentRepository.findAll().stream()
-                .filter(e -> e.getNoticeId() == noticeId).toList();
+                .filter(e -> e.getNotice().getId() == noticeId).toList();
 
         noticeAttachmentRepository.deleteAll(attachments);
 
@@ -227,7 +242,7 @@ public class NoticeService {
             }
 
             NoticeAttachment attachment = NoticeAttachment.builder()
-                    .noticeId(noticeId)
+                    .notice(notice)
                     .fileSize(file.getSize())
                     .fileType(file.getContentType())
                     .fileUrl(savedFileName)

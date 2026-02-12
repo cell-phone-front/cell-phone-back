@@ -147,9 +147,15 @@ public class MemberService {
     }
 
     // GET	/api/member/{memberId}	계정 조회	본인
-    public MemberSearchByIdResponse memberSearchByIdService(Member member) {
+    public MemberSearchByIdResponse memberSearchByIdService(Member member, String memberId) {
+        String loginId = member.getId();
+
+        if(!loginId.equals(memberId)){
+            throw new SecurityException("본인 정보만 조회할 수 있습니다.");
+        }
+
         Member self = memberRepository.findById(member.getId())
-                .orElseThrow(() -> new NoSuchElementException("찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 멤버입니다."));
 
         return MemberSearchByIdResponse.builder().member(self).build();
     }

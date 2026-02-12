@@ -3,7 +3,6 @@ package com.example.cellphoneback.service.community;
 
 import com.example.cellphoneback.dto.request.community.CreateCommentRequest;
 import com.example.cellphoneback.dto.request.community.EditCommentRequest;
-import com.example.cellphoneback.dto.request.notice.EditNoticeRequest;
 import com.example.cellphoneback.entity.community.Comment;
 import com.example.cellphoneback.entity.community.Community;
 import com.example.cellphoneback.entity.member.Member;

@@ -62,9 +62,10 @@ public class MemberController {
 
     @Operation(summary = "멤버 상세 조회", description = "멤버 ID로 멤버의 상세 정보를 조회합니다.")
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberSearchByIdResponse> MemberByIdSearch(@RequestAttribute Member member){
+    public ResponseEntity<MemberSearchByIdResponse> MemberByIdSearch(@RequestAttribute Member member,
+                                                                     @PathVariable String memberId){
 
-        MemberSearchByIdResponse response = memberService.memberSearchByIdService(member);
+        MemberSearchByIdResponse response = memberService.memberSearchByIdService(member,  memberId);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

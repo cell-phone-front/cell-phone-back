@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
@@ -34,6 +35,7 @@ import java.util.List;
 @RequestMapping("/api/notice")
 public class NoticeController {
     private final NoticeService noticeService;
+    private final ObjectMapper objectMapper;
 
     @Operation(summary = "공지사항 작성", description = "새 공지사항을 작성합니다.")
     @PostMapping
@@ -48,14 +50,19 @@ public class NoticeController {
     }
 
     @Operation(summary = "공지사항 수정", description = "기존 공지사항을 수정합니다.")
-    @PutMapping("/{noticeId}")
+    @PutMapping(value = "/{noticeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EditNoticeResponse> updateNotice(@RequestAttribute Member member,
                                                            @PathVariable Integer noticeId,
-                                                           @RequestBody EditNoticeRequest request) {
-        Notice response = noticeService.editNotice(noticeId, member, request);
+                                                           @RequestPart("request") String requestJson,
+                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+
+        // JSON 문자열 -> DTO 변환
+        EditNoticeRequest request = objectMapper.readValue(requestJson, EditNoticeRequest.class);
+
+        EditNoticeResponse response = noticeService.editNotice(noticeId, member, request, files);
         return ResponseEntity
                 .status(HttpStatus.OK) //201
-                .body(EditNoticeResponse.fromEntity(response));
+                .body(response);
     }
 
     @Operation(summary = "공지사항 삭제", description = "기존 공지사항을 삭제합니다.")
