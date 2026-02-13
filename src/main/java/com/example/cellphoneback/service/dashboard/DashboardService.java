@@ -98,7 +98,7 @@ public class DashboardService {
             GetAllSimulationResponse simulations = safeCall(
                     () -> simulationService.getAllSimulations(member, keyword),
                     GetAllSimulationResponse.builder()
-                            .simulationScheduleList(List.of())
+                            .simulationList(List.of())
                             .build()
             );
 

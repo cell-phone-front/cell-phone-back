@@ -20,7 +20,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class CommunityService {
+public class
+CommunityService {
     final CommunityRepository communityRepository;
     final CommentRepository commentRepository;
 
@@ -28,7 +29,7 @@ public class CommunityService {
     public Community createCommunity(Member member, CreateCommunityRequest request) {
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("게시글 작성 권한이 없습니다.");
+            throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
 
         Community community = request.toEntity();
@@ -43,7 +44,7 @@ public class CommunityService {
     public Community editCommunity(Member member, Integer communityId, EditCommunityRequest request) {
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("게시글 수정 권한이 없습니다.");
+            throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
@@ -59,7 +60,7 @@ public class CommunityService {
     public void deleteCommunity(Member member, Integer communityId) {
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("게시글 삭제 권한이 없습니다.");
+            throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
 
         Community community = communityRepository.findById(communityId)

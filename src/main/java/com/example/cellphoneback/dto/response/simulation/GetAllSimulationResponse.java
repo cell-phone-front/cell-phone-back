@@ -14,7 +14,7 @@ import java.util.List;
 public class GetAllSimulationResponse {
 
     @Schema(description = "시뮬레이션 스케줄 리스트")
-    private List<Item> simulationScheduleList;
+    private List<Item> simulationList;
 
     @Getter
     @Builder

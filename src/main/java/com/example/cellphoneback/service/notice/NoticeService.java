@@ -36,7 +36,7 @@ public class NoticeService {
     public Notice createNotice(Member member, CreateNoticeRequest request) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("공지사항 작성 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         Notice notice = request.toEntity();
@@ -71,7 +71,7 @@ public class NoticeService {
     public EditNoticeResponse editNotice(Integer noticeId, Member member, EditNoticeRequest request, List<MultipartFile> files) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("공지사항 작성 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         Notice notice = noticeRepository.findById(noticeId)
@@ -105,7 +105,7 @@ public class NoticeService {
     public void deleteNotice(Member member, Integer noticeId) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("공지사항 삭제 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<NoticeNotification> notification = noticeNotificationRepository.findAll().stream()
@@ -133,7 +133,7 @@ public class NoticeService {
         List<Notice> notices = noticeRepository.findAll();
 
         if (notices.isEmpty()) {
-            throw new IllegalArgumentException("존재하는 공지사항이 없습니다.");
+            throw new IllegalArgumentException("공지사항이 존재하지 않습니다.");
         }
 
 
@@ -180,7 +180,7 @@ public class NoticeService {
     public PinNoticeResponse pinNotice(Integer noticeId, Member member) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("공지사항 핀 고정 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
@@ -207,7 +207,7 @@ public class NoticeService {
     public List<NoticeAttachment> uploadFiles(Member member, Integer noticeId, List<MultipartFile> files) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("공지사항 파일 첨부 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         Notice notice = noticeRepository.findById(noticeId)

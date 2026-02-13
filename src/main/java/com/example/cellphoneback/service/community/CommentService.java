@@ -48,10 +48,10 @@ public class CommentService {
     public Comment editComment(Integer communityId, Integer commentId, Member member, EditCommentRequest request) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 commentId이거나 해당 게시글에 속하지 않는 댓글입니다."));
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("댓글 수정 권한이 없습니다.");
+            throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
 
         comment.setContent(request.getContent());
@@ -63,10 +63,10 @@ public class CommentService {
     public void deleteComment(Integer communityId, Integer commentId, Member member) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 commentId이거나 해당 게시글에 속하지 않는 댓글입니다."));
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("댓글 삭제 권한이 없습니다.");
+            throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
 
         Community community = comment.getCommunity();

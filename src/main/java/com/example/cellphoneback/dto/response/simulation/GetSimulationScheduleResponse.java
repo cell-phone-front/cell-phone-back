@@ -67,25 +67,25 @@ public class GetSimulationScheduleResponse {
         @Schema(description = "작업자 이름", example = "김철수")
         private String workerName;
 
-        @Schema(description = "태스크 ID", example = "task-12345")
+        @Schema(description = "작업 ID", example = "task-12345")
         private String taskId;
 
-        @Schema(description = "태스크 이름", example = "스마트폰 조립 작업")
+        @Schema(description = "작업 이름", example = "스마트폰 조립 작업")
         private String taskName;
 
-        @Schema(description = "설비 ID", example = "machine-67890")
+        @Schema(description = "기계 ID", example = "machine-67890")
         private String machineId;
 
-        @Schema(description = "설비 이름", example = "조립기 1호기")
+        @Schema(description = "기계 이름", example = "조립기 1호기")
         private String machineName;
 
-        @Schema(description = "작업의 오퍼레이션 ID", example = "op-98765")
+        @Schema(description = "작업의 공전 단계 ID", example = "op-98765")
         private String operationId;
 
-        @Schema(description = "작업의 오퍼레이션 이름", example = "조립")
+        @Schema(description = "작업의 공정 단계 이름", example = "조립")
         private String operationName;
 
-        @Schema(description = "작업의 오페레이션 순서")
+        @Schema(description = "작업의 공정 단계 순서")
         private int operationSeq;
 
         @Schema(description = "작업 시작 시간", example = "2024-07-01T08:00:00")

@@ -31,7 +31,7 @@ public class MemberService {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 멤버입니다."));
 
         if (!member.getName().equals(request.getName())) {
-            throw new IllegalStateException("정보가 일치하지 않습니다.");
+            throw new IllegalArgumentException("정보가 일치하지 않습니다.");
         }
 
         String token = JWT.create()

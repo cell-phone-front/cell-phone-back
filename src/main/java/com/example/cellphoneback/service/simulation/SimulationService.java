@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -51,7 +52,7 @@ public class SimulationService {
     //    simulation	POST	/api/simulation	시뮬레이션 생성	admin, planner
     public CreateSimulationResponse createSimulation(Member member, CreateSimulationRequest request) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("시뮬레이션 생성 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         // 시뮬레이션 생성 로직 구현
         Simulation simulation = Simulation.builder()
@@ -88,10 +89,10 @@ public class SimulationService {
     public RunSimulationResponse runSimulation(Member member, String simulationId) throws JsonProcessingException {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("시뮬레이션 실행 요청 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         Simulation simulation = simulationRepository.findById(simulationId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 시뮬레이션이 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 시뮬레이션이 존재하지 않습니다."));
 
         RestClient python = RestClient.create();
 
@@ -130,7 +131,7 @@ public class SimulationService {
                     task.getId(),
                     k -> {
                         if (!plannerIterator.hasNext()) {
-                            throw new NoSuchElementException("팀장 수가 부족합니다.");
+                            throw new DataIntegrityViolationException("팀장 수가 부족합니다.");
                         }
                         return plannerIterator.next();
                     });
@@ -149,7 +150,7 @@ public class SimulationService {
                         return availableAt == null || !availableAt.isAfter(startAt);
                     })
                     .min(Comparator.comparing(w -> workerAvailableAt.getOrDefault(w.getId(), LocalDateTime.MIN)))
-                    .orElseThrow(() -> new IllegalStateException("해당 시간에 투입 가능한 직원이 없습니다."));
+                    .orElseThrow(() -> new DataIntegrityViolationException("해당 시간에 투입 가능한 직원이 없습니다."));
 
             workerAvailableAt.put(worker.getId(), endAt);
 
@@ -227,7 +228,7 @@ public class SimulationService {
     //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
     public DeleteSimulationResponse deleteSimulation(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("시뮬레이션 삭제 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<SimulationSchedule> simulationScheduleList = simulationScheduleRepository.findAll();
@@ -248,7 +249,7 @@ public class SimulationService {
     //    simulation	GET	/api/simulation/{simulationId}/json	시뮬레이션 세팅 데이터 조회	admin, planner
     public GetSimulationResponse getSimulation(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("시뮬레이션 단건 조회 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         Simulation simulation = simulationRepository.findById(simulationId).orElseThrow();
         return GetSimulationResponse.builder().simulation(simulation).build();
@@ -257,7 +258,7 @@ public class SimulationService {
     //    simulation	GET	/api/simulation	시뮬레이션 전체 조회	admin, planner
     public GetAllSimulationResponse getAllSimulations(Member member, String keyword) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("시뮬레이션 전체 조회 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<GetAllSimulationResponse.Item> simulationList = simulationRepository.findAllWithMember().stream()
@@ -284,13 +285,13 @@ public class SimulationService {
                             || s.getDescription() != null && s.getDescription().toLowerCase().replaceAll("\\s+", "").contains(k);
                 }).toList();
 
-        return GetAllSimulationResponse.builder().simulationScheduleList(simulations).build();
+        return GetAllSimulationResponse.builder().simulationList(simulations).build();
     }
 
     //    simulation	GET	/api/simulation/{simulationId}	작업 지시(스케쥴) 조회	admin, planner
     public GetSimulationScheduleResponse getSimulationSchedule(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("시뮬레이션 작업 지시(스케쥴) 조회 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         Simulation simulation =  simulationRepository.findById(simulationId).orElseThrow();
         List<SimulationSchedule> scheduleList = simulationScheduleRepository.findAll();

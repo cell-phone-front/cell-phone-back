@@ -75,7 +75,7 @@ public class DashboardSearchResponse {
                         .taskList(java.util.List.of())
                         .build())
                 .simulations(GetAllSimulationResponse.builder()
-                        .simulationScheduleList(java.util.List.of())
+                        .simulationList(java.util.List.of())
                         .build())
                 .build();
     }
