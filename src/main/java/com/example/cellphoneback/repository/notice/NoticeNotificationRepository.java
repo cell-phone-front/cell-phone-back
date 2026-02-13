@@ -2,10 +2,11 @@ package com.example.cellphoneback.repository.notice;
 
 import com.example.cellphoneback.dto.response.notice.NoticeNotificationResponse;
 import com.example.cellphoneback.entity.notice.NoticeNotification;
-import org.apache.ibatis.annotations.Param;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
