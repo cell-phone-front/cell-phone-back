@@ -68,8 +68,10 @@ public class NoticeService {
     }
 
     //2	notice	PUT	/api/notice/{noticeId}	공지사항 수정	admin, planner
+    @Transactional
     public EditNoticeResponse editNotice(Integer noticeId, Member member, EditNoticeRequest request, List<MultipartFile> files) {
 
+        System.out.println(request.getDeleteAttachmentIds());
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
@@ -84,9 +86,14 @@ public class NoticeService {
         // 삭제할 ID 리스트가 null 아니거나 비어있지 않다면 해당 noticeId로 조회하고 request로 받은 ID에 포함되어 있다면 삭제
         if (request.getDeleteAttachmentIds() != null && !request.getDeleteAttachmentIds().isEmpty()) {
 
-            notice.getNoticeAttachmentList().removeIf(
-                    attachment -> request.getDeleteAttachmentIds().contains(attachment.getId())
-            );
+            List<NoticeAttachment> attachments =
+                    noticeAttachmentRepository.findByNoticeId(noticeId);
+
+            for (NoticeAttachment attachment : attachments) {
+                if (request.getDeleteAttachmentIds().contains(attachment.getId())) {
+                    noticeAttachmentRepository.delete(attachment);
+                }
+            }
         }
 
         // 파일이 null이 아니고 비어있지 않다면 업로드
