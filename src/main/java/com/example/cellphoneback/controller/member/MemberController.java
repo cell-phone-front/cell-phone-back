@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
     final MemberService memberService;
 
-    @Operation(summary = "멤버 로그인", description = "멤버가 시스템에 로그인합니다.")
+    @Operation(summary = "멤버 로그인", description = "멤버가 시스템에 로그인합니다. 모든 사용자가 접근할 수 있습니다.")
     @PostMapping("/login")
     public ResponseEntity<MemberLoginResponse> memberLogin(@RequestBody MemberLoginRequest request){
         MemberLoginResponse response = memberService.memberLoginService(request);
@@ -31,7 +31,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "멤버 엑셀 파싱", description = "엑셀 파일을 파싱하여 멤버 정보를 추출합니다.")
+    @Operation(summary = "멤버 엑셀 파싱", description = "엑셀 파일을 파싱하여 멤버 정보를 추출합니다. 관리자(ADMIN) 권한 필요.")
     @PostMapping("/parse/xls")
     public ResponseEntity<MemberParseResponse> memberParse(@RequestBody MultipartFile file,
                                                            @RequestAttribute Member member){
@@ -40,7 +40,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "멤버 일괄 업서트", description = "멤버 정보를 일괄적으로 추가 또는 업데이트합니다.")
+    @Operation(summary = "멤버 일괄 업서트", description = "멤버 정보를 일괄적으로 추가 또는 업데이트합니다. 관리자(ADMIN) 권한 필요.")
     @PostMapping("/upsert")
     public ResponseEntity<MemberBulkUpsertResponse> memberUpsert(@RequestBody MemberBulkUpsertRequest request,
                                                                  @RequestAttribute Member member){
@@ -50,7 +50,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "멤버 목록 조회", description = "멤버 목록을 조회합니다. 키워드로 필터링할 수 있습니다.")
+    @Operation(summary = "멤버 목록 조회", description = "멤버 목록을 조회합니다. 키워드로 필터링할 수 있습니다. 관리자(ADMIN) 권한 필요.")
     @GetMapping
     public ResponseEntity<MemberListResponse> MemberList(@RequestAttribute Member member,
                                                          @RequestParam(required = false) String keyword){
@@ -60,7 +60,7 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "멤버 상세 조회", description = "멤버 ID로 멤버의 상세 정보를 조회합니다.")
+    @Operation(summary = "멤버 상세 조회", description = "멤버 ID로 멤버의 상세 정보를 조회합니다. 관리자(ADMIN) 권한 필요.")
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberSearchByIdResponse> MemberByIdSearch(@RequestAttribute Member member,
                                                                      @PathVariable String memberId){

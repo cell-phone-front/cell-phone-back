@@ -25,7 +25,7 @@ public class ProductController {
     private final ProductService productService;
 
 
-    @Operation(summary = "생산 대상 엑셀 파싱", description = "생산 대상 엑셀 파일을 파싱합니다.")
+    @Operation(summary = "생산 대상 엑셀 파싱", description = "생산 대상 엑셀 파일을 파싱합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/xls")
     public ResponseEntity<ProductParseResponse> productXls(@RequestBody MultipartFile file,
                                         @RequestAttribute Member member) {
@@ -34,7 +34,7 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    @Operation(summary = "생산 대상 등록, 수정, 삭제", description = "생산 대상 정보를 등록, 수정, 삭제합니다.")
+    @Operation(summary = "생산 대상 등록, 수정, 삭제", description = "생산 대상 정보를 등록, 수정, 삭제합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/upsert")
     public ResponseEntity<?> productUpsert(@RequestBody ProductBulkUpsertRequest request,
                                            @RequestAttribute Member member) {
@@ -42,7 +42,7 @@ public class ProductController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    @Operation(summary = "생산 대상 전체 조회", description = "모든 생산 대상 정보를 조회합니다. 키워드로 필터링할 수 있습니다.")
+    @Operation(summary = "생산 대상 전체 조회", description = "모든 생산 대상 정보를 조회합니다. 키워드로 필터링할 수 있습니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<?> getAllProducts(@RequestAttribute Member member,
                                             @RequestParam(required = false) String keyword) {

@@ -30,10 +30,10 @@ public class TaskService {
     private final MachineRepository machineRepository;
     private final OperationRepository operationRepository;
 
-    // POST	/api/operation/task/xls	기계 엑셀 파싱	admin,planner
+    // POST	/api/operation/task/xls	작업 엑셀 파싱	admin,planner
     public TaskParseResponse taskParseService(Member member, MultipartFile taskFile){
         if(!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)){
-            throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         if(taskFile.isEmpty()){
             throw new NoSuchElementException("파일 내용이 존재하지 않습니다.");
@@ -67,10 +67,10 @@ public class TaskService {
         }
     }
 
-    // POST	/api/operation/task/upsert	기계 등록, 수정, 삭제	admin,planner
+    // POST	/api/operation/task/upsert	작업 등록, 수정, 삭제	admin,planner
     public TaskBulkUpsertResponse taskUpsertResponse(Member member, TaskBulkUpsertRequest request){
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<TaskBulkUpsertRequest.Item> items = request.getTaskList();
@@ -112,10 +112,10 @@ public class TaskService {
 
 
 
-    // GET	/api/operation/task	기계 전체 조회	admin,planner
+    // GET	/api/operation/task	작업 전체 조회	admin,planner
     public TaskListResponse taskListService(Member member, String keyword){
         if(!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)){
-            throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         List<TaskListResponse.Item> taskList = taskRepository.findAll().stream()
                 .map(t -> TaskListResponse.Item.builder()
