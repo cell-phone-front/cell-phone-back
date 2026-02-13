@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NoticeAttachmentRepository extends JpaRepository<NoticeAttachment, Long> {
+public interface NoticeAttachmentRepository extends JpaRepository<NoticeAttachment, String> {
     List<NoticeAttachment> findByNoticeId(Integer noticeId);
 
     List<NoticeAttachment> findByNoticeIdAndId(Integer noticeId, String noticeAttachmentId);

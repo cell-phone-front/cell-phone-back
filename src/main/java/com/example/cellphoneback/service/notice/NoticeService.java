@@ -82,12 +82,11 @@ public class NoticeService {
         notice.setCreatedAt(LocalDateTime.now());
 
         // 삭제할 ID 리스트가 null 아니거나 비어있지 않다면 해당 noticeId로 조회하고 request로 받은 ID에 포함되어 있다면 삭제
-        if(request.getDeleteAttachmentIds() != null && !request.getDeleteAttachmentIds().isEmpty()) {
-            List<NoticeAttachment> delete =
-                    noticeAttachmentRepository.findByNoticeId(noticeId).stream()
-                            .filter(e -> request.getDeleteAttachmentIds().contains(e.getId())).toList();
+        if (request.getDeleteAttachmentIds() != null && !request.getDeleteAttachmentIds().isEmpty()) {
 
-            noticeAttachmentRepository.deleteAll(delete);
+            notice.getNoticeAttachmentList().removeIf(
+                    attachment -> request.getDeleteAttachmentIds().contains(attachment.getId())
+            );
         }
 
         // 파일이 null이 아니고 비어있지 않다면 업로드
