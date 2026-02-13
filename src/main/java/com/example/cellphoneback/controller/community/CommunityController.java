@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class CommunityController {
     final CommunityService communityService;
 
-    @Operation(summary = "게시글 작성", description = "커뮤니티에 새 게시글을 작성합니다.")
+    @Operation(summary = "게시글 작성", description = "커뮤니티에 새 게시글을 작성합니다. 기획자(PLANNER), 작업자(WORKER) 권한만 접근 가능합니다.")
     @PostMapping
     public ResponseEntity<CreateCommunityResponse> createCommunity(@RequestAttribute Member member,
                                                                    @RequestBody CreateCommunityRequest request) {
@@ -39,7 +39,7 @@ public class CommunityController {
 
     }
 
-    @Operation(summary = "게시글 수정", description = "커뮤니티에 작성된 게시글을 수정합니다.")
+    @Operation(summary = "게시글 수정", description = "커뮤니티에 작성된 게시글을 수정합니다. 작성자만 접근할 수 있습니다..")
     @PutMapping("/{communityId}")
     public ResponseEntity<EditCommunityResponse> editCommunity(@RequestAttribute Member member,
                                                                @PathVariable Integer communityId,
@@ -51,7 +51,7 @@ public class CommunityController {
                 .body(EditCommunityResponse.fromEntity(response));
     }
 
-    @Operation(summary = "게시글 삭제", description = "커뮤니티에 작성된 게시글을 삭제합니다.")
+    @Operation(summary = "게시글 삭제", description = "커뮤니티에 작성된 게시글을 삭제합니다. 작성자만 접근할 수 있습니다.")
     @DeleteMapping("/{communityId}")
     public ResponseEntity<DeleteCommunityResponse> deleteCommunity(@RequestAttribute Member member,
                                                                     @PathVariable Integer communityId) {
@@ -63,7 +63,7 @@ public class CommunityController {
                 .body(DeleteCommunityResponse.fromEntity());
     }
 
-    @Operation(summary = "게시글 전체 목록 조회", description = "커뮤니티에 작성된 모든 게시글을 조회합니다.")
+    @Operation(summary = "게시글 전체 목록 조회", description = "커뮤니티에 작성된 모든 게시글을 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<SearchAllCommunityResponse> searchAllCommunity(@RequestParam(required = false) String keyword) {
 
@@ -74,7 +74,7 @@ public class CommunityController {
                 .body(response);
     }
 
-    @Operation(summary = "게시글 상세 조회", description = "커뮤니티에 작성된 게시글을 상세 조회합니다.")
+    @Operation(summary = "게시글 상세 조회", description = "커뮤니티에 작성된 게시글을 상세 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping("/{communityId}")
     public ResponseEntity<SearchCommunityByIdResponse> searchCommunityById(@PathVariable Integer communityId) {
 

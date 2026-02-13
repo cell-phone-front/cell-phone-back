@@ -32,7 +32,7 @@ public class ProductRoutingService {
     public ProductRoutingParseResponse productRoutingParseService(Member member, MultipartFile productRoutingFile) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("생산 대상 엑셀 파싱 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         if (productRoutingFile.isEmpty()) {
@@ -76,7 +76,7 @@ public class ProductRoutingService {
     public ProductRoutingBulkUpsertResponse productRoutingBulkUpsertService(Member member, ProductRoutingBulkUpsertRequest request) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("생산 대상 수정 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         List<ProductRoutingBulkUpsertRequest.Item> items = request.getProductRoutingList();
         // 아디가 String이 아닌 int 이므로 Integer로 받는다.
@@ -117,7 +117,7 @@ public class ProductRoutingService {
     public ProductRoutingListResponse productRoutingListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("생산 대상 조회 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<ProductRoutingListResponse.Item> productRoutingList = productRoutingRepository.findAll().stream()

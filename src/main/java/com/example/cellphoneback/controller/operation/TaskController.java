@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TaskController {
     final TaskService taskService;
 
-    @Operation(summary = "작업 엑셀 파싱", description = "작업 엑셀 파일을 파싱합니다.")
+    @Operation(summary = "작업 엑셀 파싱", description = "작업 엑셀 파일을 파싱합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/xls")
     public ResponseEntity<TaskParseResponse> taskParse(@RequestAttribute Member member,
                                                        @RequestBody MultipartFile file) {
@@ -33,7 +33,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "작업 등록, 수정, 삭제", description = "작업을 등록, 수정, 삭제합니다.")
+    @Operation(summary = "작업 등록, 수정, 삭제", description = "작업을 등록, 수정, 삭제합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/upsert")
     public ResponseEntity<TaskBulkUpsertResponse> taskUpsert(@RequestAttribute Member member,
                                                              @RequestBody TaskBulkUpsertRequest request) {
@@ -42,7 +42,7 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "작업 전체 조회", description = "작업을 전체 조회합니다. 키워드로 필터링할 수 있습니다.")
+    @Operation(summary = "작업 전체 조회", description = "작업을 전체 조회합니다. 키워드로 필터링할 수 있습니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<TaskListResponse> taskList(@RequestAttribute Member member,
                                                      @RequestParam(required = false) String keyword) {

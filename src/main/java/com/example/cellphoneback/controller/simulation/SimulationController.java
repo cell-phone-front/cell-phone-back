@@ -24,7 +24,7 @@ import java.util.List;
 public class SimulationController {
     private final SimulationService simulationService;
 
-    @Operation(summary = "시뮬레이션 생성", description = "새 시뮬레이션을 생성합니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "시뮬레이션 생성", description = "새 시뮬레이션을 생성합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping
     public ResponseEntity<CreateSimulationResponse> createSimulation(@RequestAttribute Member member,
                                                                      @RequestBody CreateSimulationRequest request) {
@@ -34,7 +34,7 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "시뮬레이션 실행", description = "지정된 시뮬레이션을 실행합니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "시뮬레이션 실행", description = "지정된 시뮬레이션을 실행합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/{simulationId}")
     public ResponseEntity<RunSimulationResponse> runSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) throws JsonProcessingException {
@@ -42,7 +42,7 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "시뮬레이션 삭제", description = "지정된 시뮬레이션을 삭제합니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "시뮬레이션 삭제", description = "지정된 시뮬레이션을 삭제합니다. 생성자만 접근할 수 있습니다.")
     @DeleteMapping("/{simulationId}")
     public ResponseEntity<DeleteSimulationResponse> deleteSimulation(@RequestAttribute Member member,
                                                                      @PathVariable String simulationId) {
@@ -50,7 +50,7 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "시뮬레이션 조회", description = "지정된 시뮬레이션의 세부 정보를 조회합니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "시뮬레이션 조회", description = "지정된 시뮬레이션의 세부 정보를 조회합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping("/{simulationId}/json")
     public ResponseEntity<GetSimulationResponse> getSimulation(@RequestAttribute Member member,
                                            @PathVariable String simulationId) {
@@ -58,7 +58,7 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "모든 시뮬레이션 조회", description = "모든 시뮬레이션의 요약 정보를 조회합니다. 키워드로 필터링할 수 있습니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "모든 시뮬레이션 조회", description = "모든 시뮬레이션의 요약 정보를 조회합니다. 키워드로 필터링할 수 있습니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<GetAllSimulationResponse> getAllSimulations(@RequestAttribute Member member,
                                                                       @RequestParam(required = false) String keyword) {
@@ -66,7 +66,7 @@ public class SimulationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "시뮬레이션 작업 스케줄 조회", description = "지정된 시뮬레이션의 작업 스케줄을 조회합니다. 관리자와 기획자만 접근할 수 있습니다.")
+    @Operation(summary = "시뮬레이션 작업 스케줄 조회", description = "지정된 시뮬레이션의 작업 스케줄을 조회합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping({"/{simulationId}"})
     public ResponseEntity<GetSimulationScheduleResponse> getSimulationSchedule(@RequestAttribute Member member,
                                                                           @PathVariable String simulationId) {

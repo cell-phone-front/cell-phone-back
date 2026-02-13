@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class OperationController {
     private final OperationService operationService;
 
-    @Operation(summary = "공정 단계 엑셀 파싱", description = "공정 단계 엑셀 파일을 파싱합니다. admin, planner 권한 필요")
+    @Operation(summary = "공정 단계 엑셀 파싱", description = "공정 단계 엑셀 파일을 파싱합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/xls")
     public ResponseEntity<?> operationXls(@RequestBody MultipartFile file,
                                           @RequestAttribute Member member) {
@@ -33,7 +33,7 @@ public class OperationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "공정 단계 등록, 수정, 삭제", description = "공정 단계를 등록, 수정, 삭제합니다. admin, planner 권한 필요")
+    @Operation(summary = "공정 단계 등록, 수정, 삭제", description = "공정 단계를 등록, 수정, 삭제합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/upsert")
     public ResponseEntity<?> operationUpsert(@RequestBody OperationBulkUpsertRequest request,
                                              @RequestAttribute Member member) {
@@ -43,7 +43,7 @@ public class OperationController {
     }
 
 
-    @Operation(summary = "공정 단계 전체 조회", description = "모든 공정 단계를 조회합니다. 키워드로 필터링할 수 있습니다. admin, planner 권한 필요")
+    @Operation(summary = "공정 단계 전체 조회", description = "모든 공정 단계를 조회합니다. 키워드로 필터링할 수 있습니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<?> getAllOperations(@RequestAttribute Member member,
                                               @RequestParam(required = false) String keyword) {

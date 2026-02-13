@@ -37,7 +37,7 @@ public class NoticeController {
     private final NoticeService noticeService;
     private final ObjectMapper objectMapper;
 
-    @Operation(summary = "공지사항 작성", description = "새 공지사항을 작성합니다.")
+    @Operation(summary = "공지사항 작성", description = "새 공지사항을 작성합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping
     public ResponseEntity<CreateNoticeResponse> createNotice(@RequestAttribute Member member,
                                                              @RequestBody CreateNoticeRequest request) {
@@ -49,7 +49,7 @@ public class NoticeController {
                 .body(CreateNoticeResponse.fromEntity(response));
     }
 
-    @Operation(summary = "공지사항 수정", description = "기존 공지사항을 수정합니다.")
+    @Operation(summary = "공지사항 수정", description = "기존 공지사항을 수정합니다. 작성자만 접근할 수 있습니다.")
     @PutMapping(value = "/{noticeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EditNoticeResponse> updateNotice(@RequestAttribute Member member,
                                                            @PathVariable Integer noticeId,
@@ -65,7 +65,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    @Operation(summary = "공지사항 삭제", description = "기존 공지사항을 삭제합니다.")
+    @Operation(summary = "공지사항 삭제", description = "기존 공지사항을 삭제합니다. 작성자만 접근할 수 있습니다.")
     @DeleteMapping("/{noticeId}")
     public ResponseEntity<DeleteNoticeResponse> deleteNotice(@RequestAttribute Member member,
                                                              @PathVariable Integer noticeId) {
@@ -76,7 +76,7 @@ public class NoticeController {
                 .body(DeleteNoticeResponse.fromEntity());
     }
 
-    @Operation(summary = "공지사항 전체 목록 조회", description = "모든 공지사항을 조회합니다.")
+    @Operation(summary = "공지사항 전체 목록 조회", description = "모든 공지사항을 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<SearchAllNoticeResponse> getNotice(@RequestAttribute Member member,
                                                              @RequestParam(required = false) String keyword) {
@@ -87,7 +87,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    @Operation(summary = "공지사항 상세 조회", description = "공지사항을 ID로 조회합니다.")
+    @Operation(summary = "공지사항 상세 조회", description = "공지사항을 ID로 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping("/{noticeId}")
     public ResponseEntity<SearchNoticeByIdResponse> searchNoticeById(@PathVariable Integer noticeId,
                                                                      @RequestAttribute Member member) {
@@ -99,7 +99,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    @Operation(summary = "공지사항 고정/고정해제", description = "공지사항을 고정하거나 고정해제합니다.")
+    @Operation(summary = "공지사항 고정/고정해제", description = "공지사항을 고정하거나 고정해제합니다. 작성자만 접근할 수 있습니다.")
     @PatchMapping("/{noticeId}/pin")
     public ResponseEntity<PinNoticeResponse> pinNotice(@RequestAttribute Member member,
                                                        @PathVariable Integer noticeId) {
@@ -110,7 +110,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    @Operation(summary = "공지사항 파일 업로드", description = "공지사항에 파일을 업로드합니다.")
+    @Operation(summary = "공지사항 파일 업로드", description = "공지사항에 파일을 업로드합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/{noticeId}/attachment")
     public ResponseEntity<List<NoticeAttachment>> uploadPostFiles(@RequestAttribute Member member,
                                                                   @PathVariable Integer noticeId,
@@ -123,7 +123,7 @@ public class NoticeController {
                 .body(response);
     }
 
-    @Operation(summary = "공지사항 첨부파일 다운로드", description = "공지사항 첨부파일을 다운로드합니다.")
+    @Operation(summary = "공지사항 첨부파일 다운로드", description = "공지사항 첨부파일을 다운로드합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping("/{noticeId}/attachment/{noticeAttachmentId}")
     public ResponseEntity<Resource> getNoticeAttachments(@RequestAttribute Member member,
                                                          @PathVariable Integer noticeId,
@@ -142,7 +142,7 @@ public class NoticeController {
                 .body(resource);
     }
 
-    @Operation(summary = "공지 알림 조회", description = "멤버의 공지 알림 목록을 조회합니다.")
+    @Operation(summary = "공지 알림 조회", description = "멤버의 공지 알림 목록을 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping("/notification")
     public ResponseEntity<List<NoticeNotificationResponse>> getNoticeNotifications(@RequestAttribute Member member) {
         List<NoticeNotificationResponse> response = noticeService.getNoticeNotifications(member);

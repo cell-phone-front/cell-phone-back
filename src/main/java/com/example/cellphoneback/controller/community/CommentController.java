@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class CommentController {
     private final CommentService commentService;
 
-    @Operation(summary = "댓글 작성", description = "커뮤니티 글에 새 댓글을 작성합니다.")
+    @Operation(summary = "댓글 작성", description = "커뮤니티 글에 새 댓글을 작성합니다. 기획자(PLANNER), 작업자(WORKER) 권한만 접근 가능합니다.")
     @PostMapping("/{communityId}")
     public ResponseEntity<CreateCommentResponse> createComment(@PathVariable Integer communityId,
                                                                @RequestAttribute Member member,
@@ -42,7 +42,7 @@ public class CommentController {
                 .body(CreateCommentResponse.fromEntity(response));
     }
 
-    @Operation(summary = "댓글 수정", description = "커뮤니티에 작성된 댓글을 수정합니다.")
+    @Operation(summary = "댓글 수정", description = "커뮤니티에 작성된 댓글을 수정합니다. 작성자만 접근할 수 있습니다.")
     @PutMapping("/{communityId}/{commentId}")
     public ResponseEntity<EditCommentResponse> updateComment(@PathVariable Integer communityId,
                                                              @PathVariable Integer commentId,
@@ -54,7 +54,7 @@ public class CommentController {
                 .body(EditCommentResponse.fromEntity(response));
     }
 
-    @Operation(summary = "댓글 삭제", description = "커뮤니티에 작성된 댓글을 삭제합니다.")
+    @Operation(summary = "댓글 삭제", description = "커뮤니티에 작성된 댓글을 삭제합니다. 작성자만 접근할 수 있습니다.")
     @DeleteMapping("/{communityId}/{commentId}")
     public ResponseEntity<DeleteCommentResponse> deleteComment(@PathVariable Integer communityId,
                                                                @PathVariable Integer commentId,
@@ -66,7 +66,7 @@ public class CommentController {
                 .body(DeleteCommentResponse.fromEntity());
     }
 
-    @Operation(summary = "댓글 전체 목록 조회", description = "커뮤니티 글에 작성된 모든 댓글을 조회합니다.")
+    @Operation(summary = "댓글 전체 목록 조회", description = "커뮤니티 글에 작성된 모든 댓글을 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping("/{communityId}")
     public ResponseEntity<List<SearchAllCommentResponse>> getComments(@PathVariable Integer communityId) {
         List<Comment> response = commentService.searchAllComment(communityId);

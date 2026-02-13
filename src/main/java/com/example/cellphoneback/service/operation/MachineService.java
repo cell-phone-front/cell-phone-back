@@ -29,7 +29,7 @@ public class MachineService {
     // POST	/api/operation/machine/xls	기계 엑셀 파싱	admin,planner
     public MachineParseResponse machineParseService(Member member, MultipartFile machineFile) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         if (machineFile.isEmpty()) {
             throw new NoSuchElementException("파일 내용이 존재하지 않습니다.");
@@ -65,7 +65,7 @@ public class MachineService {
     // POST	/api/operation/machine/upsert	기계 등록, 수정, 삭제	admin,planner
     public MachineBulkUpsertResponse machineUpsertService(Member member, MachineBulkUpsertRequest request) {
         if(!member.getRole().equals(Role.ADMIN) &&  !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<MachineBulkUpsertRequest.Item> items = request.getMachineList();
@@ -98,7 +98,7 @@ public class MachineService {
     public MachineListResponse machineListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("ADMIN or PLANNER 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<MachineListResponse.Item> machineList = machineRepository.findAll().stream()

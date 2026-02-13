@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductRoutingController {
     private final ProductRoutingService productRoutingService;
 
-    @Operation(summary = "프로덕트 라우팅 엑셀 파싱", description = "프로덕트 라우팅 엑셀 파일을 파싱합니다.")
+    @Operation(summary = "프로덕트 라우팅 엑셀 파싱", description = "프로덕트 라우팅 엑셀 파일을 파싱합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/xls")
     public ResponseEntity<?> productRoutingXls(@RequestBody MultipartFile file,
                                                @RequestAttribute Member member) {
@@ -35,7 +35,7 @@ public class ProductRoutingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "프로덕트 라우팅 등록, 수정, 삭제", description = "프로덕트 라우팅을 등록, 수정, 삭제합니다.")
+    @Operation(summary = "프로덕트 라우팅 등록, 수정, 삭제", description = "프로덕트 라우팅을 등록, 수정, 삭제합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @PostMapping("/upsert")
     public ResponseEntity<?> productRoutingUpsert(@RequestBody ProductRoutingBulkUpsertRequest request,
                                                   @RequestAttribute Member member) {
@@ -44,7 +44,7 @@ public class ProductRoutingController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "프로덕트 라우팅 전체 조회", description = "모든 프로덕트 라우팅을 조회합니다. 키워드로 필터링할 수 있습니다.")
+    @Operation(summary = "프로덕트 라우팅 전체 조회", description = "모든 프로덕트 라우팅을 조회합니다. 키워드로 필터링할 수 있습니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
     @GetMapping
     public ResponseEntity<?> getAllProductRouting(@RequestAttribute Member member,
                                                   @RequestParam(required = false) String keyword) {

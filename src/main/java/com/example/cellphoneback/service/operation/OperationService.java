@@ -30,7 +30,7 @@ public class OperationService {
 public OperationParseResponse operationParseService(Member member, MultipartFile operationFile){
 
     if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-        throw new SecurityException("공정 단계 엑셀 파싱 권한이 없습니다.");
+        throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
     }
 
     if (operationFile.isEmpty()) {
@@ -71,7 +71,7 @@ public OperationParseResponse operationParseService(Member member, MultipartFile
 public OperationBulkUpsertResponse operationBulkUpsertService(Member member, OperationBulkUpsertRequest request) {
 
     if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-        throw new SecurityException("공정 단계 수정 권한이 없습니다.");
+        throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
     }
 
     List<OperationBulkUpsertRequest.Item> items = request.getOperationList();
@@ -104,7 +104,7 @@ public OperationBulkUpsertResponse operationBulkUpsertService(Member member, Ope
     public OperationListResponse operationListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("공정 단계 조회 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<OperationListResponse.Item> operationList = operationRepository.findAll().stream()

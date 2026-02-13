@@ -27,7 +27,7 @@ public class ProductService {
     public ProductParseResponse productParseService(Member member, MultipartFile productFile) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("생산 대상 엑셀 파싱 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         if (productFile.isEmpty()) {
@@ -69,7 +69,7 @@ public class ProductService {
     public ProductBulkUpsertResponse productBulkUpsertService(Member member, ProductBulkUpsertRequest request) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("생산 대상 수정 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         List<ProductBulkUpsertRequest.Item> items = request.getProductList();
         // 아디가 String이 아닌 int 이므로 Integer로 받는다.
@@ -102,11 +102,11 @@ public class ProductService {
                 .updateProduct(updated).build();
     }
 
-    // 	operation	GET	/api/operation/product	생산 대상 전체 조회	admin, planner
+    // 	operation	GET	/api/operation/product	생산 대상 전체 조회 및 검색 조회	admin, planner
     public ProductListResponse productListService(Member member, String keyword) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new SecurityException("생산 대상 조회 권한이 없습니다.");
+            throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<ProductListResponse.Item> productList = productRepository.findAll().stream()

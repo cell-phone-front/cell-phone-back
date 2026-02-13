@@ -126,7 +126,7 @@ public class MemberService {
     }
 
 
-    // GET	/api/member	전체 멤버 조회	admin
+    // GET	/api/member	전체 멤버 조회 및 검색 조회	admin
     public MemberListResponse memberListService(Member member, String keyword) {
         if (!member.getRole().equals(Role.ADMIN)) {
             throw new SecurityException("ADMIN 권한이 없습니다.");
