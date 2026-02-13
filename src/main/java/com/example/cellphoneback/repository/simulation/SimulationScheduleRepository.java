@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface SimulationScheduleRepository extends JpaRepository<SimulationSchedule,Integer> {
-    List<SimulationSchedule> findByWorkerIdAndStartAtBetween(String id, LocalDateTime localDateTime, LocalDateTime localDateTime1);
+
 }

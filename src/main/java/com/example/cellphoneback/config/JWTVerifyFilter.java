@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 
-
 @Component
 @RequiredArgsConstructor
 public class JWTVerifyFilter extends OncePerRequestFilter {
@@ -27,12 +26,14 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
 
     // 특정 경로와 특정 메소드를 필터에서 제외할지 판단하는 역할
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request){
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        return  (uri.equals("/api/member/login"))
-                || method.equals("OPTIONS"); // 메소드 요청이 OPTIONS 라고 오면 필터를 거치지 않겠다.
+        return (uri.equals("/api/member/login"))
+                || method.equals("OPTIONS") // 메소드 요청이 OPTIONS 라고 오면 필터를 거치지 않겠다.
+                || uri.startsWith("/swagger-ui")
+                || uri.startsWith("/v3/api-docs");  // OpenAPI JSON 제외
     }
 
     // 모든 요청에 대해 필터가 수행할 동작 ( 인증 토큰 확인(JWT), 요청 헤더 검증 )
@@ -40,13 +41,13 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 메소드 요청이 "OPTIONS"와 같다면 필터 인증 코드를 거치지 않고
         // 인증필터에서는 그냥 넘기고 다른 필터가 있다면 그쪽으로 넘기고 없다면 컨트롤러로 넘긴다.
-        if("OPTIONS".equals(request.getMethod())){
-            filterChain.doFilter(request,response);
+        if ("OPTIONS".equals(request.getMethod())) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         // 헤더 Authorization 값을 가져와서 authHeader에 대입
-         String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("Authorization");
 
         // 만약 authHeader가 null이거나 Bearer 로 시작하지 않으면 401 에러 보냄
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -58,9 +59,9 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
 
         // 토큰 발급자가 맞는지 비밀키가 맞는지 검증
         DecodedJWT jwt;
-        try{
+        try {
             jwt = JWT.require(Algorithm.HMAC256("phoneKey")).withIssuer("cellPhone").build().verify(token);
-        } catch (JWTVerificationException exception){
+        } catch (JWTVerificationException exception) {
             throw new IllegalStateException("사용자 토큰이 일치하지 않습니다.");
         }
 
@@ -75,6 +76,6 @@ public class JWTVerifyFilter extends OncePerRequestFilter {
         request.setAttribute("member", member);
 
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

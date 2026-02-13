@@ -7,6 +7,8 @@ import com.example.cellphoneback.entity.member.Member;
 import com.example.cellphoneback.entity.notice.Notice;
 import com.example.cellphoneback.entity.notice.NoticeAttachment;
 import com.example.cellphoneback.service.notice.NoticeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tools.jackson.databind.ObjectMapper;
+
 
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
@@ -54,7 +56,7 @@ public class NoticeController {
     public ResponseEntity<EditNoticeResponse> updateNotice(@RequestAttribute Member member,
                                                            @PathVariable Integer noticeId,
                                                            @RequestPart("request") String requestJson,
-                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files) throws JsonProcessingException {
 
         // JSON 문자열 -> DTO 변환
         EditNoticeRequest request = objectMapper.readValue(requestJson, EditNoticeRequest.class);
