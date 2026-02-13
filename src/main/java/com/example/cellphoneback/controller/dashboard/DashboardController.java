@@ -24,5 +24,4 @@ public class DashboardController {
                                                    @RequestParam(required = false) String keyword) {
         return dashboardService.dashboardSearchAll(member, keyword);
     }
-
 }

@@ -45,7 +45,7 @@ public class NoticeController {
         Notice response = noticeService.createNotice(member, request);
 
         return ResponseEntity
-                .status(HttpStatus.CREATED) //201
+                .status(HttpStatus.CREATED)
                 .body(CreateNoticeResponse.fromEntity(response));
     }
 
@@ -61,7 +61,7 @@ public class NoticeController {
 
         EditNoticeResponse response = noticeService.editNotice(noticeId, member, request, files);
         return ResponseEntity
-                .status(HttpStatus.OK) //201
+                .status(HttpStatus.OK)
                 .body(response);
     }
 
@@ -72,7 +72,7 @@ public class NoticeController {
         noticeService.deleteNotice(member, noticeId);
 
         return ResponseEntity
-                .status(HttpStatus.OK) //201
+                .status(HttpStatus.OK)
                 .body(DeleteNoticeResponse.fromEntity());
     }
 
@@ -147,7 +147,7 @@ public class NoticeController {
     public ResponseEntity<List<NoticeNotificationResponse>> getNoticeNotifications(@RequestAttribute Member member) {
         List<NoticeNotificationResponse> response = noticeService.getNoticeNotifications(member);
         return ResponseEntity
-                .status(HttpStatus.OK) //200
+                .status(HttpStatus.OK)
                 .body(response);
     }
 }

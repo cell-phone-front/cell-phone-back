@@ -28,7 +28,7 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글"));
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("게시글 작성 권한이 없습니다.");
+            throw new SecurityException("댓글 작성 권한이 없습니다.");
         }
 
         Comment comment = request.toEntity();
@@ -51,7 +51,7 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("게시글 수정 권한이 없습니다.");
+            throw new SecurityException("댓글 수정 권한이 없습니다.");
         }
 
         comment.setContent(request.getContent());
@@ -66,7 +66,7 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("게시글 삭제 권한이 없습니다.");
+            throw new SecurityException("댓글 삭제 권한이 없습니다.");
         }
 
         Community community = comment.getCommunity();

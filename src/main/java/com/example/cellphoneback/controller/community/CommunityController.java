@@ -47,7 +47,7 @@ public class CommunityController {
 
         Community response = communityService.editCommunity(member, communityId, request);
         return ResponseEntity
-                .status(HttpStatus.OK) //201
+                .status(HttpStatus.OK)
                 .body(EditCommunityResponse.fromEntity(response));
     }
 
@@ -59,7 +59,7 @@ public class CommunityController {
         communityService.deleteCommunity(member, communityId);
 
         return ResponseEntity
-                .status(HttpStatus.OK) //201
+                .status(HttpStatus.OK)
                 .body(DeleteCommunityResponse.fromEntity());
     }
 
@@ -70,7 +70,7 @@ public class CommunityController {
         SearchAllCommunityResponse response = communityService.searchAllCommunity(keyword);
 
         return ResponseEntity
-                .status(HttpStatus.OK) //200
+                .status(HttpStatus.OK)
                 .body(response);
     }
 
@@ -81,7 +81,7 @@ public class CommunityController {
         Community response = communityService.searchCommunityById(communityId);
 
         return ResponseEntity
-                .status(HttpStatus.OK) //201
+                .status(HttpStatus.OK)
                 .body(SearchCommunityByIdResponse.fromEntity(response));
     }
 }

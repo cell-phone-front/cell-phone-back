@@ -180,7 +180,7 @@ public class NoticeService {
     public PinNoticeResponse pinNotice(Integer noticeId, Member member) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new IllegalArgumentException("공지사항 핀 고정 권한이 없습니다.");
+            throw new SecurityException("공지사항 핀 고정 권한이 없습니다.");
         }
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
@@ -207,11 +207,11 @@ public class NoticeService {
     public List<NoticeAttachment> uploadFiles(Member member, Integer noticeId, List<MultipartFile> files) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
-            throw new IllegalArgumentException("공지사항 파일 첨부 권한이 없습니다.");
+            throw new SecurityException("공지사항 파일 첨부 권한이 없습니다.");
         }
 
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new NoSuchElementException("공지사항 없음"));
+                .orElseThrow(() -> new IllegalStateException("공지사항 없음"));
 
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("업로드할 파일이 없습니다."); //400
@@ -260,19 +260,19 @@ public class NoticeService {
     public Path getNoticeAttachmentPath(Member member, Integer noticeId, String noticeAttachmentId) {
 
         noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new NoSuchElementException("공지사항 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("공지사항 없음"));
 
         NoticeAttachment attachment = noticeAttachmentRepository.findByNoticeIdAndId(noticeId, noticeAttachmentId)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("첨부파일 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("첨부파일 없음"));
 
 
         Path uploadPath = Path.of(System.getProperty("user.home"), "cellphone", "notice", String.valueOf(noticeId));
         Path filePath = uploadPath.resolve(attachment.getFileUrl());
 
         if (!Files.exists(filePath)) {
-            throw new NoSuchElementException("파일이 서버에 존재하지 않습니다.");
+            throw new IllegalArgumentException("파일이 서버에 존재하지 않습니다.");
         }
 
         return filePath;
