@@ -17,9 +17,4 @@ public class EditCommentRequest {
     @Schema(description = "댓글 내용", example = "댓글 내용이 수정되었습니다.")
     private String content;
 
-    public Comment toEntity() {
-        return Comment.builder()
-                .content(this.content)
-                .build();
-    }
 }

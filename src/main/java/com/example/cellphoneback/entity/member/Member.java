@@ -26,10 +26,16 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String hireDate;
+    private Boolean isActive;
 
     @PrePersist
     public void prePersist() {
-        this.id = UUID.randomUUID().toString().substring(0, 6);
+        if(this.id == null || this.id.isBlank()) {
+            this.id = UUID.randomUUID().toString().substring(0, 6);
+        }
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
     }
 
 }

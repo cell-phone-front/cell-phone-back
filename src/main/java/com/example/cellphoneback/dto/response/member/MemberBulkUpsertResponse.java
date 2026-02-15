@@ -12,7 +12,7 @@ public class MemberBulkUpsertResponse {
     @Schema(description = "생성된 회원 수", example = "5")
     private int createMember;
 
-    @Schema(description = "삭제된 회원 수", example = "2")
+    @Schema(description = "비활성화된 회원 수", example = "2")
     private int deleteMember;
 
     @Schema(description = "수정된 회원 수", example = "3")

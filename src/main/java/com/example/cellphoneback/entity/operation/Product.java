@@ -19,9 +19,19 @@ public class Product {
     private String brand;
     private String name;
     private String description;
+    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "product")
     private List<ProductRouting> productRoutingList;
+
+
+
+    @PrePersist
+    public void prePersist() {
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
+        }
+    }
 
 
 }

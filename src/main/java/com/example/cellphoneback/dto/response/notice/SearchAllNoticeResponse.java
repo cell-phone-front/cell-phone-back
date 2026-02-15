@@ -12,8 +12,8 @@ import java.util.List;
 public class SearchAllNoticeResponse {
 
     @Schema(description = "전체 공지사항 수", example = "120")
-    private long totalNoticeCount;
+    long totalNoticeCount;
 
     @Schema(description = "공지사항 리스트")
-    private List<SearchNoticeByIdResponse> noticeList;
+    List<NoticeListResponse> noticeList;
 }

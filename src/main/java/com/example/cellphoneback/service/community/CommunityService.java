@@ -3,6 +3,7 @@ package com.example.cellphoneback.service.community;
 
 import com.example.cellphoneback.dto.request.community.CreateCommunityRequest;
 import com.example.cellphoneback.dto.request.community.EditCommunityRequest;
+import com.example.cellphoneback.dto.response.community.CommunityListResponse;
 import com.example.cellphoneback.dto.response.community.SearchAllCommunityResponse;
 import com.example.cellphoneback.dto.response.community.SearchCommunityByIdResponse;
 import com.example.cellphoneback.entity.community.Community;
@@ -34,21 +35,25 @@ CommunityService {
 
         Community community = request.toEntity();
         community.setMember(member);
-        community.setCommentCount(0);
         communityRepository.save(community);
 
         return community;
     }
 
     //    community	PUT	/api/community	게시글 수정	planner, worker
+    @Transactional
     public Community editCommunity(Member member, Integer communityId, EditCommunityRequest request) {
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
             throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
+
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
+        if(!community.getMember().getId().equals(member.getId())) {
+            throw new SecurityException("작성자만 수정 가능합니다.");
+        }
 
         community.setTitle(request.getTitle());
         community.setContent(request.getContent());
@@ -66,6 +71,9 @@ CommunityService {
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
+        if (!community.getMember().getId().equals(member.getId())) {
+            throw new SecurityException("작성자만 삭제 가능합니다.");
+        }
 
         communityRepository.delete(community);
     }
@@ -73,17 +81,19 @@ CommunityService {
     //    community	GET	/api/community	게시글 전체 조회	all
     public SearchAllCommunityResponse searchAllCommunity(String keyword) {
 
-        long totalCommunityCount = communityRepository.count();
-
         List<Community> communities = communityRepository.findAll();
 
         if (communities.isEmpty()) {
-            throw new IllegalArgumentException("존재하는 게시글이 없습니다.");
+            return SearchAllCommunityResponse.builder()
+                    .totalCount(0)
+                    .communityList(List.of())
+                    .build();
         }
 
         // 정렬 - 최신순/검색
-        List<SearchCommunityByIdResponse> communityList = communities.stream()
-                .sorted(Comparator.comparing(Community::getCreatedAt).reversed())
+        List<CommunityListResponse> communityList = communities.stream()
+                // 커뮤니티 createdAt 기준 정렬하고 null 값이 있으면 맨뒤로 보내고 있으면 날짜순으로 비교해서 최신순 정렬함
+                .sorted(Comparator.comparing(Community::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
                 .filter(c -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
@@ -92,8 +102,10 @@ CommunityService {
                     return (c.getTitle() != null && c.getTitle().toLowerCase().replaceAll("\\s+", "").contains(kw)) ||
                             (c.getContent() != null && c.getContent().toLowerCase().replaceAll("\\s+", "").contains(kw));
                 })
-                .map(SearchCommunityByIdResponse::fromEntity)
+                .map(CommunityListResponse::fromEntity)
                 .toList();
+
+        long totalCommunityCount = communityList.size();
 
         return SearchAllCommunityResponse.builder()
                 .totalCount(totalCommunityCount)
@@ -103,14 +115,13 @@ CommunityService {
 
     // community	GET	/api/community/{communityId}	해당 게시글 조회	all
     @Transactional
-    public Community searchCommunityById(Integer communityId) {
-
-        communityRepository.increaseViewCount(communityId);
+    public SearchCommunityByIdResponse searchCommunityById(Integer communityId) {
 
         Community community = communityRepository.findById(communityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
+        communityRepository.increaseViewCount(communityId);
 
-        return community;
+        return SearchCommunityByIdResponse.fromEntity(community);
     }
 }

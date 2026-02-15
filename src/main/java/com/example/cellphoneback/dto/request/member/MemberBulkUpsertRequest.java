@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -39,21 +40,25 @@ public class MemberBulkUpsertRequest {
         @Schema(description = "근무 팀", example = "A조")
         private String workTeam;
 
-        @Schema(description = "권한 (ADMIN, PLANNER, USER 등)", example = "USER")
+        @Schema(description = "권한 (ADMIN, PLANNER, WORKER 등)", example = "WORKER")
         private String role;
 
         @Schema(description = "입사일", example = "2026-01-01")
         private String hireDate;
 
         public Member toEntity() {
+            String requestId = this.id;
+            if(requestId == null || requestId.isBlank()) {
+                requestId = UUID.randomUUID().toString().substring(0, 6);
+            }
             return Member.builder()
-                    .id(this.id)
+                    .id(requestId)
                     .name(this.name)
                     .email(this.email)
                     .phoneNumber(this.phoneNumber)
                     .dept(this.dept)
                     .workTeam(this.workTeam)
-                    .role(Role.valueOf(this.role))
+                    .role(Role.valueOf(this.role == null ? "" : this.role.trim().toUpperCase()))
                     .hireDate(this.hireDate)
                     .build();
         }

@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @Schema(description = "커뮤니티 생성 응답 DTO")
 public class CreateCommunityResponse {
 
+    @Schema(description = "커뮤니티 ID", example = "1")
+    private int id;
+
     @Schema(description = "커뮤니티 제목", example = "새 글 작성")
     private String title;
 
@@ -23,6 +26,7 @@ public class CreateCommunityResponse {
 
     public static CreateCommunityResponse fromEntity(Community community){
         return CreateCommunityResponse.builder()
+                .id(community.getId())
                 .title(community.getTitle())
                 .content(community.getContent())
                 .createdAt(community.getCreatedAt())

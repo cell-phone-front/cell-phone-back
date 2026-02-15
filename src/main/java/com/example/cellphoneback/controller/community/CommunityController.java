@@ -78,10 +78,10 @@ public class CommunityController {
     @GetMapping("/{communityId}")
     public ResponseEntity<SearchCommunityByIdResponse> searchCommunityById(@PathVariable Integer communityId) {
 
-        Community response = communityService.searchCommunityById(communityId);
+        SearchCommunityByIdResponse response = communityService.searchCommunityById(communityId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(SearchCommunityByIdResponse.fromEntity(response));
+                .body(response);
     }
 }

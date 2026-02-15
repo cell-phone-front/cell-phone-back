@@ -13,6 +13,7 @@ import com.example.cellphoneback.repository.operation.MachineRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -39,7 +40,10 @@ public class MachineService {
             Workbook workbook = WorkbookFactory.create(machineFile.getInputStream());
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> iterator = sheet.iterator();
-            Row header = iterator.next();
+            if (!iterator.hasNext()) {
+                throw new NoSuchElementException("엑셀에 헤더/데이터가 없습니다.");
+            }
+            iterator.next();
 
             DataFormatter formatter = new DataFormatter();
             List<MachineParseResponse.xls> machineXls = new ArrayList<>();
@@ -63,30 +67,59 @@ public class MachineService {
     }
 
     // POST	/api/operation/machine/upsert	기계 등록, 수정, 삭제	admin,planner
+    @Transactional
     public MachineBulkUpsertResponse machineUpsertService(Member member, MachineBulkUpsertRequest request) {
         if(!member.getRole().equals(Role.ADMIN) &&  !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
         List<MachineBulkUpsertRequest.Item> items = request.getMachineList();
-        List<String> machineIds = items.stream().map(e -> e.getId()).toList();
+        List<String> machineIds = items.stream()
+                .map(i -> i.getId() == null ? "" : i.getId().trim())
+                .toList();
+
+        boolean hasBlankId = machineIds.stream().anyMatch(id -> id.isBlank());
+        if (hasBlankId) {
+            throw new IllegalArgumentException("Machine id는 필수입니다. 빈 id가 포함되어 있습니다.");
+        }
 
         List<Machine> saveMachine = machineRepository.findAll();
         List<Machine> notContainsMachine =
                 saveMachine.stream()
                         .filter(e -> !machineIds.contains(e.getId())).toList();
-        machineRepository.deleteAll(notContainsMachine);
+
+        int deleted = (int) notContainsMachine.stream()
+                .filter(m -> Boolean.FALSE.equals(m.getIsDeleted())).count();
+
+        List<Machine> machinesDeleted = notContainsMachine.stream()
+                .map(m -> {
+                    m.setIsDeleted(true);
+                    return m;
+                }).toList();
+        machineRepository.saveAll(machinesDeleted);
 
         List<Machine> upsertMachine = items.stream().map(e -> Machine.builder()
                 .id(e.getId())
                 .name(e.getName())
                 .description(e.getDescription())
+                .isDeleted(false)
                 .build()).toList();
         machineRepository.saveAll(upsertMachine);
 
-        int deleted = notContainsMachine.size();
-        int updated = saveMachine.size() - deleted;
-        int created = upsertMachine.size() - updated;
+        int updated = 0;
+        int created = 0;
+
+        for (String id : machineIds) {
+            boolean exists = false;
+            for (Machine m : saveMachine) {
+                if (m.getId() != null && m.getId().equals(id)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) updated++;
+            else created++;
+        }
 
         return MachineBulkUpsertResponse.builder()
                 .deleteMachine(deleted)
@@ -102,6 +135,7 @@ public class MachineService {
         }
 
         List<MachineListResponse.Item> machineList = machineRepository.findAll().stream()
+                .filter(m -> Boolean.FALSE.equals(m.getIsDeleted()))
                 .map(m -> MachineListResponse.Item.builder()
                         .id(m.getId())
                         .name(m.getName())

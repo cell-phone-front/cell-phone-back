@@ -15,5 +15,5 @@ public class SearchAllCommunityResponse {
     private long totalCount;
 
     @Schema(description = "커뮤니티 리스트")
-    private List<SearchCommunityByIdResponse> communityList;
+    private List<CommunityListResponse> communityList;
 }

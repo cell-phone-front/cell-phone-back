@@ -41,7 +41,7 @@ public class MemberParseResponse {
         @Schema(description = "팀", example = "백엔드")
         private String workTeam;
 
-        @Schema(description = "권한", example = "ROLE_ADMIN")
+        @Schema(description = "권한", example = "ADMIN")
         private String role;
 
         @Schema(description = "입사일", example = "2023-01-15")

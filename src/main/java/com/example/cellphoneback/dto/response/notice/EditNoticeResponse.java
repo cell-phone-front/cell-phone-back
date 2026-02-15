@@ -23,6 +23,9 @@ public class EditNoticeResponse {
     @Schema(description = "공지사항 내용", example = "공지사항 내용 예시")
     String content;
 
+    @Schema(description = "핀 고정 여부", example = "false")
+    Boolean pinned;
+
     @Schema(description = "공지사항 생성일", example = "2026-02-06T09:00:00")
     LocalDateTime createdAt;
 
@@ -34,6 +37,7 @@ public class EditNoticeResponse {
                 .id(notice.getId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
+                .pinned(notice.getPinned())
                 .createdAt(notice.getCreatedAt())
                 // null 이면 빈 List를 넣고 null이 아니면 NoticeAttachmentFromEntity -> NoticeAttachmentResponse로 변환해서 List로 만듬
                 .noticeAttachmentList(

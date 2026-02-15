@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
@@ -36,8 +37,6 @@ import java.util.stream.Collectors;
 @Service
 public class SimulationService {
     private final SimulationRepository simulationRepository;
-    private final MachineRepository machineRepository;
-    private final OperationRepository operationRepository;
     private final ProductRepository productRepository;
     private final SimulationScheduleRepository simulationScheduleRepository;
     private final SimulationProductRepository simulationProductRepository;
@@ -86,6 +85,7 @@ public class SimulationService {
 
 
     //    simulation	POST	/api/simulation/{simulationId}/	시뮬레이션 실행 요청	admin, planner
+    @Transactional
     public RunSimulationResponse runSimulation(Member member, String simulationId) throws JsonProcessingException {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
@@ -226,22 +226,16 @@ public class SimulationService {
     }
 
     //    simulation	DELETE	/api/simulation	시뮬레이션 삭제	admin, planner
+    @Transactional
     public DeleteSimulationResponse deleteSimulation(Member member, String simulationId) {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<SimulationSchedule> simulationScheduleList = simulationScheduleRepository.findAll();
-        List<SimulationSchedule> simulationSchedule = simulationScheduleList.stream()
-                .filter(e -> e.getSimulation().getId().equals(simulationId)).toList();
-        simulationScheduleRepository.deleteAll(simulationSchedule);
+        Simulation simulation = simulationRepository.findById(simulationId)
+                .orElseThrow(() -> new NoSuchElementException("해당 시뮬레이션이 존재하지 않습니다."));
 
-        List<SimulationProduct> simulationProductList = simulationProductRepository.findAll();
-        List<SimulationProduct> deleteSimulationProduct =
-                simulationProductList.stream().filter(e -> e.getSimulation().getId().equals(simulationId)).toList();
-        simulationProductRepository.deleteAll(deleteSimulationProduct);
-
-        simulationRepository.deleteById(simulationId);
+        simulationRepository.delete(simulation);
 
         return DeleteSimulationResponse.builder().message("정상적으로 삭제 되었습니다.").build();
     }
@@ -262,6 +256,10 @@ public class SimulationService {
         }
 
         List<GetAllSimulationResponse.Item> simulationList = simulationRepository.findAllWithMember().stream()
+                .sorted(Comparator.comparing(
+                        Simulation::getSimulationStartDate,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
                 .map(one -> GetAllSimulationResponse.Item.builder()
                         .id(one.getId())
                         .memberName(one.getMember().getName())

@@ -13,6 +13,7 @@ import com.example.cellphoneback.repository.operation.ProductRoutingRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -47,7 +48,10 @@ public class ProductRoutingService {
             // 시트에 존재하는 모든 행을 위에서부터 하나씩 읽기 위한 반복자
             Iterator<Row> iterator = sheet.iterator();
             // id,email 등 컬럼이 첫행이라고 보고 분리
-            Row header = iterator.next();
+            if (!iterator.hasNext()) {
+                throw new NoSuchElementException("엑셀에 헤더/데이터가 없습니다.");
+            }
+            iterator.next();
 
             DataFormatter formatter = new DataFormatter();
             List<ProductRoutingParseResponse.xls> productRoutingXls = new ArrayList<>();
@@ -73,6 +77,7 @@ public class ProductRoutingService {
     }
 
     //    operation	POST	/api/operation/product/routing/upsert	프로덕트 라우팅  추가, 수정, 삭제	admin, planner
+    @Transactional
     public ProductRoutingBulkUpsertResponse productRoutingBulkUpsertService(Member member, ProductRoutingBulkUpsertRequest request) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
@@ -80,13 +85,29 @@ public class ProductRoutingService {
         }
         List<ProductRoutingBulkUpsertRequest.Item> items = request.getProductRoutingList();
         // 아디가 String이 아닌 int 이므로 Integer로 받는다.
-        List<String> itemIds = items.stream().map(e -> e.getId()).toList();
+        List<String> itemIds = items.stream()
+                .map(i -> i.getId() == null ? "" : i.getId().trim())
+                .toList();
+
+        boolean hasBlankId = itemIds.stream().anyMatch(id -> id.isBlank());
+        if (hasBlankId) {
+            throw new IllegalArgumentException("ProductRouting id는 필수입니다. 빈 id가 포함되어 있습니다.");
+        }
 
         List<ProductRouting> saveProductRouting = productRoutingRepository.findAll();
         List<ProductRouting> notContainsProductRouting =
                 saveProductRouting.stream()
                         .filter(e -> !itemIds.contains(e.getId())).toList();
-        productRoutingRepository.deleteAll(notContainsProductRouting);
+
+        int deleted = (int) notContainsProductRouting.stream()
+                .filter(r -> Boolean.FALSE.equals(r.getIsDeleted())).count();
+
+        List<ProductRouting> productRoutingDelete = notContainsProductRouting.stream()
+                .map(r -> {
+                    r.setIsDeleted(true);
+                    return r;
+                }).toList();
+        productRoutingRepository.saveAll(productRoutingDelete);
 
         List<ProductRouting> UpsertProductRoutingList = items.stream()
                 .map(e -> ProductRouting.builder()
@@ -98,14 +119,26 @@ public class ProductRoutingService {
                         .operation(operationRepository.findById(e.getOperationId()).orElseThrow())
                         .operationSeq(e.getOperationSeq())
                         .description(e.getDescription())
+                        .isDeleted(false )
                         .build())
                 .toList();
         productRoutingRepository.saveAll(UpsertProductRoutingList);
 
 
-        int deleted = notContainsProductRouting.size();
-        int updated = saveProductRouting.size() - deleted;
-        int created = UpsertProductRoutingList.size() - updated;
+        int updated = 0;
+        int created = 0;
+
+        for (String id : itemIds) {
+            boolean exists = false;
+            for (ProductRouting r : saveProductRouting) {
+                if (r.getId().equals(id)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) updated++;
+            else created++;
+        }
 
         return ProductRoutingBulkUpsertResponse.builder()
                 .createProductRouting(created)
@@ -120,7 +153,11 @@ public class ProductRoutingService {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<ProductRoutingListResponse.Item> productRoutingList = productRoutingRepository.findAll().stream()
+        List<ProductRouting> alive = productRoutingRepository.findAll().stream()
+                .filter(p -> Boolean.FALSE.equals(p.getIsDeleted()))
+                .toList();
+
+        List<ProductRoutingListResponse.Item> productRoutingList = alive.stream()
                 .map(r -> ProductRoutingListResponse.Item.builder()
                         .id(r.getId())
                         .name(r.getName())
@@ -140,6 +177,30 @@ public class ProductRoutingService {
 
                     return r.getName() != null && r.getName().toLowerCase().replaceAll("\\s+", "").contains(k)
                             || r.getDescription() != null && r.getDescription().toLowerCase().replaceAll("\\s+", "").contains(k);
+                })
+                .sorted((a, b) -> {
+                    String ap = a.getProductId();
+                    String bp = b.getProductId();
+
+                    // null-safe 문자열 비교 (null은 뒤로)
+                    if (ap == null && bp != null) return 1;
+                    if (ap != null && bp == null) return -1;
+                    if (ap != null) {
+                        int c = ap.compareTo(bp);
+                        if (c != 0) return c;
+                    }
+
+                    // operationSeq 오름차순
+                    int s = Integer.compare(a.getOperationSeq(), b.getOperationSeq());
+                    if (s != 0) return s;
+
+                    // (선택) id 오름차순으로 안정 정렬
+                    String ai = a.getId();
+                    String bi = b.getId();
+                    if (ai == null && bi != null) return 1;
+                    if (ai != null && bi == null) return -1;
+                    if (ai == null) return 0;
+                    return ai.compareTo(bi);
                 }).toList();
 
 
