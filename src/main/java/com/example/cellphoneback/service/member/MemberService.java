@@ -13,11 +13,13 @@ import com.example.cellphoneback.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin
 @RequiredArgsConstructor
@@ -29,6 +31,10 @@ public class MemberService {
     public MemberLoginResponse memberLoginService(MemberLoginRequest request) {
         Member member = memberRepository.findById(request.getId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 멤버입니다."));
+
+        if (Boolean.FALSE.equals(member.getIsActive())) {
+            throw new SecurityException("비활성 계정입니다.");
+        }
 
         if (!member.getName().equals(request.getName())) {
             throw new IllegalArgumentException("정보가 일치하지 않습니다.");
@@ -63,7 +69,7 @@ public class MemberService {
             // 시트에 존재하는 모든 행을 위에서부터 하나씩 읽기 위한 반복자
             Iterator<Row> iterator = sheet.iterator();
             // id,email 등 컬럼이 첫행이라고 보고 분리
-            Row header = iterator.next();
+            iterator.next();
 
             DataFormatter formatter = new DataFormatter();
             List<MemberParseResponse.xls> memberXls = new ArrayList<>();
@@ -91,40 +97,73 @@ public class MemberService {
     }
 
     // POST	/api/member/upsert	계정 생성, 수정, 삭제	admin
+    @Transactional
     public MemberBulkUpsertResponse memberBulkUpsertService(Member member, MemberBulkUpsertRequest request) {
+
         if (!member.getRole().equals(Role.ADMIN)) {
             throw new SecurityException("ADMIN 권한이 없습니다.");
         }
+
         List<MemberBulkUpsertRequest.Item> items = request.getMemberList();
-        List<String> itemIds = items.stream().map(e -> e.toEntity().getId()).toList();
+
+        // items 를 Entity로 변환
+        List<Member> reqMembers = items.stream()
+                .map(e -> e.toEntity()).toList();
+
+        List<String> itemIds = reqMembers.stream()
+                .map(m -> m.getId()).toList();
 
         List<Member> saveMember = memberRepository.findAll();
+
         List<Member> notContainsMember =
                 saveMember.stream()
                         .filter(e -> !itemIds.contains(e.getId())).toList();
-        memberRepository.deleteAll(notContainsMember);
 
-        List<Member> upsertMembers = items.stream().map(e -> Member.builder()
-                .id(e.toEntity().getId())
-                .name(e.toEntity().getName())
-                .email(e.toEntity().getEmail())
-                .phoneNumber(e.toEntity().getPhoneNumber())
-                .dept(e.toEntity().getDept())
-                .workTeam(e.toEntity().getWorkTeam())
-                .role(e.toEntity().getRole())
-                .hireDate(e.toEntity().getHireDate()).build()).toList();
+        // 요청으로 비활성화될 수만 카운드
+        int deleted = (int) notContainsMember.stream()
+                .filter(m -> Boolean.TRUE.equals(m.getIsActive()))
+                .count();
+
+        // 삭제로직 지우고 비활성화로 변경하는 로직 추가
+        List<Member> deactivated = notContainsMember.stream()
+                .map(m -> {
+                    m.setIsActive(false);
+                    return m;
+                }).toList();
+        memberRepository.saveAll(deactivated);
+
+        List<Member> upsertMembers = reqMembers.stream()
+                .map(e -> Member.builder()
+                        .id(e.getId())
+                        .name(e.getName())
+                        .email(e.getEmail())
+                        .phoneNumber(e.getPhoneNumber())
+                        .dept(e.getDept())
+                        .workTeam(e.getWorkTeam())
+                        .role(e.getRole())
+                        .hireDate(e.getHireDate())
+                        .isActive(true).build()).toList();
         memberRepository.saveAll(upsertMembers);
 
-        int deleted = notContainsMember.size();
-        int updated = saveMember.size() - deleted;
-        int created = upsertMembers.size() - updated;
+        // 기존 ID Set 만들기
+        Set<String> existing =
+                saveMember.stream()
+                        .map(m -> m.getId())
+                        .collect(Collectors.toSet());
+        // update 계산
+        int updated =
+                (int) itemIds.stream()
+                        .filter(id -> existing.contains(id)).count();
+        // created 계산
+        int created =
+                (int) itemIds.stream()
+                        .filter(id -> !existing.contains(id)).count();
 
         return MemberBulkUpsertResponse.builder()
                 .createMember(created)
                 .deleteMember(deleted)
                 .updateMember(updated).build();
     }
-
 
     // GET	/api/member	전체 멤버 조회 및 검색 조회	admin
     public MemberListResponse memberListService(Member member, String keyword) {
@@ -133,6 +172,7 @@ public class MemberService {
         }
 
         List<Member> memberList = memberRepository.findAll().stream()
+                .filter(m -> Boolean.TRUE.equals(m.getIsActive()))
                 .filter(m -> {
                     if (keyword == null || keyword.isBlank())
                         return true;
@@ -142,20 +182,65 @@ public class MemberService {
                     return (m.getName() != null && m.getName().toLowerCase().replaceAll("\\s+", "").contains(k))
                             || (m.getDept() != null && m.getDept().toLowerCase().replaceAll("\\s+", "").contains(k))
                             || (m.getWorkTeam() != null && m.getWorkTeam().toLowerCase().replaceAll("\\s+", "").contains(k));
-                }).toList();
+                }) .sorted(
+                        Comparator
+                                //  Role 그룹: ADMIN -> PLANNER -> WORKER
+                                .comparingInt((Member m) -> roleOrder(m.getRole()))
+                                //  그룹 내 이름 정렬: 문자 먼저, 숫자는 숫자대로
+                                .thenComparing((a, b) -> compareNameNatural(a.getName(), b.getName()))
+                )
+                .toList();
         return MemberListResponse.builder().memberList(memberList).build();
+
+
+    }
+
+    private int roleOrder(Role role) {
+        if (role == Role.ADMIN) return 0;
+        if (role == Role.PLANNER) return 1;
+        if (role == Role.WORKER) return 2;
+        return 99;
+    }
+
+    // ✅ planner1, planner2, planner10 자연정렬 + 한글 ㄱ~ㅎ
+    private int compareNameNatural(String nameA, String nameB) {
+        if (nameA == null && nameB == null) return 0;
+        if (nameA == null) return 1;
+        if (nameB == null) return -1;
+
+        String textA = nameA.replaceAll("\\d", "");
+        String textB = nameB.replaceAll("\\d", "");
+
+        int textCompare = textA.compareTo(textB);
+        if (textCompare != 0) return textCompare;
+
+        String numA = nameA.replaceAll("\\D", "");
+        String numB = nameB.replaceAll("\\D", "");
+
+        if (numA.isEmpty() || numB.isEmpty()) {
+            return nameA.compareTo(nameB);
+        }
+
+        int intA = Integer.parseInt(numA);
+        int intB = Integer.parseInt(numB);
+
+        return Integer.compare(intA, intB);
     }
 
     // GET	/api/member/{memberId}	계정 조회	본인
     public MemberSearchByIdResponse memberSearchByIdService(Member member, String memberId) {
         String loginId = member.getId();
 
-        if(!loginId.equals(memberId)){
+        if (!loginId.equals(memberId)) {
             throw new SecurityException("본인 정보만 조회할 수 있습니다.");
         }
 
         Member self = memberRepository.findById(member.getId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 멤버입니다."));
+
+        if (Boolean.FALSE.equals(self.getIsActive())) {
+            throw new SecurityException("비활성 계정입니다.");
+        }
 
         return MemberSearchByIdResponse.builder().member(self).build();
     }

@@ -33,7 +33,8 @@ public class NoticeService {
     private final NoticeNotificationRepository noticeNotificationRepository;
 
     //   1	notice	POST	/api/notice	공지사항 작성	admin, planner
-    public Notice createNotice(Member member, CreateNoticeRequest request) {
+    @Transactional
+    public Notice createNotice(Member member, CreateNoticeRequest request, List<MultipartFile> files) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
@@ -41,14 +42,24 @@ public class NoticeService {
 
         Notice notice = request.toEntity();
         notice.setMember(member);
-        notice.setPinned(request.getPinned());
+
+        notice.setPinned(Boolean.TRUE.equals(request.getPinned()));
+
+        if(notice.getCreatedAt() == null) {
+            notice.setCreatedAt(LocalDateTime.now());
+        }
+
         Notice savedNotice = noticeRepository.save(notice);
 
+        if(files != null &&  !files.isEmpty()) {
+            uploadFiles(member, savedNotice.getId(), files);
+        }
+
+        // 작성자 제외
         List<Member> members = memberRepository.findAll();
         List<NoticeNotification> notifications = new ArrayList<>();
         for (Member m : members) {
 
-            // ✅ 작성자 제외
             if (m.getId().equals(member.getId())) continue;
 
             NoticeNotification noticeNotification = NoticeNotification.builder()
@@ -81,7 +92,10 @@ public class NoticeService {
 
         notice.setTitle(request.getTitle());
         notice.setContent(request.getContent());
-        notice.setCreatedAt(LocalDateTime.now());
+
+        if (request.getPinned() != null) {
+            notice.setPinned(Boolean.TRUE.equals(request.getPinned()));
+        }
 
         // 삭제할 ID 리스트가 null 아니거나 비어있지 않다면 해당 noticeId로 조회하고 request로 받은 ID에 포함되어 있다면 삭제
         if (request.getDeleteAttachmentIds() != null && !request.getDeleteAttachmentIds().isEmpty()) {
@@ -107,57 +121,72 @@ public class NoticeService {
     }
 
 
-    //3	notice	DELETE	/api/notice	공지사항 삭제	admin, planner
+    //3	notice	DELETE	/api/notice/{noticeId}	공지사항 삭제	admin, planner
     public void deleteNotice(Member member, Integer noticeId) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<NoticeNotification> notification = noticeNotificationRepository.findAll().stream()
-                .filter(e -> e.getNoticeId() == noticeId).toList();
-
-        noticeNotificationRepository.deleteAll(notification);
-
-        List<NoticeAttachment> attachments = noticeAttachmentRepository.findAll().stream()
-                .filter(e -> e.getNotice().getId() == noticeId).toList();
-
-        noticeAttachmentRepository.deleteAll(attachments);
-
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
-
         noticeRepository.delete(notice);
+
+        Path uploadPath = Path.of(System.getProperty("user.home"),
+                "cellphone",
+                "notice",
+                String.valueOf(noticeId));
+        try {
+            if (Files.exists(uploadPath)) {
+                // 폴더 안 파일 먼저 삭제 후 폴더 삭제
+                Files.walk(uploadPath)
+                        .sorted(Comparator.reverseOrder())
+                        .forEach(p -> {
+                            try {
+                                Files.deleteIfExists(p);
+                            } catch (IOException ex) {
+                                throw new RuntimeException("파일 삭제 실패", ex);
+                            }
+                        });
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("업로드 폴더 삭제 실패", e);
+        }
     }
 
     //4	notice	GET	/api/notice	전체 공지사항 조회	all
-    public SearchAllNoticeResponse searchAllNotice(Member member, String keyword) {
-
-        long totalNoticeCount = noticeRepository.count();
+    public SearchAllNoticeResponse searchAllNotice(String keyword) {
 
         List<Notice> notices = noticeRepository.findAll();
 
         if (notices.isEmpty()) {
-            throw new IllegalArgumentException("공지사항이 존재하지 않습니다.");
+            return SearchAllNoticeResponse.builder()
+                    .totalNoticeCount(0)
+                    .noticeList(List.of()).build();
         }
+        String k = (keyword == null) ? "" : keyword.trim().toLowerCase().replaceAll("\\s+", "");
 
+        // Notice 리스트로 필터 + 정렬 (핀 우선, 최신순)
+        List<NoticeListResponse> noticeList = notices.stream()
+                .filter(n -> {
+                    if (k.isBlank()) return true;
 
-        // 정렬 - 최신순, 검색
-        List<SearchNoticeByIdResponse> noticeList = notices.stream()
-                .sorted(Comparator.comparing((Notice n) -> n.getPinned() != null && n.getPinned())
-                        .thenComparing(Notice::getCreatedAt).reversed())
-                .filter(c -> {
-                    if (keyword == null || keyword.isBlank())
-                        return true;
-
-                    String kw = keyword.trim().toLowerCase().replaceAll("\\s+", "");
-                    return (c.getTitle() != null && c.getTitle().toLowerCase().replaceAll("\\s+", "").contains(kw)) ||
-                            (c.getContent() != null && c.getContent().toLowerCase().replaceAll("\\s+", "").contains(kw));
+                    String t = (n.getTitle() == null) ? "" : n.getTitle().toLowerCase().replaceAll("\\s+", "");
+                    String c = (n.getContent() == null) ? "" : n.getContent().toLowerCase().replaceAll("\\s+", "");
+                    return t.contains(k) || c.contains(k);
                 })
-                .map(n->SearchNoticeByIdResponse.fromEntity(n, null))
+                .sorted(
+                        Comparator
+                                .comparing((Notice n) -> Boolean.TRUE.equals(n.getPinned()))
+                                .thenComparing(Notice::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()))
+                                .reversed()
+                )
+                .map(n -> NoticeListResponse.fromEntity(n))
                 .toList();
 
+        // count는 검색 결과 수
+        long totalNoticeCount = noticeList.size();
 
         return SearchAllNoticeResponse.builder()
                 .totalNoticeCount(totalNoticeCount)
@@ -169,13 +198,13 @@ public class NoticeService {
     @Transactional
     public SearchNoticeByIdResponse searchNoticeById(Member member, Integer noticeId) {
 
-        noticeRepository.increaseViewCount(noticeId);
-
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
-
-        noticeNotificationRepository.markAsRead(member.getId(), noticeId);
+        noticeRepository.increaseViewCount(noticeId);
+        if (member != null) {
+            noticeNotificationRepository.markAsRead(member.getId(), noticeId);
+        }
 
         List<NoticeAttachment> attachments = noticeAttachmentRepository.findByNoticeId(noticeId);
 
@@ -183,6 +212,7 @@ public class NoticeService {
     }
 
     // PATCH	/api/notice/{noticeId}/pin	공지사항 핀 고정	admin, planner
+    @Transactional
     public PinNoticeResponse pinNotice(Integer noticeId, Member member) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
@@ -192,7 +222,7 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 공지사항입니다."));
 
 
-        boolean currentPin = notice.getPinned(); // 현재 핀 상태
+        boolean currentPin = Boolean.TRUE.equals(notice.getPinned());
         if (!currentPin) {
             long pinnedCount = noticeRepository.countByPinnedTrue(); // 현재 핀 고정된 공지사항 수
             if (pinnedCount >= 3) {
@@ -234,27 +264,40 @@ public class NoticeService {
 
         // 파일 저장 및 DB 기록
         List<NoticeAttachment> attachments = new ArrayList<>();
+        List<Path> savedPaths = new ArrayList<>(); // 실패 시 삭제용
 
-        for (MultipartFile file : files) {
-            if (file.isEmpty()) continue;
+        try {
+            for (MultipartFile file : files) {
+                if (file == null || file.isEmpty()) continue;
 
-            String savedFileName = UUID.randomUUID().toString()
-                    .replace("-", "") + "_" + file.getOriginalFilename();
+                String original = file.getOriginalFilename();
+                String safeOriginal = (original == null ? "file" : Path.of(original).getFileName().toString());
 
-            try {
-                file.transferTo(uploadPath.resolve(savedFileName));
-            } catch (IOException e) {
-                throw new RuntimeException("파일 저장 실패", e); //500
+                String savedFileName = UUID.randomUUID().toString().replace("-", "") + "_" + safeOriginal;
+                Path target = uploadPath.resolve(savedFileName);
+
+                file.transferTo(target);
+                savedPaths.add(target);
+
+                NoticeAttachment attachment = NoticeAttachment.builder()
+                        .notice(notice)
+                        .fileSize(file.getSize())
+                        .fileType(file.getContentType())
+                        .fileUrl(savedFileName)
+                        .build();
+
+                attachments.add(attachment);
             }
+        } catch (IOException e) {
+            // ✅ 디스크 롤백(최소)
+            for (Path p : savedPaths) {
+                try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+            }
+            throw new RuntimeException("파일 저장 실패", e); // 500
+        }
 
-            NoticeAttachment attachment = NoticeAttachment.builder()
-                    .notice(notice)
-                    .fileSize(file.getSize())
-                    .fileType(file.getContentType())
-                    .fileUrl(savedFileName)
-                    .build();
-
-            attachments.add(attachment);
+        if (attachments.isEmpty()) {
+            throw new IllegalArgumentException("업로드할 파일이 없습니다."); // 400
         }
 
         noticeAttachmentRepository.saveAll(attachments);
@@ -264,6 +307,12 @@ public class NoticeService {
 
     // notice	GET	/api/notice/{noticeId}/attachment/{noticeAttachmentId}	공지사항 파일 다운로드 admin, planner
     public Path getNoticeAttachmentPath(Member member, Integer noticeId, String noticeAttachmentId) {
+
+        if (!member.getRole().equals(Role.ADMIN)
+                && !member.getRole().equals(Role.PLANNER)
+                && !member.getRole().equals(Role.WORKER)) {
+            throw new SecurityException("다운로드 권한이 없습니다.");
+        }
 
         noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항 없음"));

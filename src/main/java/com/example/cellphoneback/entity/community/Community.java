@@ -30,7 +30,8 @@ public class Community {
 
     @PrePersist
     public void prePersist() {
-        createdAt = LocalDateTime.now();
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+
     }
 
 }

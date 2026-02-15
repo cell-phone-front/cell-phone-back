@@ -1,10 +1,7 @@
 package com.example.cellphoneback.entity.operation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -28,5 +25,13 @@ public class Task {
     private String name;
     private int duration;
     private String description;
+    private Boolean isDeleted;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.isDeleted == null) {
+            this.isDeleted = false;
+        }
+    }
 
 }

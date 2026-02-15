@@ -21,6 +21,9 @@ public class EditNoticeRequest {
     @Schema(description = "공지사항 내용", example = "공지사항 내용이 수정되었습니다.")
     String content;
 
+    @Schema(description = "핀 고정 여부(미전달 시 변경 없음)", example = "true")
+    Boolean pinned;
+
     @Schema(description = "삭제할 첨부파일 ID 목록", example = "[\"a1b2c3\", \"d4e5f6\"]")
     List<String> deleteAttachmentIds;
 

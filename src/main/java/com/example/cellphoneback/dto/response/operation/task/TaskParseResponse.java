@@ -34,7 +34,7 @@ public class TaskParseResponse {
         private String name;
 
         @Schema(description = "작업 소요 시간(분)", example = "60")
-        private int duration;
+        private Integer duration;
 
         @Schema(description = "Task 설명", example = "스마트폰 A 모델 조립 작업")
         private String description;

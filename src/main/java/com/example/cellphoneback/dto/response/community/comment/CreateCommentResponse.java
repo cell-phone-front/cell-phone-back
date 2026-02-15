@@ -15,8 +15,8 @@ public class CreateCommentResponse {
     @Schema(description = "댓글이 속한 커뮤니티 ID", example = "10")
     private Integer communityId;
 
-    @Schema(description = "댓글 작성자 회원 ID", example = "user123")
-    private String memberId;
+    @Schema(description = "익명 작성자 번호", example = "익명1")
+    private String anonymous;
 
     @Schema(description = "댓글 내용", example = "댓글 내용입니다.")
     private String content;
@@ -24,10 +24,10 @@ public class CreateCommentResponse {
     @Schema(description = "댓글 작성 시간", example = "2020-01-26 09:00")
     private LocalDateTime createdAt;
 
-    public static CreateCommentResponse fromEntity(Comment comment){
+    public static CreateCommentResponse fromEntity(Comment comment, String anonymous){
         return CreateCommentResponse.builder()
                 .communityId(comment.getCommunity().getId())
-                .memberId(comment.getMember().getId())
+                .anonymous(anonymous)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();

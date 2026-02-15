@@ -13,6 +13,7 @@ import com.example.cellphoneback.repository.operation.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -42,12 +43,18 @@ public class ProductService {
             // 시트에 존재하는 모든 행을 위에서부터 하나씩 읽기 위한 반복자
             Iterator<Row> iterator = sheet.iterator();
             // id,email 등 컬럼이 첫행이라고 보고 분리
-            Row header = iterator.next();
+            if (!iterator.hasNext()) {
+                throw new NoSuchElementException("엑셀에 헤더/데이터가 없습니다.");
+            }
+            iterator.next();
+
+
 
             DataFormatter formatter = new DataFormatter();
             List<ProductParseResponse.xls> productXls = new ArrayList<>();
             while (iterator.hasNext()) {
                 Row row = iterator.next();
+
                 // 해당 아이디가 int auto_increment면 엑셀 값을 안 받아도 됨 ( 값이 0으로 들어옴 )
                 ProductParseResponse.xls one =
                         ProductParseResponse.xls.builder()
@@ -66,20 +73,39 @@ public class ProductService {
     }
 
     //    operation	POST	/api/operation/product/upsert	생산 대상 등록,  수정, 삭제	admin, planner
+    @Transactional
     public ProductBulkUpsertResponse productBulkUpsertService(Member member, ProductBulkUpsertRequest request) {
 
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
         List<ProductBulkUpsertRequest.Item> items = request.getProductList();
-        // 아디가 String이 아닌 int 이므로 Integer로 받는다.
-        List<String> itemIds = items.stream().map(e -> e.getId()).toList();
+
+        List<String> itemIds = items.stream()
+                .map(i -> i.getId() == null ? "" : i.getId().trim())
+                .toList();
+
+        boolean hasBlankId = itemIds.stream().anyMatch(id -> id.isBlank());
+        if (hasBlankId) {
+            throw new IllegalArgumentException("Product id는 필수입니다. 빈 id가 포함되어 있습니다.");
+        }
 
         List<Product> saveProduct = productRepository.findAll();
-        List<Product> notContainsProduct =
-                saveProduct.stream()
-                        .filter(e -> !itemIds.contains(e.getId())).toList();
-        productRepository.deleteAll(notContainsProduct);
+
+        // 기존 데이터 중 요청에 없는 것은 삭제 대상
+        List<Product> notContainsProduct = saveProduct.stream()
+                .filter(p -> !itemIds.contains(p.getId())).toList();
+
+        // 요청으로 삭제되는 것만 카운트 (이미 isDeleted가 true 인건 제외)
+        int deleted = (int) notContainsProduct.stream()
+                .filter(p -> Boolean.FALSE.equals(p.getIsDeleted())).count();
+
+        List<Product> softDeleted = notContainsProduct.stream()
+                .map(p -> {
+                    p.setIsDeleted(true);
+                    return p;
+                }).toList();
+        productRepository.saveAll(softDeleted);
 
         List<Product> UpsertProductList = items.stream()
                 .map(e -> Product.builder()
@@ -89,12 +115,24 @@ public class ProductService {
                         .brand(e.getBrand())
                         .name(e.getName())
                         .description(e.getDescription())
+                        .isDeleted(false)
                         .build()).toList();
         productRepository.saveAll(UpsertProductList);
 
-        int deleted = notContainsProduct.size();
-        int updated = saveProduct.size() - deleted;
-        int created = UpsertProductList.size() - updated;
+        int updated = 0;
+        int created = 0;
+
+        for (String id : itemIds) {
+            boolean exists = false;
+            for (Product p : saveProduct) {
+                if (p.getId().equals(id)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) updated++;
+            else created++;
+        }
 
         return ProductBulkUpsertResponse.builder()
                 .createProduct(created)
@@ -109,7 +147,11 @@ public class ProductService {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<ProductListResponse.Item> productList = productRepository.findAll().stream()
+        List<Product> aliveProducts = productRepository.findAll().stream()
+                .filter(p -> Boolean.FALSE.equals(p.getIsDeleted()))
+                .toList();
+
+        List<ProductListResponse.Item> productList = aliveProducts.stream()
                 .map(p -> ProductListResponse.Item.builder()
                         .id(p.getId())
                         .brand(p.getBrand())

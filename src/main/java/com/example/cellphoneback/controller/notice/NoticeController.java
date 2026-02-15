@@ -40,11 +40,14 @@ public class NoticeController {
     private final ObjectMapper objectMapper;
 
     @Operation(summary = "공지사항 작성", description = "새 공지사항을 작성합니다. 관리자(ADMIN), 기획자(PLANNER)만 접근할 수 있습니다.")
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateNoticeResponse> createNotice(@RequestAttribute Member member,
-                                                             @RequestBody CreateNoticeRequest request) {
+                                                             @RequestPart("request") String requestJson,
+                                                             @RequestPart(value = "files", required = false) List<MultipartFile> files) throws JsonProcessingException {
 
-        Notice response = noticeService.createNotice(member, request);
+        CreateNoticeRequest request = objectMapper.readValue(requestJson, CreateNoticeRequest.class);
+
+        Notice response = noticeService.createNotice(member, request, files);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -58,7 +61,6 @@ public class NoticeController {
                                                            @RequestPart("request") String requestJson,
                                                            @RequestPart(value = "files", required = false) List<MultipartFile> files) throws JsonProcessingException {
 
-        // JSON 문자열 -> DTO 변환
         EditNoticeRequest request = objectMapper.readValue(requestJson, EditNoticeRequest.class);
 
         EditNoticeResponse response = noticeService.editNotice(noticeId, member, request, files);
@@ -80,9 +82,8 @@ public class NoticeController {
 
     @Operation(summary = "공지사항 전체 목록 조회", description = "모든 공지사항을 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping
-    public ResponseEntity<SearchAllNoticeResponse> getNotice(@RequestAttribute Member member,
-                                                             @RequestParam(required = false) String keyword) {
-        SearchAllNoticeResponse response = noticeService.searchAllNotice(member, keyword);
+    public ResponseEntity<SearchAllNoticeResponse> getNotice(@RequestParam(required = false) String keyword) {
+        SearchAllNoticeResponse response = noticeService.searchAllNotice(keyword);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200

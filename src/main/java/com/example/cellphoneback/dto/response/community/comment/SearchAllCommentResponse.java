@@ -15,11 +15,8 @@ public class SearchAllCommentResponse {
     @Schema(description = "댓글 ID", example = "1")
     private Integer id;
 
-    @Schema(description = "댓글이 속한 커뮤니티 ID", example = "10")
-    private Integer communityId;
-
-    @Schema(description = "작성자 회원 ID", example = "user123")
-    private String memberId;
+    @Schema(description = "익명 작성자 번호", example = "익명1")
+    private String anonymous;
 
     @Schema(description = "댓글 내용", example = "좋은 글이에요!")
     private String content;
@@ -28,11 +25,10 @@ public class SearchAllCommentResponse {
     private LocalDateTime createdAt;
 
 
-    public static SearchAllCommentResponse fromEntity(Comment comment){
+    public static SearchAllCommentResponse fromEntity(Comment comment, String anonymous){
         return SearchAllCommentResponse.builder()
                 .id(comment.getId())
-                .communityId(comment.getCommunity().getId())
-                .memberId(comment.getMember().getId())
+                .anonymous(anonymous)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();

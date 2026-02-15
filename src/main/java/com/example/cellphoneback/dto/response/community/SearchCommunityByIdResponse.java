@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-@Schema(description = "커뮤니티 ID로 조회한 응답 DTO")
+@Schema(description = "커뮤니티 상세 조회 응답 DTO")
 public class SearchCommunityByIdResponse {
 
     @Schema(description = "커뮤니티 ID", example = "1")

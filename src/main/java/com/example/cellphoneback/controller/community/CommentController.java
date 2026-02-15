@@ -35,11 +35,11 @@ public class CommentController {
                                                                @RequestAttribute Member member,
                                                                @RequestBody CreateCommentRequest request) {
 
-        Comment response = commentService.createComment(member, communityId, request);
+        CreateCommentResponse response = commentService.createComment(member, communityId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED) //201
-                .body(CreateCommentResponse.fromEntity(response));
+                .body(response);
     }
 
     @Operation(summary = "댓글 수정", description = "커뮤니티에 작성된 댓글을 수정합니다. 작성자만 접근할 수 있습니다.")
@@ -48,10 +48,10 @@ public class CommentController {
                                                              @PathVariable Integer commentId,
                                                              @RequestAttribute Member member,
                                                              @RequestBody EditCommentRequest request) {
-        Comment response = commentService.editComment(communityId, commentId, member, request);
+        EditCommentResponse response = commentService.editComment(communityId, commentId, member, request);
         return ResponseEntity
                 .status(HttpStatus.OK) //200
-                .body(EditCommentResponse.fromEntity(response));
+                .body(response);
     }
 
     @Operation(summary = "댓글 삭제", description = "커뮤니티에 작성된 댓글을 삭제합니다. 작성자만 접근할 수 있습니다.")
@@ -69,14 +69,11 @@ public class CommentController {
     @Operation(summary = "댓글 전체 목록 조회", description = "커뮤니티 글에 작성된 모든 댓글을 조회합니다. 모든 사용자가 접근할 수 있습니다.")
     @GetMapping("/{communityId}")
     public ResponseEntity<List<SearchAllCommentResponse>> getComments(@PathVariable Integer communityId) {
-        List<Comment> response = commentService.searchAllComment(communityId);
 
-        List<SearchAllCommentResponse> responseList = response.stream()
-                .map(SearchAllCommentResponse::fromEntity)
-                .collect(Collectors.toList());
+        List<SearchAllCommentResponse> response = commentService.searchAllComment(communityId);
 
         return ResponseEntity
                 .status(HttpStatus.OK) //200
-                .body(responseList);
+                .body(response);
     }
 }

@@ -54,7 +54,7 @@ public class DashboardService {
             );
 
             SearchAllNoticeResponse notices = safeCall(
-                    () -> noticeService.searchAllNotice(member, keyword),
+                    () -> noticeService.searchAllNotice(keyword),
                     SearchAllNoticeResponse.builder()
                             .noticeList(List.of())
                             .build()
@@ -128,7 +128,7 @@ public class DashboardService {
             );
 
             SearchAllNoticeResponse notices = safeCall(
-                    () -> noticeService.searchAllNotice(member, keyword),
+                    () -> noticeService.searchAllNotice(keyword),
                     SearchAllNoticeResponse.builder()
                             .noticeList(List.of())
                             .build()
