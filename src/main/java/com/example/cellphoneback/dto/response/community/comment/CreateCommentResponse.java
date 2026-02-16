@@ -15,6 +15,9 @@ public class CreateCommentResponse {
     @Schema(description = "댓글이 속한 커뮤니티 ID", example = "10")
     private Integer communityId;
 
+    @Schema(description = "작성자(멤버) ID", example = "02948b")
+    private String memberId;
+
     @Schema(description = "익명 작성자 번호", example = "익명1")
     private String anonymous;
 
@@ -27,6 +30,7 @@ public class CreateCommentResponse {
     public static CreateCommentResponse fromEntity(Comment comment, String anonymous){
         return CreateCommentResponse.builder()
                 .communityId(comment.getCommunity().getId())
+                .memberId(comment.getMember().getId())
                 .anonymous(anonymous)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())

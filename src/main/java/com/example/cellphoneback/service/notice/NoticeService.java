@@ -247,7 +247,7 @@ public class NoticeService {
         }
 
         Notice notice = noticeRepository.findById(noticeId)
-                .orElseThrow(() -> new IllegalStateException("공지사항 없음"));
+                .orElseThrow(() -> new IllegalArgumentException("공지사항 없음"));
 
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("업로드할 파일이 없습니다."); //400
