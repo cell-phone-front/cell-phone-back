@@ -15,6 +15,9 @@ public class SearchAllCommentResponse {
     @Schema(description = "댓글 ID", example = "1")
     private Integer id;
 
+    @Schema(description = "작성자(멤버) ID", example = "02948b")
+    private String memberId;
+
     @Schema(description = "익명 작성자 번호", example = "익명1")
     private String anonymous;
 
@@ -28,6 +31,7 @@ public class SearchAllCommentResponse {
     public static SearchAllCommentResponse fromEntity(Comment comment, String anonymous){
         return SearchAllCommentResponse.builder()
                 .id(comment.getId())
+                .memberId(comment.getMember().getId())
                 .anonymous(anonymous)
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
