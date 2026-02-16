@@ -73,7 +73,10 @@ public class MachineService {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<MachineBulkUpsertRequest.Item> items = request.getMachineList();
+        List<MachineBulkUpsertRequest.Item> rawItems =
+                request.getMachineList() == null ? List.of() : request.getMachineList();
+
+        List<MachineBulkUpsertRequest.Item> items = rawItems;
         List<String> machineIds = items.stream()
                 .map(i -> i.getId() == null ? "" : i.getId().trim())
                 .toList();
