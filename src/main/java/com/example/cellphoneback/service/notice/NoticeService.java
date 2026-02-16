@@ -94,7 +94,7 @@ public class NoticeService {
         notice.setContent(request.getContent());
 
         if (request.getPinned() != null) {
-            notice.setPinned(Boolean.TRUE.equals(request.getPinned()));
+            notice.setPinned(request.getPinned());
         }
 
         // 삭제할 ID 리스트가 null 아니거나 비어있지 않다면 해당 noticeId로 조회하고 request로 받은 ID에 포함되어 있다면 삭제

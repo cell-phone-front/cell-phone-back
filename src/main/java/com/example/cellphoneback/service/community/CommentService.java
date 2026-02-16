@@ -72,7 +72,7 @@ public class CommentService {
         return "익명" + map.get(memberId);
     }
 
-    //    community	PUT	/api/comment/{communityId}/	댓글 수정	planner, worker	pathvariable={communityId}
+    //    community	PUT	/api/comment/{communityId}/{commentId}	댓글 수정	planner, worker	pathvariable={communityId}
     public EditCommentResponse editComment(Integer communityId, Integer commentId, Member member, EditCommentRequest request) {
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
