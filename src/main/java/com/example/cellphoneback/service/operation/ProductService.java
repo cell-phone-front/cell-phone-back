@@ -79,7 +79,11 @@ public class ProductService {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
-        List<ProductBulkUpsertRequest.Item> items = request.getProductList();
+
+        List<ProductBulkUpsertRequest.Item> rawItem =
+                request.getProductList() == null ? List.of() : request.getProductList();
+
+        List<ProductBulkUpsertRequest.Item> items = rawItem;
 
         List<String> itemIds = items.stream()
                 .map(i -> i.getId() == null ? "" : i.getId().trim())

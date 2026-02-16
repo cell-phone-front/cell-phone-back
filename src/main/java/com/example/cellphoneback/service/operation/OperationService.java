@@ -79,7 +79,10 @@ public class OperationService {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<OperationBulkUpsertRequest.Item> items = request.getOperationList();
+        List<OperationBulkUpsertRequest.Item> rawItem =
+                request.getOperationList() == null ? List.of() : request.getOperationList();
+
+        List<OperationBulkUpsertRequest.Item> items = rawItem;
         List<String> itemIds = items.stream()
                 .map(i -> i.getId() == null ? "" : i.getId().trim())
                 .toList();

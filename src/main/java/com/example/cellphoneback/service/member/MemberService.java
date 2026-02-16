@@ -103,8 +103,10 @@ public class MemberService {
         if (!member.getRole().equals(Role.ADMIN)) {
             throw new SecurityException("ADMIN 권한이 없습니다.");
         }
+        List<MemberBulkUpsertRequest.Item> rawItems =
+                request.getMemberList() == null ? List.of() : request.getMemberList();
 
-        List<MemberBulkUpsertRequest.Item> items = request.getMemberList();
+        List<MemberBulkUpsertRequest.Item> items = rawItems;
 
         // items 를 Entity로 변환
         List<Member> reqMembers = items.stream()

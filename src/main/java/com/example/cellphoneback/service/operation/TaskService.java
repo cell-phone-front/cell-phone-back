@@ -99,7 +99,10 @@ public class TaskService {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
 
-        List<TaskBulkUpsertRequest.Item> items = request.getTaskList();
+        List<TaskBulkUpsertRequest.Item> rawItem =
+                request.getTaskList() == null ? List.of() : request.getTaskList();
+
+        List<TaskBulkUpsertRequest.Item> items = rawItem;
         List<String> taskIds = items.stream()
                 .map(e -> e.getId() == null ? "" : e.getId().trim())
                 .toList();

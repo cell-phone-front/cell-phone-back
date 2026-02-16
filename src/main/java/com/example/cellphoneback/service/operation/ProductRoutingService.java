@@ -83,7 +83,11 @@ public class ProductRoutingService {
         if (!member.getRole().equals(Role.ADMIN) && !member.getRole().equals(Role.PLANNER)) {
             throw new SecurityException("ADMIN, PLANNER 권한이 없습니다.");
         }
-        List<ProductRoutingBulkUpsertRequest.Item> items = request.getProductRoutingList();
+
+        List<ProductRoutingBulkUpsertRequest.Item> rawItem =
+                request.getProductRoutingList() == null ? List.of() : request.getProductRoutingList();
+
+        List<ProductRoutingBulkUpsertRequest.Item> items = rawItem;
         // 아디가 String이 아닌 int 이므로 Integer로 받는다.
         List<String> itemIds = items.stream()
                 .map(i -> i.getId() == null ? "" : i.getId().trim())
