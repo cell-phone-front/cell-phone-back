@@ -30,11 +30,11 @@ public class CommentService {
     public CreateCommentResponse createComment(Member member, Integer communityId, CreateCommentRequest request) {
 
         if (!member.getRole().equals(Role.PLANNER) && !member.getRole().equals(Role.WORKER)) {
-            throw new SecurityException("댓글 작성 권한이 없습니다.");
+            throw new SecurityException("PLANNER, WORKER 권한이 없습니다.");
         }
 
         Community community = communityRepository.findById(communityId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
         Comment comment = request.toEntity();
         comment.setMember(member);
